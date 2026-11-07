@@ -61,6 +61,9 @@ export function resolveAffiliateUrl(
   }
   const url = new URL(program.baseUrl);
   url.searchParams.set(program.paramKey || 'ref', code);
+  if (affiliateId === 'aimlapi') {
+    url.searchParams.set('utm_source', 'affiliate');
+  }
   if (subIdSlug) {
     url.searchParams.set('utm_campaign', subIdSlug.replace(/[^a-zA-Z0-9_-]/g, ''));
   }
