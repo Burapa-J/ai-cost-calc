@@ -1,0 +1,6 @@
+.verify/
+todo.md
+dist/
+node_modules/
+.DS_Store
+telemetry-events.jsonl
