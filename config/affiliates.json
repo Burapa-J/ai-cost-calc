@@ -44,16 +44,16 @@
     },
     "vercel": {
       "id": "vercel",
-      "name": "Vercel / v0 Frontend & AI Cloud",
+      "name": "Cloudways Managed App & AI Cloud (Vercel Alternative)",
       "category": "cloud_vps",
       "commissionLabel": {
-        "en": "30% Recurring (6 months) + $5 per qualified lead",
-        "th": "ค่าคอม 30% นาน 6 เดือน + $5 ต่อ Lead ที่ผ่านเกณฑ์"
+        "en": "$50–$125 CPA per signup or Hybrid Recurring",
+        "th": "ค่าคอม $50–$125 ต่อลูกค้าใหม่ (ประมาณ 1,700–4,300 บาท/เคส)"
       },
-      "estimatedPayoutUsd": 35,
-      "baseUrl": "https://vercel.com/",
-      "paramKey": "utm_source",
-      "affiliateCode": "YOUR_VERCEL_ID"
+      "estimatedPayoutUsd": 85,
+      "baseUrl": "https://www.cloudways.com/en/",
+      "paramKey": "id",
+      "affiliateCode": "2225344"
     },
     "hostatom": {
       "id": "hostatom",
