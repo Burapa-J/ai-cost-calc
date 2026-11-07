@@ -77,9 +77,9 @@
         "th": "ค่าคอมสูงสุด 33% สำหรับ Cloud VPS ไทยพร้อมทีมดูแล"
       },
       "estimatedPayoutUsd": 30,
-      "baseUrl": "https://ruk-com.in.th/",
+      "baseUrl": "https://portal.ruk-com.cloud/aff.php",
       "paramKey": "aff",
-      "affiliateCode": "YOUR_RUKCOM_ID"
+      "affiliateCode": "1874"
     },
     "agensi": {
       "id": "agensi",
