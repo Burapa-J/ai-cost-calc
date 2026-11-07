@@ -26,7 +26,10 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
 
     const thHome = fs.readFileSync(path.join(distPath, 'th', 'index.html'), 'utf8');
     assert.equal(thHome.includes('TCO // BENCHMARK.26'), true);
-    assert.equal(thHome.includes('--paper: #F6F5F0'), true);
+    assert.equal(thHome.includes('--paper: #FBFBFD'), true);
+    assert.equal(thHome.includes('backdrop-filter: saturate(180%) blur(20px)'), true);
+    assert.equal(thHome.includes('YOUR_AGENSI_ID'), true);
+    assert.equal(thHome.includes('จ่ายที่เดียวจบ ไม่ต้องแยกหลายบิล'), true);
     assert.equal(thHome.includes('https://abacus.jasoncameron.dev/hit/'), true);
     assert.equal(thHome.includes('burapa_ai_cost_calc_live'), true);
     assert.equal(

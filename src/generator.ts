@@ -1,8 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { calculateCostComparison, sanitizeIndexNowKey, sanitizeWorkloadInput } from './calculator.ts';
+import {
+  calculateCostComparison,
+  resolveAffiliateUrl,
+  sanitizeIndexNowKey,
+  sanitizeWorkloadInput
+} from './calculator.ts';
 import {
   type AffiliateConfigFile,
+  AGENT_SKILLS_CATALOG,
   CLOUD_GPUS,
   CLOUD_VPS_OPTIONS,
   LLM_MODELS,
@@ -24,18 +30,19 @@ function escapeHtml(text: string): string {
 function renderSharedStyles(): string {
   return `
     :root {
-      --paper: #F6F5F0;
+      --paper: #FBFBFD;
       --surface: #FFFFFF;
-      --surface-alt: #EFECE4;
-      --ink: #141413;
-      --ink-secondary: #575651;
-      --ink-muted: #85837C;
-      --line: #DCD9CF;
-      --line-strong: #141413;
-      --signal: #C83E1D;
-      --ledger-green: #165B33;
-      --mono: "JetBrains Mono", "SF Mono", "Menlo", "Consolas", monospace;
-      --sans: "Inter", -apple-system, BlinkMacSystemFont, "Noto Sans Thai", "Thonburi", sans-serif;
+      --surface-alt: #F5F5F7;
+      --ink: #1D1D1F;
+      --ink-secondary: #515154;
+      --ink-muted: #86868B;
+      --line: rgba(0, 0, 0, 0.08);
+      --line-strong: rgba(0, 0, 0, 0.14);
+      --accent: #0066CC;
+      --ledger-green: #1D7D3F;
+      --mono: "SF Mono", "JetBrains Mono", "Menlo", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Noto Sans Thai", sans-serif;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     }
     * { box-sizing: border-box; }
     body {
@@ -43,132 +50,189 @@ function renderSharedStyles(): string {
       font-family: var(--sans);
       background: var(--paper);
       color: var(--ink);
-      line-height: 1.5;
+      line-height: 1.55;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
-    a { color: var(--ink); text-decoration: none; }
-    .shell {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 0 20px 80px;
+    a { color: var(--accent); text-decoration: none; transition: opacity 0.2s var(--ease-out); }
+    a:hover { opacity: 0.78; }
+    @keyframes settleIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .nav-glass {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(251, 251, 253, 0.8);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--line);
     }
     .masthead {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 52px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 0;
-      border-bottom: 1.5px solid var(--line-strong);
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      flex-wrap: wrap;
-      gap: 12px;
+      font-size: 0.8rem;
     }
     .brand-mark {
-      font-weight: 700;
+      font-weight: 600;
       color: var(--ink);
-      letter-spacing: 0.06em;
+      letter-spacing: -0.01em;
+      font-size: 0.9rem;
     }
     .nav-bar {
       display: flex;
-      gap: 18px;
+      gap: 22px;
       align-items: center;
-      flex-wrap: wrap;
     }
     .nav-link {
       color: var(--ink-secondary);
-      padding: 3px 0;
-      border-bottom: 1.5px solid transparent;
+      font-size: 0.78rem;
+      transition: color 0.2s var(--ease-out);
     }
     .nav-link:hover, .nav-link.active {
       color: var(--ink);
-      border-bottom-color: var(--ink);
+      font-weight: 500;
+      opacity: 1;
+    }
+    .shell {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 24px 96px;
+      animation: settleIn 0.55s var(--ease-out) both;
     }
     .hero-block {
-      padding: 36px 0 28px;
-      border-bottom: 1px solid var(--line);
+      padding: 56px 0 36px;
     }
     .kicker {
-      font-family: var(--mono);
-      font-size: 0.72rem;
+      font-size: 0.75rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--ink-secondary);
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
       margin-bottom: 10px;
     }
     h1 {
-      font-size: clamp(1.65rem, 3vw, 2.45rem);
+      font-size: clamp(2rem, 3.8vw, 3.1rem);
       font-weight: 600;
-      letter-spacing: -0.03em;
-      line-height: 1.15;
-      margin: 0 0 12px;
-      max-width: 28ch;
+      letter-spacing: -0.032em;
+      line-height: 1.1;
+      margin: 0 0 16px;
+      max-width: 24ch;
+      color: var(--ink);
     }
     .lead {
       color: var(--ink-secondary);
-      font-size: 0.98rem;
-      max-width: 68ch;
+      font-size: 1.08rem;
+      line-height: 1.6;
+      max-width: 64ch;
       margin: 0;
+      font-weight: 400;
+    }
+    .benefit-trio {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 28px;
+    }
+    @media (max-width: 860px) {
+      .benefit-trio { grid-template-columns: 1fr; }
+    }
+    .benefit-tile {
+      background: var(--surface-alt);
+      border-radius: 18px;
+      padding: 22px 24px;
+      transition: transform 0.35s var(--ease-out), background 0.35s var(--ease-out);
+    }
+    .benefit-tile:hover {
+      transform: translateY(-2px);
+    }
+    .benefit-title {
+      font-size: 0.94rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 0 0 6px;
+      letter-spacing: -0.01em;
+    }
+    .benefit-desc {
+      font-size: 0.84rem;
+      color: var(--ink-secondary);
+      margin: 0;
+      line-height: 1.5;
     }
     .ledger-frame {
       display: grid;
-      grid-template-columns: 390px 1fr;
-      border: 1px solid var(--line-strong);
-      background: var(--surface);
+      grid-template-columns: 370px 1fr;
+      gap: 24px;
       margin-top: 28px;
+      align-items: start;
     }
-    @media (max-width: 920px) {
+    @media (max-width: 940px) {
       .ledger-frame { grid-template-columns: 1fr; }
     }
     .panel-left {
-      border-right: 1px solid var(--line);
-      padding: 24px;
-      background: var(--paper);
+      position: sticky;
+      top: 72px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 26px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
     }
-    @media (max-width: 920px) {
-      .panel-left { border-right: none; border-bottom: 1px solid var(--line); }
+    @media (max-width: 940px) {
+      .panel-left { position: static; }
     }
     .panel-right {
-      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
     .section-tag {
-      font-family: var(--mono);
-      font-size: 0.7rem;
+      font-size: 0.72rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--ink-secondary);
-      padding-bottom: 10px;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--line);
       margin-bottom: 18px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
     .preset-strip {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      border: 1px solid var(--line);
+      gap: 6px;
+      background: var(--surface-alt);
+      padding: 4px;
+      border-radius: 12px;
       margin-bottom: 22px;
-      background: var(--surface);
     }
     .preset-btn {
       background: transparent;
       border: none;
-      border-right: 1px solid var(--line);
+      border-radius: 9px;
       padding: 8px 6px;
-      font-family: var(--mono);
-      font-size: 0.68rem;
+      font-family: var(--sans);
+      font-size: 0.74rem;
+      font-weight: 500;
       color: var(--ink-secondary);
       cursor: pointer;
-      text-align: center;
-      transition: background 0.12s, color 0.12s;
+      transition: background 0.25s var(--ease-out), color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
     }
-    .preset-btn:last-child { border-right: none; }
-    .preset-btn:hover { background: var(--ink); color: var(--surface); }
+    .preset-btn:hover {
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
     .field-row {
       margin-bottom: 18px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--line);
     }
     .field-top {
       display: flex;
@@ -184,115 +248,127 @@ function renderSharedStyles(): string {
     }
     .field-readout {
       font-family: var(--mono);
-      font-size: 0.86rem;
+      font-size: 0.84rem;
       font-weight: 600;
       color: var(--ink);
       font-variant-numeric: tabular-nums;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      padding: 2px 8px;
+      background: var(--surface-alt);
+      padding: 3px 9px;
+      border-radius: 8px;
     }
     input[type="range"] {
       -webkit-appearance: none;
       appearance: none;
       width: 100%;
-      height: 2px;
-      background: var(--line-strong);
+      height: 4px;
+      background: #E5E5EA;
+      border-radius: 999px;
       outline: none;
       cursor: pointer;
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 12px;
-      height: 12px;
-      background: var(--ink);
-      border: 1.5px solid var(--surface);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
       cursor: pointer;
+      transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.08);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
     }
     .verdict-cell {
-      padding: 24px 28px;
-      border-bottom: 1px solid var(--line-strong);
+      padding: 28px 30px;
+      border-radius: 20px;
       background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 20px;
+      align-items: center;
+      gap: 24px;
       flex-wrap: wrap;
     }
-    .verdict-meta { max-width: 64ch; }
+    .verdict-meta { max-width: 60ch; }
     .verdict-title {
-      font-size: 1.35rem;
+      font-size: 1.45rem;
       font-weight: 600;
-      letter-spacing: -0.02em;
-      margin: 4px 0 6px;
+      letter-spacing: -0.025em;
+      margin: 4px 0 8px;
       font-variant-numeric: tabular-nums;
+      color: var(--ink);
     }
     .verdict-copy {
-      font-size: 0.88rem;
+      font-size: 0.92rem;
       color: var(--ink-secondary);
       margin: 0;
+      line-height: 1.55;
     }
     .btn-primary {
       display: inline-block;
       background: var(--ink);
       color: var(--surface);
-      font-family: var(--mono);
-      font-size: 0.76rem;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 12px 18px;
-      border: 1px solid var(--ink);
+      font-size: 0.84rem;
+      font-weight: 500;
+      padding: 12px 22px;
+      border-radius: 999px;
+      border: none;
       cursor: pointer;
       white-space: nowrap;
-      transition: background 0.12s, color 0.12s;
+      transition: transform 0.25s var(--ease-out), background 0.25s var(--ease-out), opacity 0.25s var(--ease-out);
     }
     .btn-primary:hover {
-      background: var(--signal);
-      border-color: var(--signal);
+      background: #333336;
       color: #fff;
+      transform: scale(1.015);
+      opacity: 1;
     }
     .btn-outline {
       width: 100%;
-      background: var(--surface);
+      background: var(--surface-alt);
       color: var(--ink);
-      font-family: var(--mono);
-      font-size: 0.74rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      padding: 10px 14px;
-      border: 1px solid var(--line-strong);
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 11px 16px;
+      border-radius: 12px;
+      border: 1px solid transparent;
       cursor: pointer;
+      transition: background 0.2s var(--ease-out);
     }
     .btn-outline:hover {
-      background: var(--ink);
-      color: var(--surface);
+      background: #E8E8ED;
     }
     .table-block {
-      padding: 22px 28px;
-      border-bottom: 1px solid var(--line);
+      padding: 26px 28px;
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
     }
-    .table-block:last-child { border-bottom: none; }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.86rem;
+      font-size: 0.88rem;
       font-variant-numeric: tabular-nums;
     }
     th {
-      font-family: var(--mono);
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       color: var(--ink-muted);
       text-align: left;
-      padding: 8px 10px 8px 0;
+      padding: 8px 10px 10px 0;
       border-bottom: 1px solid var(--line-strong);
-      font-weight: 500;
+      font-weight: 600;
     }
     th.num, td.num { text-align: right; }
     td {
-      padding: 11px 10px 11px 0;
+      padding: 14px 10px 14px 0;
       border-bottom: 1px solid var(--line);
       vertical-align: middle;
     }
@@ -302,48 +378,67 @@ function renderSharedStyles(): string {
       font-weight: 600;
       color: var(--ink);
     }
-    .sub-val {
+    .savings-val {
       font-family: var(--mono);
-      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--ledger-green);
+    }
+    .sub-val {
+      font-size: 0.78rem;
       color: var(--ink-secondary);
       display: block;
+      margin-top: 2px;
+    }
+    .bar-track {
+      width: 100%;
+      max-width: 140px;
+      height: 4px;
+      background: var(--surface-alt);
+      border-radius: 999px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: var(--ink);
+      border-radius: 999px;
+      transition: width 0.45s var(--ease-out);
     }
     .action-link {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--signal);
-      border-bottom: 1px solid currentColor;
-      padding-bottom: 1px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--accent);
+      white-space: nowrap;
     }
-    .action-link:hover { color: var(--ink); }
     .standalone-section {
-      margin-top: 32px;
+      margin-top: 24px;
+      border-radius: 20px;
       border: 1px solid var(--line);
       background: var(--surface);
-      padding: 24px 28px;
+      padding: 26px 28px;
     }
     .index-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      border-top: 1px solid var(--line);
-      border-left: 1px solid var(--line);
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 10px;
       margin-top: 14px;
     }
     .index-cell {
-      padding: 10px 12px;
-      border-right: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-      font-size: 0.8rem;
-      color: var(--ink-secondary);
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--surface-alt);
+      font-size: 0.82rem;
+      color: var(--ink);
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 8px;
+      transition: background 0.2s var(--ease-out), transform 0.2s var(--ease-out);
     }
     .index-cell:hover {
-      background: var(--surface-alt);
-      color: var(--ink);
+      background: #E8E8ED;
+      transform: translateY(-1px);
+      opacity: 1;
     }
   `;
 }
@@ -358,7 +453,7 @@ function selectRelatedSpecs(
   }
   const current = allPages.find((p) => p.slug === currentSlug);
   if (!current) {
-    return allPages.slice(0, 24);
+    return allPages.slice(0, 8);
   }
   const sameCategory = allPages.filter(
     (p) =>
@@ -366,7 +461,7 @@ function selectRelatedSpecs(
       (p.category === current.category ||
         (current.primaryModelId && p.primaryModelId === current.primaryModelId))
   );
-  return sameCategory.slice(0, 24);
+  return sameCategory.slice(0, 8);
 }
 
 function renderCalculatorPage(
@@ -391,70 +486,97 @@ function renderCalculatorPage(
     : `${rootPrefix}/${alternateLang}/index.html`;
 
   const relatedPages = selectRelatedSpecs(pageSlug, allPages, !isComparisonSubpage);
+  const maxInitialApiUsd = Math.max(...initialCalc.apiOptions.map((a) => a.monthlyUsd), 1);
+
+  const flagshipInitial =
+    initialCalc.apiOptions.find((a) => a.modelId === 'claude-3-7-sonnet') ??
+    initialCalc.apiOptions[initialCalc.apiOptions.length - 1];
 
   const labels =
     locale === 'th'
       ? {
-          kicker: 'ตารางวิเคราะห์ต้นทุนโครงสร้างพื้นฐาน AI // อัปเดต 2026',
+          kicker: 'TCO // BENCHMARK.26 — เครื่องมือช่วยวางแผนงบ AI ตามการใช้งานจริง',
           subtitle:
-            'เปรียบเทียบต้นทุนจริงรายเดือนระหว่างการเรียกใช้ LLM API (รวมส่วนลด Prompt Caching และตัวคูณ Agent หลายขั้นตอน) เทียบกับการเช่าเครื่อง Cloud GPU รายชั่วโมง และเซิร์ฟเวอร์ Cloud VPS',
-          workloadTag: '01 // ตัวแปรปริมาณงาน (WORKLOAD PARAMETERS)',
-          presetStartup: '1.5K งาน/วัน',
-          presetAgent: '5K AGENT',
-          presetHigh: '25K องค์กร',
-          reqLabel: 'จำนวนงานต่อวัน (Tasks / Day)',
-          agentLabel: 'จำนวนรอบที่เรียกโมเดลต่อ 1 งาน (Agent Steps)',
-          inTokLabel: 'Input Tokens ต่อรอบ (Prompt + Context)',
-          outTokLabel: 'Output Tokens ต่อรอบ (Completion)',
-          cacheLabel: 'อัตราส่วน Prompt Cache Hit (%)',
-          hoursLabel: 'ชั่วโมงเปิดเครื่อง GPU ต่อวัน (Active Hours)',
-          shareBtn: 'คัดลอกลิงก์พารามิเตอร์ชุดนี้',
-          winnerTag: '02 // ข้อสรุปต้นทุนต่ำสุด (OPTIMAL TCO VERDICT)',
-          apiTableTag: '03 // ตารางต้นทุน MANAGED LLM API (เรียงจากถูกสุด)',
-          gpuTableTag: '04 // ตารางเช่า DEDICATED CLOUD GPU และจุดคุ้มทุน',
-          vpsTableTag: '05 // ตาราง CLOUD VPS สำหรับรันระบบหลังบ้าน (ไทย & สากล)',
-          colModel: 'รุ่นโมเดล / สเปกเครื่อง',
-          colMonthly: 'รายเดือน (USD / THB)',
-          colMetric: 'ต้นทุนต่อหน่วย / จุดคุ้มทุน',
-          colAction: 'ผู้ให้บริการ',
-          ctaTryApi: 'เปิดดูเรทราคา API',
-          ctaRentGpu: 'เช่าเครื่อง GPU',
-          ctaHostVps: 'ดูแพ็กเกจ VPS',
-          faqTag: '06 // ข้อมูลจำเพาะทางเทคนิค (SPECIFICATION NOTES)',
+            'เทียบให้เห็นชัดๆ ว่างานของคุณควรจ่ายเป็นครั้งตามที่ใช้จริง หรือเช่าเหมาชั่วโมงถึงจะประหยัดที่สุด พร้อมวิธีตั้งค่าให้ใช้งานได้นานขึ้นโดยโควต้าไม่หมดไว และรวมบิลจ่ายที่เดียวจบ',
+          b1Title: 'จ่ายที่เดียวจบ ไม่ต้องแยกหลายบิล',
+          b1Desc:
+            'เช่น แทนที่จะต้องผูกบัตรเติมเงินแยกทั้ง OpenAI, Claude และ Gemini คุณสามารถใช้คีย์เดียวสลับโมเดลตามความยากของงานได้เลย',
+          b2Title: 'ทำงานได้นานขึ้นในงบเท่าเดิม',
+          b2Desc:
+            'เช่น เวลาสั่งแก้โค้ดหรือสรุปเอกสาร หากเปิดใช้ระบบจำข้อความซ้ำ (Cache) และตั้งค่าให้อ่านเฉพาะจุดสำคัญ จะยืดโควต้าใช้งานได้เกือบเท่าตัว',
+          b3Title: 'รู้เพดานรายจ่าย ไม่มีบิลช็อกสิ้นเดือน',
+          b3Desc:
+            'เมื่อทีมเริ่มใช้งานหนักขึ้น ตารางจะบอกจุดตัดทันทีว่าต้องมีงานกี่ครั้งต่อวัน การเปลี่ยนไปเช่าเครื่องรายชั่วโมงถึงจะถูกกว่า',
+          workloadTag: 'ปรับตามลักษณะงานจริงของคุณ',
+          presetStartup: 'งานทั่วไป / ทีมเล็ก',
+          presetAgent: 'สั่งงานต่อเนื่องหลายขั้นตอน',
+          presetHigh: 'เปิดระบบบริการลูกค้าทั้งวัน',
+          reqLabel: 'จำนวนงานที่สั่งต่อวัน (ครั้ง/วัน)',
+          agentLabel: 'ความซับซ้อน (AI ต้องคิดกี่รอบต่อ 1 งาน)',
+          inTokLabel: 'ปริมาณข้อมูลที่ส่งเข้าไปต่อรอบ (Input Tokens)',
+          outTokLabel: 'ความยาวคำตอบที่ได้รับต่อรอบ (Output Tokens)',
+          cacheLabel: 'สัดส่วนข้อมูลเดิมที่ใช้ซ้ำได้ (Prompt Cache %)',
+          hoursLabel: 'จำนวนชั่วโมงที่ต้องเปิดระบบต่อวัน',
+          shareBtn: 'คัดลอกลิงก์ผลคำนวณนี้ไว้ส่งต่อ',
+          winnerTag: 'ทางเลือกที่ประหยัดและสะดวกที่สุดสำหรับคุณ',
+          apiTableTag: '1. แบบจ่ายตามที่ใช้จริง (รวมทุกโมเดลในบิลเดียว ไม่ต้องดูแลเครื่อง)',
+          gpuTableTag: '2. แบบเช่าเครื่องส่วนตัวรายชั่วโมง (เหมาะกับงานหนัก คุมงบรายเดือนนิ่ง)',
+          vpsTableTag: '3. เซิร์ฟเวอร์สำหรับรันหน้าเว็บและระบบหลังบ้าน (มีทีมดูแลให้ครบ)',
+          skillsTableTag: '4. ชุดคำสั่งเสริมช่วยให้ AI ประหยัดโควต้าและทำงานจบไวขึ้น (Agensi.io)',
+          colModel: 'ตัวเลือก / ประโยชน์ที่ได้รับจริง',
+          colMonthly: 'ค่าใช้จ่าย / เดือน',
+          colMetric: 'ความคุ้มค่า / จุดตัด',
+          colAction: 'รายละเอียด',
+          ctaTryApi: 'ดูวิธีรวมบิลที่เดียว',
+          ctaRentGpu: 'ดูสเปกเครื่องเช่า',
+          ctaHostVps: 'ดูแพ็กเกจเซิร์ฟเวอร์',
+          ctaSkill: 'ดูชุดคำสั่งลดโควต้า',
+          faqTag: 'คำถามจากการใช้งานจริง',
           directoryTag: isComparisonSubpage
-            ? '07 // หน้าคำนวณที่เกี่ยวข้อง (RELATED MODELS)'
-            : `07 // ดัชนีหน้าคำนวณทั้งหมด (${allPages.length} MODELS)`
+            ? 'เปรียบเทียบเคสอื่นๆ ที่ใกล้เคียงกัน'
+            : `รวมหน้าคำนวณแยกตามรูปแบบงานจริง (${allPages.length} รูปแบบ)`
         }
       : {
-          kicker: 'INFRASTRUCTURE UNIT ECONOMICS LEDGER // 2026 REVISION',
+          kicker: 'TCO // BENCHMARK.26 — PRACTICAL AI COST & QUOTA PLANNER',
           subtitle:
-            'Model monthly production spend across pay-per-token LLM APIs (incorporating prompt caching & sequential agent steps), dedicated Cloud GPU instances, and managed VPS infrastructure.',
-          workloadTag: '01 // WORKLOAD PARAMETERS',
-          presetStartup: '1.5K SAAS',
-          presetAgent: '5K AGENT',
-          presetHigh: '25K SCALE',
-          reqLabel: 'Daily User Tasks',
-          agentLabel: 'Sequential Agent Steps / Task',
-          inTokLabel: 'Input Tokens / Step',
-          outTokLabel: 'Output Tokens / Step',
-          cacheLabel: 'Prompt Cache Hit Rate (%)',
-          hoursLabel: 'Active GPU Hours / Day',
-          shareBtn: 'Copy Parameter Permalink',
-          winnerTag: '02 // LOWEST TCO VERDICT',
-          apiTableTag: '03 // MANAGED LLM API LEDGER',
-          gpuTableTag: '04 // DEDICATED CLOUD GPU BREAK-EVEN LEDGER',
-          vpsTableTag: '05 // CLOUD VPS & APPLICATION HOSTING LEDGER',
-          colModel: 'Model / Hardware Spec',
-          colMonthly: 'Monthly Bill (USD / THB)',
-          colMetric: 'Unit Cost / Break-Even',
-          colAction: 'Provider',
-          ctaTryApi: 'Inspect API Tier',
-          ctaRentGpu: 'Provision GPU',
-          ctaHostVps: 'Inspect VPS',
-          faqTag: '06 // SPECIFICATION NOTES',
+            'See clearly whether pay-as-you-go API billing or hourly dedicated rental costs less for your daily workload—plus practical ways to stretch your quota further and consolidate billing in one place.',
+          b1Title: 'One-Stop Billing, Zero Juggling',
+          b1Desc:
+            'Real example: Instead of maintaining separate credit balances across OpenAI, Anthropic, and Google, route routine tasks to low-cost models and hard tasks to flagship models from a single account.',
+          b2Title: 'Work Longer Without Hitting Limits',
+          b2Desc:
+            'Real example: Reusing cached context and guiding coding agents to read only changed lines stretches your daily token budget significantly further.',
+          b3Title: 'Predictable Monthly Ceiling',
+          b3Desc:
+            'See the exact daily volume where switching from per-token billing to a flat hourly GPU caps your monthly bill with zero surprise overages.',
+          workloadTag: 'Match Your Daily Usage',
+          presetStartup: 'Solo / Small Team',
+          presetAgent: 'Multi-Step Workflows',
+          presetHigh: 'All-Day Production',
+          reqLabel: 'Tasks per Day',
+          agentLabel: 'Steps AI Runs per Task',
+          inTokLabel: 'Input Context per Step (Tokens)',
+          outTokLabel: 'Output Length per Step (Tokens)',
+          cacheLabel: 'Repeated Context Reuse (Cache %)',
+          hoursLabel: 'Active System Hours per Day',
+          shareBtn: 'Copy Shareable Link for This Scenario',
+          winnerTag: 'Most Cost-Effective Choice for Your Workload',
+          apiTableTag: '1. Pay-As-You-Go APIs (One-Stop Billing, Zero Maintenance)',
+          gpuTableTag: '2. Dedicated Hourly GPUs (Fixed Ceiling for Heavy Workloads)',
+          vpsTableTag: '3. Managed Cloud Servers for Web & Backend Systems',
+          skillsTableTag: '4. Ready-to-Use Agent Workflows to Stretch Token Quota (Agensi.io)',
+          colModel: 'Option / Practical Benefit',
+          colMonthly: 'Monthly Cost',
+          colMetric: 'Efficiency / Break-Even',
+          colAction: 'Details',
+          ctaTryApi: 'View Single-Bill Option',
+          ctaRentGpu: 'View Hourly GPU',
+          ctaHostVps: 'View Managed Server',
+          ctaSkill: 'View Workflow Skill',
+          faqTag: 'Practical Questions & Examples',
           directoryTag: isComparisonSubpage
-            ? '07 // RELATED COST MODELS'
-            : `07 // COMPLETE CALCULATION INDEX (${allPages.length} MODELS)`
+            ? 'Related Workload Comparisons'
+            : `All Workload & Model Calculators (${allPages.length})`
         };
 
   const canonicalUrl = isComparisonSubpage
@@ -496,10 +618,18 @@ function renderCalculatorPage(
     ? `\n  <meta name="google-site-verification" content="${escapeHtml(affiliateConfig.googleSiteVerification)}" />`
     : '';
 
+  const compactPrograms = Object.fromEntries(
+    Object.entries(affiliateConfig.programs).map(([k, v]) => [
+      k,
+      { baseUrl: v.baseUrl, paramKey: v.paramKey, affiliateCode: v.affiliateCode }
+    ])
+  );
+
   const clientCatalogJson = JSON.stringify({
     models: LLM_MODELS.map(({ summary: _s, ...rest }) => rest),
     gpus: CLOUD_GPUS.map(({ summary: _s, bestForModels: _b, ...rest }) => rest),
-    affiliates: affiliateConfig,
+    skills: AGENT_SKILLS_CATALOG,
+    affiliates: { usdToThbDefault: affiliateConfig.usdToThbDefault, programs: compactPrograms },
     locale,
     pageSlug,
     initialWorkload
@@ -522,29 +652,45 @@ function renderCalculatorPage(
   <style>${renderSharedStyles()}</style>
 </head>
 <body>
-  <div class="shell">
+  <div class="nav-glass">
     <header class="masthead">
       <a class="brand-mark" href="${rootPrefix}/${locale}/index.html">TCO // BENCHMARK.26</a>
       <nav class="nav-bar">
-        <a class="nav-link" href="${rootPrefix}/${locale}/index.html">INDEX (${allPages.length})</a>
-        <a class="nav-link" href="${rootPrefix}/validation-dashboard.html">TELEMETRY</a>
-        <span>|</span>
-        <a class="nav-link ${locale === 'th' ? 'active' : ''}" href="${locale === 'th' ? '#' : alternatePath}">TH</a>
-        <a class="nav-link ${locale === 'en' ? 'active' : ''}" href="${locale === 'en' ? '#' : alternatePath}">EN</a>
+        <a class="nav-link" href="${rootPrefix}/${locale}/index.html">Models (${allPages.length})</a>
+        <a class="nav-link" href="${rootPrefix}/validation-dashboard.html">Live Stats</a>
+        <a class="nav-link ${locale === 'th' ? 'active' : ''}" href="${locale === 'th' ? '#' : alternatePath}">ภาษาไทย</a>
+        <a class="nav-link ${locale === 'en' ? 'active' : ''}" href="${locale === 'en' ? '#' : alternatePath}">English</a>
       </nav>
     </header>
+  </div>
 
+  <div class="shell">
     <section class="hero-block">
       <div class="kicker">${escapeHtml(labels.kicker)}</div>
       <h1>${escapeHtml(h1)}</h1>
       <p class="lead">${escapeHtml(labels.subtitle)}</p>
+
+      <div class="benefit-trio">
+        <div class="benefit-tile">
+          <div class="benefit-title">${escapeHtml(labels.b1Title)}</div>
+          <p class="benefit-desc">${escapeHtml(labels.b1Desc)}</p>
+        </div>
+        <div class="benefit-tile">
+          <div class="benefit-title">${escapeHtml(labels.b2Title)}</div>
+          <p class="benefit-desc">${escapeHtml(labels.b2Desc)}</p>
+        </div>
+        <div class="benefit-tile">
+          <div class="benefit-title">${escapeHtml(labels.b3Title)}</div>
+          <p class="benefit-desc">${escapeHtml(labels.b3Desc)}</p>
+        </div>
+      </div>
     </section>
 
     <div class="ledger-frame">
       <aside class="panel-left">
         <div class="section-tag">
           <span>${escapeHtml(labels.workloadTag)}</span>
-          <span>FX: 34.5 THB</span>
+          <span>1 USD = 34.5 THB</span>
         </div>
 
         <div class="preset-strip">
@@ -632,14 +778,19 @@ function renderCalculatorPage(
             </thead>
             <tbody id="api-tbody">
               ${initialCalc.apiOptions
-                .map(
-                  (api) => `<tr>
-                    <td><span class="mono-val">${escapeHtml(api.name)}</span><span class="sub-val">${escapeHtml(api.provider)}</span></td>
+                .map((api) => {
+                  const pct = Math.max(4, Math.round((api.monthlyUsd / maxInitialApiUsd) * 100));
+                  return `<tr>
+                    <td>
+                      <span class="mono-val">${escapeHtml(api.name)}</span>
+                      <span class="sub-val">${escapeHtml(api.provider)}</span>
+                      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+                    </td>
                     <td class="num"><span class="mono-val">$${api.monthlyUsd.toLocaleString()}</span><span class="sub-val">฿${api.monthlyThb.toLocaleString()}</span></td>
                     <td class="num"><span class="mono-val">$${api.costPer1kTasksUsd}</span><span class="sub-val">per 1k tasks</span></td>
-                    <td class="num"><a class="action-link" href="${escapeHtml(api.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${api.affiliateId}', ${api.monthlyUsd})">${escapeHtml(labels.ctaTryApi)}</a></td>
-                  </tr>`
-                )
+                    <td class="num"><a class="action-link" href="${escapeHtml(api.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${api.affiliateId}', ${api.monthlyUsd})">${escapeHtml(labels.ctaTryApi)} →</a></td>
+                  </tr>`;
+                })
                 .join('\n')}
             </tbody>
           </table>
@@ -648,7 +799,7 @@ function renderCalculatorPage(
         <div class="table-block">
           <div class="section-tag">
             <span>${escapeHtml(labels.gpuTableTag)}</span>
-            <span>DEDICATED HOURLY</span>
+            <span>FLAT HOURLY</span>
           </div>
           <table>
             <thead>
@@ -663,10 +814,10 @@ function renderCalculatorPage(
               ${initialCalc.gpuOptions
                 .map(
                   (gpu) => `<tr>
-                    <td><span class="mono-val">${escapeHtml(gpu.name)}</span><span class="sub-val">${gpu.instancesNeeded}x instance // ${gpu.vramGb}GB VRAM</span></td>
+                    <td><span class="mono-val">${escapeHtml(gpu.name)}</span><span class="sub-val">${gpu.instancesNeeded}x machine // ${gpu.vramGb}GB VRAM</span></td>
                     <td class="num"><span class="mono-val">$${gpu.monthlyUsd.toLocaleString()}</span><span class="sub-val">฿${gpu.monthlyThb.toLocaleString()}</span></td>
                     <td class="num"><span class="mono-val">${gpu.breakEvenTasksPerDayVsFlagshipApi.toLocaleString()}</span><span class="sub-val">tasks/day break-even</span></td>
-                    <td class="num"><a class="action-link" href="${escapeHtml(gpu.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${gpu.affiliateId}', ${gpu.monthlyUsd})">${escapeHtml(labels.ctaRentGpu)}</a></td>
+                    <td class="num"><a class="action-link" href="${escapeHtml(gpu.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${gpu.affiliateId}', ${gpu.monthlyUsd})">${escapeHtml(labels.ctaRentGpu)} →</a></td>
                   </tr>`
                 )
                 .join('\n')}
@@ -676,8 +827,38 @@ function renderCalculatorPage(
 
         <div class="table-block">
           <div class="section-tag">
+            <span>${escapeHtml(labels.skillsTableTag)}</span>
+            <span>WORK LONGER / PAY LESS</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>${escapeHtml(labels.colModel)}</th>
+                <th class="num">Est. Savings</th>
+                <th class="num">${escapeHtml(labels.colMetric)}</th>
+                <th class="num">${escapeHtml(labels.colAction)}</th>
+              </tr>
+            </thead>
+            <tbody id="skills-tbody">
+              ${AGENT_SKILLS_CATALOG.map((sk) => {
+                const savedUsd = Number((flagshipInitial.monthlyUsd * sk.tokenSavingsFraction).toFixed(2));
+                const savedThb = Math.round(savedUsd * initialWorkload.usdToThbRate);
+                const agensiUrl = resolveAffiliateUrl(affiliateConfig, sk.affiliateId, `${pageSlug}-${sk.id}`);
+                return `<tr>
+                  <td><span class="mono-val">${escapeHtml(sk.name)}</span><span class="sub-val">${escapeHtml(sk.tagline[locale])}</span></td>
+                  <td class="num"><span class="savings-val">-$${savedUsd.toLocaleString()}/mo</span><span class="sub-val">-฿${savedThb.toLocaleString()}/เดือน</span></td>
+                  <td class="num"><span class="mono-val">${sk.priceUsd > 0 ? `$${sk.priceUsd} once` : 'Free / Paid'}</span><span class="sub-val">${escapeHtml(sk.metricNote[locale])}</span></td>
+                  <td class="num"><a class="action-link" href="${escapeHtml(agensiUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${sk.affiliateId}', ${savedUsd})">${escapeHtml(labels.ctaSkill)} →</a></td>
+                </tr>`;
+              }).join('\n')}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-block">
+          <div class="section-tag">
             <span>${escapeHtml(labels.vpsTableTag)}</span>
-            <span>MANAGED / NVME</span>
+            <span>MANAGED SERVERS</span>
           </div>
           <table>
             <thead>
@@ -695,7 +876,7 @@ function renderCalculatorPage(
                     <td><span class="mono-val">${escapeHtml(vps.name)}</span></td>
                     <td class="num"><span class="mono-val">$${vps.monthlyUsd.toLocaleString()}</span><span class="sub-val">฿${vps.monthlyThb.toLocaleString()}</span></td>
                     <td class="num"><span class="mono-val">${vps.vcpu} vCPU / ${vps.ramGb}GB</span><span class="sub-val">${vps.region.toUpperCase()}</span></td>
-                    <td class="num"><a class="action-link" href="${escapeHtml(vps.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${vps.affiliateId}', ${vps.monthlyUsd})">${escapeHtml(labels.ctaHostVps)}</a></td>
+                    <td class="num"><a class="action-link" href="${escapeHtml(vps.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${vps.affiliateId}', ${vps.monthlyUsd})">${escapeHtml(labels.ctaHostVps)} →</a></td>
                   </tr>`
                 )
                 .join('\n')}
@@ -708,12 +889,12 @@ function renderCalculatorPage(
     ${
       faqList.length > 0
         ? `<section class="standalone-section">
-            <div class="section-tag"><span>${escapeHtml(labels.faqTag)}</span><span>QA</span></div>
+            <div class="section-tag"><span>${escapeHtml(labels.faqTag)}</span><span>REAL-WORLD EXAMPLES</span></div>
             ${faqList
               .map(
-                (item) => `<div style="margin-bottom:14px;">
-                  <div style="font-weight:600; font-size:0.9rem;">${escapeHtml(item.q[locale])}</div>
-                  <p style="margin:4px 0 0; color:var(--ink-secondary); font-size:0.86rem;">${escapeHtml(item.a[locale])}</p>
+                (item) => `<div style="margin-bottom:16px;">
+                  <div style="font-weight:600; font-size:0.94rem;">${escapeHtml(item.q[locale])}</div>
+                  <p style="margin:6px 0 0; color:var(--ink-secondary); font-size:0.88rem;">${escapeHtml(item.a[locale])}</p>
                 </div>`
               )
               .join('\n')}
@@ -724,15 +905,15 @@ function renderCalculatorPage(
     <section class="standalone-section">
       <div class="section-tag">
         <span>${escapeHtml(labels.directoryTag)}</span>
-        <a href="${rootPrefix}/${locale}/index.html" style="text-decoration:underline;">VIEW ALL ${allPages.length}</a>
+        <a href="${rootPrefix}/${locale}/index.html">View All ${allPages.length} →</a>
       </div>
       <div class="index-grid">
         ${relatedPages
           .map(
-            (p, idx) =>
+            (p) =>
               `<a class="index-cell" href="${rootPrefix}/${locale}/compare/${p.slug}.html">
                 <span>${escapeHtml(p.h1[locale])}</span>
-                <span style="font-family:var(--mono); font-size:0.7rem; color:var(--ink-muted);">#${String(idx + 1).padStart(2, '0')}</span>
+                <span style="color:var(--ink-muted);">→</span>
               </a>`
           )
           .join('\n')}
@@ -834,6 +1015,7 @@ function renderCalculatorPage(
         return { id: m.id, name: m.name, provider: m.provider, monthlyUsd: monthlyUsd, monthlyThb: monthlyThb, per1k: per1k, affiliateId: m.affiliateId, url: url };
       }).sort(function(a, b) { return a.monthlyUsd - b.monthlyUsd; });
 
+      const maxApiUsd = Math.max.apply(null, apiRows.map(function(r) { return r.monthlyUsd; }).concat([1]));
       const flagship = apiRows.find(function(r) { return r.id === 'claude-3-7-sonnet'; }) || apiRows[apiRows.length - 1];
       const reqTokPerSec = (req * steps * outTok) / Math.max(1, hours * 3600);
 
@@ -849,18 +1031,32 @@ function renderCalculatorPage(
       }).sort(function(a, b) { return a.monthlyUsd - b.monthlyUsd; });
 
       document.getElementById('api-tbody').innerHTML = apiRows.map(function(r) {
-        return '<tr><td><span class="mono-val">' + r.name + '</span><span class="sub-val">' + r.provider + '</span></td>' +
+        const pct = Math.max(4, Math.round((r.monthlyUsd / maxApiUsd) * 100));
+        return '<tr><td><span class="mono-val">' + r.name + '</span><span class="sub-val">' + r.provider + '</span><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></td>' +
           '<td class="num"><span class="mono-val">$' + r.monthlyUsd.toLocaleString() + '</span><span class="sub-val">฿' + r.monthlyThb.toLocaleString() + '</span></td>' +
           '<td class="num"><span class="mono-val">$' + r.per1k + '</span><span class="sub-val">per 1k tasks</span></td>' +
-          '<td class="num"><a class="action-link" href="' + r.url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\\'' + r.affiliateId + '\\', ' + r.monthlyUsd + ')">${escapeHtml(labels.ctaTryApi)}</a></td></tr>';
+          '<td class="num"><a class="action-link" href="' + r.url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\\'' + r.affiliateId + '\\', ' + r.monthlyUsd + ')">${escapeHtml(labels.ctaTryApi)} →</a></td></tr>';
       }).join('');
 
       document.getElementById('gpu-tbody').innerHTML = gpuRows.map(function(g) {
-        return '<tr><td><span class="mono-val">' + g.name + '</span><span class="sub-val">' + g.instances + 'x instance // ' + g.vramGb + 'GB VRAM</span></td>' +
+        return '<tr><td><span class="mono-val">' + g.name + '</span><span class="sub-val">' + g.instances + 'x machine // ' + g.vramGb + 'GB VRAM</span></td>' +
           '<td class="num"><span class="mono-val">$' + g.monthlyUsd.toLocaleString() + '</span><span class="sub-val">฿' + g.monthlyThb.toLocaleString() + '</span></td>' +
           '<td class="num"><span class="mono-val">' + g.breakEven.toLocaleString() + '</span><span class="sub-val">tasks/day break-even</span></td>' +
-          '<td class="num"><a class="action-link" href="' + g.url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\\'' + g.affiliateId + '\\', ' + g.monthlyUsd + ')">${escapeHtml(labels.ctaRentGpu)}</a></td></tr>';
+          '<td class="num"><a class="action-link" href="' + g.url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\\'' + g.affiliateId + '\\', ' + g.monthlyUsd + ')">${escapeHtml(labels.ctaRentGpu)} →</a></td></tr>';
       }).join('');
+
+      if (APP_DATA.skills && document.getElementById('skills-tbody')) {
+        document.getElementById('skills-tbody').innerHTML = APP_DATA.skills.map(function(sk) {
+          const savedUsd = Number((flagship.monthlyUsd * sk.tokenSavingsFraction).toFixed(2));
+          const savedThb = Math.round(savedUsd * fx);
+          const u = buildAffiliateLink(sk.affiliateId, sk.id);
+          const priceLabel = sk.priceUsd > 0 ? ('$' + sk.priceUsd + ' once') : 'Free / Paid';
+          return '<tr><td><span class="mono-val">' + sk.name + '</span><span class="sub-val">' + sk.tagline[APP_DATA.locale] + '</span></td>' +
+            '<td class="num"><span class="savings-val">-$' + savedUsd.toLocaleString() + '/mo</span><span class="sub-val">-฿' + savedThb.toLocaleString() + '/เดือน</span></td>' +
+            '<td class="num"><span class="mono-val">' + priceLabel + '</span><span class="sub-val">' + sk.metricNote[APP_DATA.locale] + '</span></td>' +
+            '<td class="num"><a class="action-link" href="' + u + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\\'' + sk.affiliateId + '\\', ' + savedUsd + ')">${escapeHtml(labels.ctaSkill)} →</a></td></tr>';
+        }).join('');
+      }
 
       const bestGpu = gpuRows[0];
       const winnerNameEl = document.getElementById('winner-name');
@@ -872,8 +1068,8 @@ function renderCalculatorPage(
         const diffThb = Math.round(diffUsd * fx);
         winnerNameEl.textContent = bestGpu.name + ' — $' + bestGpu.monthlyUsd.toLocaleString() + '/mo (฿' + bestGpu.monthlyThb.toLocaleString() + ')';
         winnerVerdictEl.textContent = APP_DATA.locale === 'th'
-          ? 'ที่ปริมาณงาน ' + req.toLocaleString() + ' งาน/วัน (คูณ ' + steps + ' ขั้นตอน Agent) การเช่า ' + bestGpu.name + ' ประหยัดได้ถึง ฿' + diffThb.toLocaleString() + '/เดือน เมื่อเทียบกับ ' + flagship.name
-          : 'At ' + req.toLocaleString() + ' tasks/day × ' + steps + ' agent steps, renting ' + bestGpu.name + ' saves $' + diffUsd.toLocaleString() + '/mo vs ' + flagship.name + '.';
+          ? 'ที่ปริมาณงาน ' + req.toLocaleString() + ' งาน/วัน การเช่าเหมาชั่วโมง (' + bestGpu.name + ') ช่วยคุมงบรายเดือนให้นิ่งอยู่ที่ ฿' + bestGpu.monthlyThb.toLocaleString() + ' ประหยัดลง ฿' + diffThb.toLocaleString() + '/เดือน เมื่อเทียบกับ ' + flagship.name + ' โดยไม่ต้องกังวลบิลพุ่ง'
+          : 'At ' + req.toLocaleString() + ' tasks/day, renting ' + bestGpu.name + ' caps your bill at a predictable $' + bestGpu.monthlyUsd.toLocaleString() + '/mo — saving $' + diffUsd.toLocaleString() + '/mo vs. ' + flagship.name + '.';
         winnerCtaEl.href = bestGpu.url;
         winnerCtaEl.textContent = '${escapeHtml(labels.ctaRentGpu)} →';
         winnerCtaEl.onclick = function() { recordAffiliateClick(bestGpu.affiliateId, bestGpu.monthlyUsd); };
@@ -882,8 +1078,8 @@ function renderCalculatorPage(
         const diffThb = Math.round(diffUsd * fx);
         winnerNameEl.textContent = flagship.name + ' — $' + flagship.monthlyUsd.toLocaleString() + '/mo (฿' + flagship.monthlyThb.toLocaleString() + ')';
         winnerVerdictEl.textContent = APP_DATA.locale === 'th'
-          ? 'หากปริมาณงานต่ำกว่า ' + bestGpu.breakEven.toLocaleString() + ' งาน/วัน การใช้ API จ่ายตามจริง (' + flagship.name + ') ประหยัดกว่าเช่า GPU รายชั่วโมงถึง ฿' + diffThb.toLocaleString() + '/เดือน'
-          : 'Below ' + bestGpu.breakEven.toLocaleString() + ' tasks/day, pay-per-token API (' + flagship.name + ') is cheaper than renting dedicated GPUs by $' + diffUsd.toLocaleString() + '/mo.';
+          ? 'เมื่อใช้งานไม่ถึง ' + bestGpu.breakEven.toLocaleString() + ' งาน/วัน การจ่ายตามจริงผ่าน API (' + flagship.name + ') ประหยัดกว่าเช่าเครื่องทิ้งไว้ถึง ฿' + diffThb.toLocaleString() + '/เดือน รวมบิลจ่ายที่เดียวจบและไม่ต้องดูแลเซิร์ฟเวอร์เอง'
+          : 'Below ' + bestGpu.breakEven.toLocaleString() + ' tasks/day, paying only for what you use via API (' + flagship.name + ') saves $' + diffUsd.toLocaleString() + '/mo with one-stop billing and zero server maintenance.';
         winnerCtaEl.href = flagship.url;
         winnerCtaEl.textContent = '${escapeHtml(labels.ctaTryApi)} →';
         winnerCtaEl.onclick = function() { recordAffiliateClick(flagship.affiliateId, flagship.monthlyUsd); };
@@ -919,7 +1115,7 @@ function renderCalculatorPage(
       }
       sendTelemetry('scenario_shared', {});
       const btn = document.getElementById('btn-share');
-      btn.textContent = APP_DATA.locale === 'th' ? 'คัดลอกลิงก์พารามิเตอร์เรียบร้อย' : 'PERMALINK COPIED';
+      btn.textContent = APP_DATA.locale === 'th' ? 'คัดลอกลิงก์เรียบร้อยแล้ว' : 'Link Copied';
     }
 
     ['inp-req', 'inp-steps', 'inp-intok', 'inp-outtok', 'inp-cache', 'inp-hours'].forEach(function(id) {
@@ -949,57 +1145,59 @@ function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): st
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TELEMETRY &amp; DEMAND PROOF LEDGER // 100,000 THB TARGET</title>
+  <title>TCO // BENCHMARK.26 — Live Usage &amp; Conversion Telemetry</title>
   <style>${renderSharedStyles()}</style>
 </head>
 <body>
-  <div class="shell">
+  <div class="nav-glass">
     <header class="masthead">
       <a class="brand-mark" href="./th/index.html">TCO // BENCHMARK.26</a>
       <nav class="nav-bar">
-        <a class="nav-link" href="./th/index.html">CALCULATOR (TH)</a>
-        <a class="nav-link" href="./en/index.html">CALCULATOR (EN)</a>
-        <a class="nav-link active" href="./validation-dashboard.html">TELEMETRY</a>
+        <a class="nav-link" href="./th/index.html">ภาษาไทย</a>
+        <a class="nav-link" href="./en/index.html">English</a>
+        <a class="nav-link active" href="./validation-dashboard.html">Live Stats</a>
       </nav>
     </header>
+  </div>
 
+  <div class="shell">
     <section class="hero-block">
-      <div class="kicker">CENTRALIZED LIVE TELEMETRY // GLOBAL + LOCAL FUNNEL</div>
-      <h1>Demand Validation &amp; Revenue Proof Ledger</h1>
-      <p class="lead">ระบบวัดผลผู้เข้าชมจริงจากทั่วโลกแบบรวมศูนย์ (Centralized Live Counter) เพื่อพิสูจน์อัตราการคำนวณ (Interaction Rate) และอัตราคลิกลิงก์พาร์ทเนอร์ (Affiliate CTR) ก่อนขยายระบบ</p>
+      <div class="kicker">CENTRALIZED LIVE TELEMETRY</div>
+      <h1>Real-User Demand &amp; Conversion Tracker</h1>
+      <p class="lead">หน้าสรุปจำนวนผู้เข้าชมจริง อัตราการเลื่อนคำนวณ และยอดคลิกลิงก์พาร์ทเนอร์จากทั่วโลก เพื่อวัดผลความสนใจของตลาดจริงแบบตรงไปตรงมา</p>
     </section>
 
-    <section class="standalone-section" style="border-color:var(--line-strong);">
+    <section class="standalone-section">
       <div class="section-tag">
-        <span>01 // VERDICT STATUS</span>
+        <span>สถานะการพิสูจน์ตลาด (Validation Status)</span>
         <span id="telemetry-source">SOURCE: GLOBAL LIVE COUNTER</span>
       </div>
       <div class="verdict-title" id="verdict-code">LOADING...</div>
-      <p class="verdict-copy" id="verdict-desc">กำลังดึงสถิติรวมจากผู้เข้าชมทั้งหมด...</p>
+      <p class="verdict-copy" id="verdict-desc">กำลังดึงข้อมูลล่าสุด...</p>
     </section>
 
     <div class="ledger-frame">
       <aside class="panel-left">
-        <div class="section-tag"><span>02 // CONTROLS</span><span>TEST HARNESS</span></div>
-        <p style="font-size:0.84rem; color:var(--ink-secondary); margin-top:0;">ระบบจะดึงยอดผู้เข้าชมจริงรวมจาก Global Counter โดยอัตโนมัติ หรือสามารถกดจำลองทราฟฟิก 60 คนในเครื่องเพื่อทดสอบสมการตัดสินผลได้</p>
-        <button class="btn-primary" style="width:100%; margin-bottom:10px;" type="button" onclick="simulateSmokeTestBatch()">SIMULATE 60 VISITORS (LOCAL)</button>
-        <button class="btn-outline" type="button" onclick="clearLocalTelemetry()">SWITCH TO LIVE GLOBAL DATA</button>
+        <div class="section-tag"><span>โหมดทดสอบ</span><span>SIMULATION</span></div>
+        <p style="font-size:0.84rem; color:var(--ink-secondary); margin-top:0;">แสดงผลจากตัวนับออนไลน์รวมศูนย์เป็นค่าเริ่มต้น หรือสามารถกดจำลองผู้เข้าชม 60 คนเพื่อดูการคำนวณเป้าหมายได้</p>
+        <button class="btn-primary" style="width:100%; margin-bottom:10px;" type="button" onclick="simulateSmokeTestBatch()">จำลองผู้เข้าชม 60 คน</button>
+        <button class="btn-outline" type="button" onclick="clearLocalTelemetry()">สลับกลับไปดูยอดจริงออนไลน์</button>
       </aside>
 
       <main class="panel-right">
         <div class="table-block">
-          <div class="section-tag"><span>03 // FUNNEL METRICS</span><span>THRESHOLD BENCHMARK</span></div>
+          <div class="section-tag"><span>ตัวชี้วัดการใช้งานจริง</span><span>LIVE METRICS</span></div>
           <table>
             <tbody>
-              <tr><td>Unique Visitor Sessions</td><td class="num mono-val" id="m-sessions">0</td></tr>
-              <tr><td>Total Page Views</td><td class="num mono-val" id="m-views">0</td></tr>
-              <tr><td>Active Calculator Runs</td><td class="num mono-val" id="m-calcs">0</td></tr>
-              <tr><td>Calculator Interaction Rate (Target &ge; 15.0%)</td><td class="num mono-val" id="m-ir">0.0%</td></tr>
-              <tr><td>Outbound Affiliate Clicks</td><td class="num mono-val" id="m-clicks">0</td></tr>
-              <tr><td>Affiliate Click-Through Rate (Target &ge; 2.5%)</td><td class="num mono-val" id="m-ctr">0.0%</td></tr>
-              <tr><td>Clicks by Partner Program</td><td class="num mono-val" id="m-byprog">-</td></tr>
-              <tr><td>Projected Commission (at 8% conversion)</td><td class="num mono-val" id="m-proj">$0 (฿0)</td></tr>
-              <tr><td>Monthly Visitors Needed for 100,000 THB/mo</td><td class="num mono-val" id="m-req-vis">12,500</td></tr>
+              <tr><td>จำนวนผู้เข้าชมไม่ซ้ำ (Unique Sessions)</td><td class="num mono-val" id="m-sessions">0</td></tr>
+              <tr><td>จำนวนการเปิดหน้าเว็บทั้งหมด (Page Views)</td><td class="num mono-val" id="m-views">0</td></tr>
+              <tr><td>จำนวนครั้งที่ผู้ใช้ปรับตัวเลขคำนวณจริง</td><td class="num mono-val" id="m-calcs">0</td></tr>
+              <tr><td>สัดส่วนคนที่คำนวณจริง (เป้าหมาย &ge; 15.0%)</td><td class="num mono-val" id="m-ir">0.0%</td></tr>
+              <tr><td>จำนวนคลิกลิงก์พาร์ทเนอร์รวมทุกค่าย</td><td class="num mono-val" id="m-clicks">0</td></tr>
+              <tr><td>อัตราคลิกลิงก์พาร์ทเนอร์ (เป้าหมาย &ge; 2.5%)</td><td class="num mono-val" id="m-ctr">0.0%</td></tr>
+              <tr><td>ยอดคลิกแยกตามผู้ให้บริการ</td><td class="num mono-val" id="m-byprog">-</td></tr>
+              <tr><td>รายได้คาดการณ์จากยอดคลิกชุดนี้ (คิดที่ 8% ซื้อจริง)</td><td class="num mono-val" id="m-proj">$0 (฿0)</td></tr>
+              <tr><td>จำนวนผู้เข้าชมต่อเดือนที่ต้องใช้เพื่อแตะ 100,000 บาท/เดือน</td><td class="num mono-val" id="m-req-vis">12,500</td></tr>
             </tbody>
           </table>
         </div>
@@ -1039,14 +1237,15 @@ function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): st
             cloudways: localEvents.filter(function(e){return e.affiliateId==='cloudways';}).length,
             vercel: localEvents.filter(function(e){return e.affiliateId==='vercel';}).length,
             hostatom: localEvents.filter(function(e){return e.affiliateId==='hostatom';}).length,
-            rukcom: localEvents.filter(function(e){return e.affiliateId==='rukcom';}).length
+            rukcom: localEvents.filter(function(e){return e.affiliateId==='rukcom';}).length,
+            agensi: localEvents.filter(function(e){return e.affiliateId==='agensi';}).length
           }
         ));
         return;
       }
 
       document.getElementById('telemetry-source').textContent = 'SOURCE: GLOBAL LIVE COUNTER';
-      const [u, views, calcs, shares, cAiml, cRunpod, cCw, cVercel, cHa, cRuk] = await Promise.all([
+      const [u, views, calcs, shares, cAiml, cRunpod, cCw, cVercel, cHa, cRuk, cAgensi] = await Promise.all([
         getGlobalKey('unique_sessions'),
         getGlobalKey('page_views'),
         getGlobalKey('calculation_runs'),
@@ -1056,7 +1255,8 @@ function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): st
         getGlobalKey('aff_cloudways'),
         getGlobalKey('aff_vercel'),
         getGlobalKey('aff_hostatom'),
-        getGlobalKey('aff_rukcom')
+        getGlobalKey('aff_rukcom'),
+        getGlobalKey('aff_agensi')
       ]);
 
       renderReport(computeFromCounts(u, views, calcs, shares, {
@@ -1065,7 +1265,8 @@ function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): st
         cloudways: cCw,
         vercel: cVercel,
         hostatom: cHa,
-        rukcom: cRuk
+        rukcom: cRuk,
+        agensi: cAgensi
       }));
     }
 
@@ -1085,16 +1286,16 @@ function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): st
       const reqVis = revPerVis > 0 ? Math.ceil(100000 / revPerVis) : 12500;
 
       let verdict = 'INSUFFICIENT_DATA';
-      let th = 'เก็บข้อมูลผู้เข้าชมจริงจากทั่วโลกได้ ' + u + '/50 คนแรก แนะนำให้นำลิงก์ไปโพสต์ตามชุดข้อความใน validation-kit.md เพื่อให้ครบ 50 คนแรก';
+      let th = 'เก็บข้อมูลผู้เข้าชมจริงจากทั่วโลกได้ ' + u + '/50 คนแรก แนะนำให้นำลิงก์ไปแชร์ในกลุ่มผู้ใช้งานจริงเพื่อให้ครบ 50 คนแรก';
       if (u >= 50 && ir >= 0.15 && ctr >= 0.025) {
         verdict = 'PROVEN_GO_SCALE';
-        th = 'ผ่านเกณฑ์! อัตราการคำนวณ (' + (ir*100).toFixed(1) + '%) และอัตราคลิก Affiliate (' + (ctr*100).toFixed(1) + '%) พิสูจน์แล้วว่ามีคนใช้และคลิกจริง คุ้มค่าที่จะขยายทราฟฟิกสู่ ' + reqVis.toLocaleString() + ' คน/เดือน เพื่อแตะ 100,000 บาท/เดือน';
+        th = 'ผ่านเกณฑ์! อัตราการคำนวณ (' + (ir*100).toFixed(1) + '%) และอัตราคลิก (' + (ctr*100).toFixed(1) + '%) ยืนยันว่ามีคนใช้งานจริง คุ้มค่าที่จะขยายผลสู่ ' + reqVis.toLocaleString() + ' คน/เดือน';
       } else if (u >= 50 && ir >= 0.15) {
         verdict = 'ITERATE_CTA';
-        th = 'ผู้เข้าชมใช้งานเครื่องคำนวณสูง (' + (ir*100).toFixed(1) + '%) แต่อัตราคลิกลิงก์ Affiliate ยังต่ำกว่า 2.5% แนะนำปรับข้อความปุ่มก่อนขยายผล';
+        th = 'ผู้เข้าชมใช้งานเครื่องคำนวณสูง (' + (ir*100).toFixed(1) + '%) แต่อัตราคลิกลิงก์ยังต่ำกว่า 2.5%';
       } else if (u >= 50) {
         verdict = 'KILL_OR_PIVOT';
-        th = 'อัตราการคำนวณต่ำกว่า 15% แนะนำสลับไปทดสอบโมเดลที่ 2 โดยยังไม่ต้องเสียเงินจดโดเมน';
+        th = 'อัตราการคำนวณต่ำกว่า 15%';
       }
 
       return {
@@ -1134,7 +1335,7 @@ function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): st
         const sid = 'sim-sess-' + i;
         list.push({ eventId: 'pv-' + i, sessionId: sid, eventType: 'page_view', locale: 'th', pageSlug: 'home' });
         if (i <= 24) list.push({ eventId: 'calc-' + i, sessionId: sid, eventType: 'calculation_run', locale: 'th', pageSlug: 'home' });
-        if (i <= 4) list.push({ eventId: 'aff-' + i, sessionId: sid, eventType: 'affiliate_cta_click', locale: 'th', pageSlug: 'home', affiliateId: i % 2 === 0 ? 'cloudways' : 'runpod' });
+        if (i <= 4) list.push({ eventId: 'aff-' + i, sessionId: sid, eventType: 'affiliate_cta_click', locale: 'th', pageSlug: 'home', affiliateId: i % 2 === 0 ? 'agensi' : 'runpod' });
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
       localStorage.setItem('ai_cost_calc_use_sim', '1');
@@ -1162,35 +1363,17 @@ function renderValidationKitMarkdown(baseUrl: string, pageCount: number): string
 
 ## Part 1: Direct Affiliate Signup Links (Update in \`config/affiliates.json\`)
 
-1. **Cloudways ($50–$125 CPA per sale):** https://www.cloudways.com/en/web-hosting-affiliate-program.php
-2. **RunPod (10% Recurring GPU Spend via PartnerStack):** https://www.runpod.io/ (PartnerStack network)
-3. **AI/ML API (30% Recurring Lifetime):** https://aimlapi.com/affiliate-program
-4. **Vercel (30% Recurring + $5/lead):** https://vercel.com/partners
-5. **Hostatom Thailand (Up to 25% Commission):** https://www.hostatom.com/affiliate/
-6. **Ruk-Com Cloud Thailand (10–20% Commission):** https://ruk-com.in.th/affiliate/
+1. **Agensi.io (90% Self-Referred Skill Sales + 20% 6-Month Affiliate):** https://agensi.io/ (Dashboard -> Affiliate)
+2. **Cloudways ($50–$125 CPA per sale):** https://www.cloudways.com/en/partners/cloud-affiliate-program.php
+3. **RunPod (10% Recurring GPU Spend via PartnerStack):** https://www.runpod.io/console/user/referrals
+4. **AI/ML API (30% Recurring Lifetime):** https://aimlapi.com/affiliate
+5. **Ruk-Com Cloud Thailand (33% First-Cycle Commission):** https://ruk-com.in.th/
+6. **Hostatom Thailand (150–500 THB CPA):** https://www.hostatom.com/
 
 To update any partner code and rebuild:
 \`\`\`bash
 node src/cli-affiliate.ts <partner_id> <your_affiliate_code>
 \`\`\`
-
----
-
-## Part 2: Launch Copy for Real-User Smoke Test (First 50–200 Visitors)
-
-### Thai Developer / AI Communities (Facebook / Pantip)
-**หัวข้อ:** ทำตารางคำนวณต้นทุน AI API (10 โมเดล) เทียบกับจุดคุ้มทุนเช่า GPU รายชั่วโมง (RunPod) และ Cloud VPS ไทย คิดเป็นเงินบาทให้ใช้ฟรีครับ
-
-**เนื้อหา:**
-ทำหน้าตารางคำนวณแบบ Minimal (ไม่มีโฆษณา) สำหรับเทียบต้นทุนจริงเวลาทำระบบ AI ที่มี Prompt Caching หรือ Agent เรียกซ้ำหลายรอบต่อ 1 งาน ว่าจุดไหนใช้ API จ่ายตาม Token คุ้มกว่า และจุดไหนควรเช่า GPU แยก:
-${baseUrl}/th/index.html
-
-### Reddit (r/LocalLLaMA / r/SideProject) & Hacker News (Show HN)
-**Title:** Show HN: Minimal LLM API vs. Dedicated GPU Break-Even Ledger (2026 pricing, prompt caching, agent loops)
-
-**Body:**
-Built a clean, zero-dependency tabular cost calculator covering 10 frontier/open models and 6 dedicated GPU tiers (RTX 4090 to 2x A100 160GB), factoring in prompt cache hit rates and sequential agent loop multipliers:
-${baseUrl}/en/index.html
 `;
 }
 
@@ -1223,10 +1406,10 @@ export function generateStaticSite(
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="refresh" content="0; url=./th/index.html" />
-  <title>TCO // BENCHMARK.26 — AI &amp; Cloud Unit Economics Ledger</title>
+  <title>TCO // BENCHMARK.26 — Practical AI Cost &amp; Quota Planner</title>
 </head>
 <body>
-  <p><a href="./th/index.html">THAI LEDGER</a> | <a href="./en/index.html">ENGLISH LEDGER</a></p>
+  <p><a href="./th/index.html">ภาษาไทย</a> | <a href="./en/index.html">English</a></p>
 </body>
 </html>`;
   fs.writeFileSync(path.join(stagingDir, 'index.html'), rootRedirectHtml, 'utf8');
@@ -1237,14 +1420,14 @@ export function generateStaticSite(
       locale,
       'home',
       locale === 'th'
-        ? 'ตารางคำนวณต้นทุน AI API เทียบกับเช่า Cloud GPU และ VPS (2026)'
-        : 'AI API vs. Cloud GPU & VPS Unit Economics Ledger (2026)',
+        ? 'วางแผนค่าใช้จ่าย AI ให้ประหยัดที่สุด — เทียบจ่ายตามจริง vs เหมาชั่วโมง (2026)'
+        : 'Practical AI Cost & Quota Planner — Pay-As-You-Go vs. Hourly GPU (2026)',
       locale === 'th'
-        ? 'คำนวณค่าใช้จ่าย Claude, GPT-4o, Gemini, DeepSeek, Llama, Qwen เทียบกับจุดคุ้มทุนการเช่า GPU RunPod และ Cloud VPS ไทย'
-        : 'Precision LLM API vs. dedicated Cloud GPU break-even calculator with prompt caching, multi-step agent loops, and VPS benchmarks.',
+        ? 'เทียบชัดๆ ว่างานของคุณควรจ่ายตามที่ใช้จริงรวมในบิลเดียว หรือเช่าเหมาชั่วโมงถึงจะประหยัดกว่า พร้อมวิธีตั้งค่าให้ใช้งานได้นานขึ้นโดยโควต้าไม่หมดไว'
+        : 'See clearly whether pay-as-you-go single-bill APIs or flat hourly GPUs cost less for your daily workload, plus practical ways to stretch your token quota.',
       locale === 'th'
-        ? 'ตารางคำนวณต้นทุน AI API เทียบกับจุดคุ้มทุน Cloud GPU และ VPS'
-        : 'AI API vs. Dedicated GPU Break-Even Ledger',
+        ? 'จ่ายน้อยลง ทำงานได้นานขึ้น และรวมทุกค่ายจบในที่เดียว'
+        : 'Pay less. Work longer. Consolidate in one place.',
       {
         requestsPerDay: 1500,
         inputTokensPerReq: 2500,
@@ -1306,12 +1489,12 @@ ${sitemapUrls.map((u) => `  <url><loc>${escapeHtml(u)}</loc></url>`).join('\n')}
     'utf8'
   );
 
-  const llmsTxt = `# TCO // BENCHMARK.26 — AI, Cloud GPU & VPS Cost Ledger (EN / TH)
-> Precision break-even calculator covering 10 LLM APIs, 6 dedicated Cloud GPU tiers, 6 Cloud VPS tiers, and 5 production workload archetypes (${totalHtmlPages} bilingual pages).
+  const llmsTxt = `# TCO // BENCHMARK.26 — Practical AI Cost & Quota Planner (EN / TH)
+> Compare single-bill pay-as-you-go LLM APIs, flat-rate hourly GPUs, managed servers, and token-saving Agent Skills (${totalHtmlPages} bilingual pages).
 
-- English Index: ${publicBaseUrl}/en/index.html
-- Thai Index: ${publicBaseUrl}/th/index.html
-- Telemetry Ledger: ${publicBaseUrl}/validation-dashboard.html
+- English Planner: ${publicBaseUrl}/en/index.html
+- Thai Planner: ${publicBaseUrl}/th/index.html
+- Live Stats: ${publicBaseUrl}/validation-dashboard.html
 - Sitemap (${sitemapUrls.length} URLs): ${publicBaseUrl}/sitemap.xml
 `;
   fs.writeFileSync(path.join(stagingDir, 'llms.txt'), llmsTxt, 'utf8');

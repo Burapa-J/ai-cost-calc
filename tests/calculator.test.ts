@@ -8,7 +8,8 @@ import {
   resolveAffiliateUrl,
   sanitizeIndexNowKey,
   sanitizeWorkloadInput,
-  updateAffiliateCode
+  updateAffiliateCode,
+  validateSkillMarkdown
 } from '../src/calculator.ts';
 import type { AffiliateConfigFile } from '../src/domain.ts';
 
@@ -96,6 +97,18 @@ test('Pre-mortem #4: resolveAffiliateUrl injects partner parameter and campaign 
 
   assert.equal(sanitizeIndexNowKey('a8f4c2e91b6d40789e3c5a12f08d6b4e'), 'a8f4c2e91b6d40789e3c5a12f08d6b4e');
   assert.equal(sanitizeIndexNowKey('bad key!@#'), 'a8f4c2e91b6d40789e3c5a12f08d6b4e');
+
+  const skill1Content = fs.readFileSync(
+    path.resolve(import.meta.dirname, '../agensi-skills-pack/token-budget-architect/SKILL.md'),
+    'utf8'
+  );
+  const skill2Content = fs.readFileSync(
+    path.resolve(import.meta.dirname, '../agensi-skills-pack/swiss-minimal-ui-ledger/SKILL.md'),
+    'utf8'
+  );
+  assert.equal(validateSkillMarkdown('token-budget-architect', skill1Content).valid, true);
+  assert.equal(validateSkillMarkdown('swiss-minimal-ui-ledger', skill2Content).valid, true);
+  assert.equal(validateSkillMarkdown('wrong-folder-name', skill1Content).valid, false);
 });
 
 test('Pre-mortem #2: DemandValidationStore deduplicates repeated eventId and computes PROVEN_GO_SCALE verdict', () => {

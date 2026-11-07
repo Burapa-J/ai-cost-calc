@@ -8,7 +8,8 @@ export type AffiliateId =
   | 'cloudways'
   | 'vercel'
   | 'hostatom'
-  | 'rukcom';
+  | 'rukcom'
+  | 'agensi';
 
 export interface BilingualText {
   en: string;
@@ -72,6 +73,16 @@ export interface WorkloadArchetypeSpec {
   name: BilingualText;
   preset: Partial<WorkloadInput>;
   summary: BilingualText;
+}
+
+export interface AgentSkillSpec {
+  id: string;
+  name: string;
+  priceUsd: number;
+  tokenSavingsFraction: number;
+  affiliateId: AffiliateId;
+  tagline: BilingualText;
+  metricNote: BilingualText;
 }
 
 export interface WorkloadInput {
@@ -596,6 +607,54 @@ export const WORKLOAD_ARCHETYPES: WorkloadArchetypeSpec[] = [
     summary: {
       en: 'Always-on 24/7 high-concurrency customer triage requiring low latency and predictable monthly bills.',
       th: 'เปิดระบบตลอด 24 ชม. รองรับลูกค้าจำนวนมาก เน้นความเร็วตอบกลับและคุมงบรายเดือนไม่ให้บานปลาย'
+    }
+  }
+];
+
+export const AGENT_SKILLS_CATALOG: AgentSkillSpec[] = [
+  {
+    id: 'token-budget-architect',
+    name: 'token-budget-architect',
+    priceUsd: 9.99,
+    tokenSavingsFraction: 0.3,
+    affiliateId: 'agensi',
+    tagline: {
+      en: 'Work longer without hitting quota limits. Guides Claude Code & Cursor to read only the lines being edited instead of scanning entire files on every turn.',
+      th: 'ทำงานได้นานขึ้นโดยโควต้าไม่หมดไว: ตั้งกฎให้ AI เปิดอ่านเฉพาะบรรทัดที่ต้องแก้แทนการกวาดอ่านทั้งไฟล์ทุกครั้ง ช่วยยืดเวลาใช้งานในงบเท่าเดิม'
+    },
+    metricNote: {
+      en: 'Saves ~25–35% tokens on typical edits',
+      th: 'ลด Token ที่เสียเปล่าได้ราว 25–35%'
+    }
+  },
+  {
+    id: 'swiss-minimal-ui-ledger',
+    name: 'swiss-minimal-ui-ledger',
+    priceUsd: 14.99,
+    tokenSavingsFraction: 0.2,
+    affiliateId: 'agensi',
+    tagline: {
+      en: 'Get clean, readable layouts on the first pass instead of spending 3–4 extra prompts asking AI to remove clutter and fix spacing.',
+      th: 'ไม่ต้องเสียเวลาและเปลืองโควต้าสั่งรื้อหน้าเว็บซ้ำๆ: กำหนดโครงสร้างที่สะอาดตาตั้งแต่รอบแรก เหมาะกับหน้าสรุปข้อมูลและระบบหลังบ้าน'
+    },
+    metricNote: {
+      en: 'Avoids 2–3 rounds of rework prompts',
+      th: 'ลดการสั่งแก้หน้าเว็บซ้ำ 2–3 รอบ'
+    }
+  },
+  {
+    id: 'agensi-verified-marketplace',
+    name: 'Agensi.io Skill Catalog',
+    priceUsd: 0,
+    tokenSavingsFraction: 0.2,
+    affiliateId: 'agensi',
+    tagline: {
+      en: 'One-stop library of tested workflows for Claude Code, Cursor, and Copilot. Plug in what you need in seconds instead of writing rules from scratch.',
+      th: 'สะดวกจบในที่เดียว: เลือกชุดคำสั่งที่คนทำงานจริงทดสอบแล้วไปเสียบใช้กับโปรแกรมที่ใช้อยู่ได้ทันที ไม่ต้องลองผิดลองถูกเขียนเอง'
+    },
+    metricNote: {
+      en: 'Works with 20+ coding agents',
+      th: 'รองรับโปรแกรมเขียนโค้ดหลักครบ'
     }
   }
 ];

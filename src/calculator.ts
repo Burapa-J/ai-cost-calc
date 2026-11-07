@@ -89,6 +89,62 @@ export function sanitizeIndexNowKey(rawKey?: string): string {
   return candidate;
 }
 
+export interface SkillFrontmatterValidationResult {
+  valid: boolean;
+  name?: string;
+  description?: string;
+  error?: string;
+}
+
+export function validateSkillMarkdown(
+  expectedFolderName: string,
+  markdownContent: string
+): SkillFrontmatterValidationResult {
+  const match = markdownContent.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]+)$/);
+  if (!match) {
+    return { valid: false, error: 'Missing YAML frontmatter block or markdown body' };
+  }
+  const frontmatter = match[1];
+  const body = match[2].trim();
+  if (!body) {
+    return { valid: false, error: 'Markdown body must not be empty' };
+  }
+
+  const nameMatch = frontmatter.match(/^name:\s*(.+)$/m);
+  const descMatch = frontmatter.match(/^description:\s*(.+)$/m);
+  if (!nameMatch || !descMatch) {
+    return { valid: false, error: 'Missing required name or description field in frontmatter' };
+  }
+
+  const name = nameMatch[1].trim().replace(/^["']|["']$/g, '');
+  const description = descMatch[1].trim().replace(/^["']|["']$/g, '');
+
+  if (
+    name.length < 1 ||
+    name.length > 64 ||
+    !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name) ||
+    name !== expectedFolderName
+  ) {
+    return {
+      valid: false,
+      name,
+      description,
+      error: `Invalid skill name "${name}" (must match folder "${expectedFolderName}" and be lowercase a-z0-9-)`
+    };
+  }
+
+  if (description.length < 10 || description.length > 1024) {
+    return {
+      valid: false,
+      name,
+      description,
+      error: 'Skill description must be between 10 and 1024 characters'
+    };
+  }
+
+  return { valid: true, name, description };
+}
+
 export function calculateCostComparison(
   rawInput: Partial<WorkloadInput>,
   affiliateConfig: AffiliateConfigFile,
@@ -210,8 +266,8 @@ export function calculateCostComparison(
         affiliateId: bestGpu.affiliateId,
         affiliateUrl: bestGpu.affiliateUrl,
         verdict: {
-          en: `At ${input.requestsPerDay.toLocaleString()} tasks/day × ${input.agentSteps} agent steps, renting ${bestGpu.name} saves $${savingsUsd.toLocaleString()}/mo vs ${flagshipApi.name}.`,
-          th: `ที่ปริมาณงาน ${input.requestsPerDay.toLocaleString()} งาน/วัน (คูณ ${input.agentSteps} ขั้นตอน Agent) การเช่า ${bestGpu.name} ประหยัดได้ถึง ฿${savingsThb.toLocaleString()}/เดือน เมื่อเทียบกับ ${flagshipApi.name}`
+          en: `At ${input.requestsPerDay.toLocaleString()} tasks/day, renting a dedicated GPU (${bestGpu.name}) caps your bill at a predictable $${bestGpu.monthlyUsd.toLocaleString()}/mo — saving $${savingsUsd.toLocaleString()}/mo compared to per-token billing on ${flagshipApi.name} with no surprise overages.`,
+          th: `ที่ปริมาณงาน ${input.requestsPerDay.toLocaleString()} งาน/วัน การเช่าเหมาชั่วโมง (${bestGpu.name}) ช่วยคุมงบรายเดือนให้นิ่งอยู่ที่ ฿${bestGpu.monthlyThb.toLocaleString()} ประหยัดลง ฿${savingsThb.toLocaleString()}/เดือน เมื่อเทียบกับ ${flagshipApi.name} และทำงานต่อเนื่องได้โดยไม่ต้องกังวลว่าบิลจะพุ่งตามจำนวนรอบ`
         }
       }
     };
@@ -238,8 +294,8 @@ export function calculateCostComparison(
       affiliateId: flagshipApi.affiliateId,
       affiliateUrl: flagshipApi.affiliateUrl,
       verdict: {
-        en: `Below ${bestGpu.breakEvenTasksPerDayVsFlagshipApi.toLocaleString()} tasks/day, pay-per-token API (${flagshipApi.name}) is cheaper than renting dedicated GPUs by $${savingsUsd.toLocaleString()}/mo.`,
-        th: `หากปริมาณงานต่ำกว่า ${bestGpu.breakEvenTasksPerDayVsFlagshipApi.toLocaleString()} งาน/วัน การใช้ API จ่ายตามจริง (${flagshipApi.name}) ประหยัดกว่าเช่า GPU รายชั่วโมงถึง ฿${savingsThb.toLocaleString()}/เดือน`
+        en: `Below ${bestGpu.breakEvenTasksPerDayVsFlagshipApi.toLocaleString()} tasks/day, paying only for what you use via API (${flagshipApi.name}) saves $${savingsUsd.toLocaleString()}/mo vs. renting a GPU, with one-stop billing and zero server maintenance.`,
+        th: `เมื่อใช้งานไม่ถึง ${bestGpu.breakEvenTasksPerDayVsFlagshipApi.toLocaleString()} งาน/วัน การจ่ายตามจริงผ่าน API (${flagshipApi.name}) ช่วยประหยัดเงินได้ ฿${savingsThb.toLocaleString()}/เดือน ไม่เสียค่าเช่าเครื่องทิ้งไว้ตอนไม่มีคนใช้ และรวมบิลจ่ายที่เดียวจบโดยไม่ต้องดูแลเซิร์ฟเวอร์เอง`
       }
     }
   };
@@ -278,7 +334,8 @@ export class DemandValidationStore {
       cloudways: 0,
       vercel: 0,
       hostatom: 0,
-      rukcom: 0
+      rukcom: 0,
+      agensi: 0
     };
 
     for (const ev of this.events) {

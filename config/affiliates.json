@@ -73,13 +73,26 @@
       "name": "Ruk-Com Managed Cloud VPS (Thailand)",
       "category": "cloud_vps",
       "commissionLabel": {
-        "en": "10%–20% Commission on Thai Managed Cloud",
-        "th": "ค่าคอม 10%–20% สำหรับ Cloud VPS ไทยพร้อมทีมดูแล"
+        "en": "Up to 33% First-Cycle Commission on Thai Managed Cloud",
+        "th": "ค่าคอมสูงสุด 33% สำหรับ Cloud VPS ไทยพร้อมทีมดูแล"
       },
       "estimatedPayoutUsd": 30,
       "baseUrl": "https://ruk-com.in.th/",
       "paramKey": "aff",
       "affiliateCode": "YOUR_RUKCOM_ID"
+    },
+    "agensi": {
+      "id": "agensi",
+      "name": "Agensi.io AI Agent Skills Marketplace",
+      "category": "llm_api",
+      "commissionLabel": {
+        "en": "90% Self-Referred Skill Sales + 20% Recurring (6 Months)",
+        "th": "รับ 90% เมื่อขายสกิลตัวเอง + ค่าคอม 20% นาน 6 เดือนทุกยอดซื้อ"
+      },
+      "estimatedPayoutUsd": 18,
+      "baseUrl": "https://agensi.io/",
+      "paramKey": "ref",
+      "affiliateCode": "YOUR_AGENSI_ID"
     }
   }
 }
