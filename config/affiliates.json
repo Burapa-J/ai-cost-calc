@@ -40,7 +40,7 @@
       "estimatedPayoutUsd": 85,
       "baseUrl": "https://www.cloudways.com/en/",
       "paramKey": "id",
-      "affiliateCode": "YOUR_CLOUDWAYS_ID"
+      "affiliateCode": "2225344"
     },
     "vercel": {
       "id": "vercel",
