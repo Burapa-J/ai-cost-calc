@@ -28,8 +28,8 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
     assert.equal(thHome.includes('TCO // BENCHMARK.26'), true);
     assert.equal(thHome.includes('--paper: #FBFBFD'), true);
     assert.equal(thHome.includes('backdrop-filter: saturate(180%) blur(20px)'), true);
-    assert.equal(thHome.includes('YOUR_AGENSI_ID'), true);
-    assert.equal(thHome.includes('https://www.agensi.io/r/YOUR_AGENSI_ID'), true);
+    assert.equal(thHome.includes('BURAPA'), true);
+    assert.equal(thHome.includes('https://www.agensi.io/r/BURAPA'), true);
     assert.equal(thHome.includes('id="affiliate-disclosure"'), true);
     assert.equal(thHome.includes('จ่ายที่เดียวจบ ไม่ต้องแยกหลายบิล'), true);
     assert.equal(thHome.includes('https://abacus.jasoncameron.dev/hit/'), true);

@@ -90,9 +90,9 @@
         "th": "รับ 90% เมื่อขายสกิลตัวเอง + ค่าคอม 20% นาน 6 เดือนทุกยอดซื้อ"
       },
       "estimatedPayoutUsd": 18,
-      "baseUrl": "https://agensi.io/",
+      "baseUrl": "https://www.agensi.io/r/BURAPA",
       "paramKey": "ref",
-      "affiliateCode": "YOUR_AGENSI_ID"
+      "affiliateCode": "BURAPA"
     }
   }
 }
