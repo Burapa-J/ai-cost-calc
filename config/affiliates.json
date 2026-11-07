@@ -25,9 +25,9 @@
         "th": "ค่าคอม 10% จากยอดเช่า GPU ต่อเนื่อง (PartnerStack)"
       },
       "estimatedPayoutUsd": 65,
-      "baseUrl": "https://www.runpod.io/console/gpu-cloud",
+      "baseUrl": "https://runpod.io/",
       "paramKey": "ref",
-      "affiliateCode": "YOUR_RUNPOD_ID"
+      "affiliateCode": "gk3w1fiy"
     },
     "cloudways": {
       "id": "cloudways",
