@@ -65,6 +65,13 @@ export interface CloudVpsSpec {
   summary: BilingualText;
 }
 
+export interface WorkloadArchetypeSpec {
+  id: string;
+  name: BilingualText;
+  preset: Partial<WorkloadInput>;
+  summary: BilingualText;
+}
+
 export interface WorkloadInput {
   requestsPerDay: number;
   inputTokensPerReq: number;
@@ -174,7 +181,7 @@ export interface DemandValidationReport {
 
 export interface ProgrammaticComparisonPageSpec {
   slug: string;
-  category: 'api_vs_api' | 'api_vs_gpu' | 'vps_vs_vps';
+  category: 'api_vs_api' | 'api_vs_gpu' | 'vps_vs_vps' | 'workload_usecase';
   title: BilingualText;
   metaDescription: BilingualText;
   h1: BilingualText;
@@ -184,6 +191,7 @@ export interface ProgrammaticComparisonPageSpec {
   gpuId?: string;
   vpsIdA?: string;
   vpsIdB?: string;
+  archetypeId?: string;
   faq: Array<{ q: BilingualText; a: BilingualText }>;
 }
 
@@ -203,6 +211,20 @@ export const LLM_MODELS: LlmModelSpec[] = [
     }
   },
   {
+    id: 'claude-3-5-haiku',
+    name: 'Claude 3.5 Haiku',
+    provider: 'Anthropic (via AI/ML API)',
+    inputUsdPer1M: 0.8,
+    cachedInputUsdPer1M: 0.08,
+    outputUsdPer1M: 4.0,
+    contextWindowK: 200,
+    affiliateId: 'aimlapi',
+    summary: {
+      en: 'Low-latency Anthropic model ideal for fast sub-agents, routing, and real-time chat.',
+      th: 'โมเดลความเร็วสูงจาก Anthropic เหมาะสำหรับ Sub-agent คัดกรองงานและแชทบอทแบบเรียลไทม์'
+    }
+  },
+  {
     id: 'gpt-4o',
     name: 'OpenAI GPT-4o',
     provider: 'OpenAI (via AI/ML API)',
@@ -217,17 +239,45 @@ export const LLM_MODELS: LlmModelSpec[] = [
     }
   },
   {
-    id: 'deepseek-v3-r1',
-    name: 'DeepSeek V3 / R1 (API)',
-    provider: 'DeepSeek / Router',
-    inputUsdPer1M: 0.55,
-    cachedInputUsdPer1M: 0.14,
-    outputUsdPer1M: 2.19,
+    id: 'gpt-4o-mini',
+    name: 'OpenAI GPT-4o mini',
+    provider: 'OpenAI (via AI/ML API)',
+    inputUsdPer1M: 0.15,
+    cachedInputUsdPer1M: 0.075,
+    outputUsdPer1M: 0.6,
     contextWindowK: 128,
     affiliateId: 'aimlapi',
     summary: {
-      en: 'High-efficiency open-weight frontier model with aggressive token pricing for heavy reasoning.',
-      th: 'โมเดล Open-weight ประสิทธิภาพสูง ราคาประหยัดสำหรับงานวิเคราะห์และ Agent หลายขั้นตอน'
+      en: 'Budget-friendly workhorse for classification, extraction, and high-frequency subtasks.',
+      th: 'โมเดลรุ่นเล็กประหยัดงบ เหมาะกับงานคัดกรองข้อมูล ตอบแชทพื้นฐาน และเรียกใช้งานถี่ๆ'
+    }
+  },
+  {
+    id: 'o3-mini',
+    name: 'OpenAI o3-mini (Reasoning)',
+    provider: 'OpenAI (via AI/ML API)',
+    inputUsdPer1M: 1.1,
+    cachedInputUsdPer1M: 0.55,
+    outputUsdPer1M: 4.4,
+    contextWindowK: 200,
+    affiliateId: 'aimlapi',
+    summary: {
+      en: 'STEM, math, and structured code reasoning model with 50% cached input discount.',
+      th: 'โมเดลสายคิดวิเคราะห์ตรรกะ คณิตศาสตร์ และเขียนโค้ดซับซ้อนในราคาคุ้มค่า'
+    }
+  },
+  {
+    id: 'gemini-2-5-pro',
+    name: 'Gemini 2.5 Pro',
+    provider: 'Google (via AI/ML API)',
+    inputUsdPer1M: 1.25,
+    cachedInputUsdPer1M: 0.31,
+    outputUsdPer1M: 10.0,
+    contextWindowK: 2000,
+    affiliateId: 'aimlapi',
+    summary: {
+      en: '2M context window flagship reasoning model for massive repository analysis and complex docs.',
+      th: 'รองรับ Context กว้างถึง 2 ล้าน Token เหมาะกับวิเคราะห์โค้ดทั้งโปรเจกต์และเอกสารขนาดใหญ่'
     }
   },
   {
@@ -245,17 +295,45 @@ export const LLM_MODELS: LlmModelSpec[] = [
     }
   },
   {
-    id: 'gpt-4o-mini',
-    name: 'OpenAI GPT-4o mini',
-    provider: 'OpenAI (via AI/ML API)',
-    inputUsdPer1M: 0.15,
-    cachedInputUsdPer1M: 0.075,
+    id: 'deepseek-v3-r1',
+    name: 'DeepSeek V3 / R1 (API)',
+    provider: 'DeepSeek (via AI/ML API)',
+    inputUsdPer1M: 0.55,
+    cachedInputUsdPer1M: 0.14,
+    outputUsdPer1M: 2.19,
+    contextWindowK: 128,
+    affiliateId: 'aimlapi',
+    summary: {
+      en: 'High-efficiency open-weight frontier model with aggressive token pricing for heavy reasoning.',
+      th: 'โมเดล Open-weight ประสิทธิภาพสูง ราคาประหยัดสำหรับงานวิเคราะห์และ Agent หลายขั้นตอน'
+    }
+  },
+  {
+    id: 'llama-3-3-70b-api',
+    name: 'Llama 3.3 70B Instruct (API)',
+    provider: 'Meta / Unified Router',
+    inputUsdPer1M: 0.4,
+    cachedInputUsdPer1M: 0.2,
     outputUsdPer1M: 0.6,
     contextWindowK: 128,
     affiliateId: 'aimlapi',
     summary: {
-      en: 'Budget-friendly workhorse for classification, extraction, and high-frequency subtasks.',
-      th: 'โมเดลรุ่นเล็กประหยัดงบ เหมาะกับงานคัดกรองข้อมูล ตอบแชทพื้นฐาน และเรียกใช้งานถี่ๆ'
+      en: 'Industry-standard 70B open model with predictable low output token cost.',
+      th: 'โมเดล 70B มาตรฐานยอดนิยม ค่า Output Token ต่ำมาก เหมาะกับงานสร้างเนื้อหาจำนวนมาก'
+    }
+  },
+  {
+    id: 'qwen-2-5-coder-32b-api',
+    name: 'Qwen 2.5 Coder 32B (API)',
+    provider: 'Alibaba Cloud / Router',
+    inputUsdPer1M: 0.2,
+    cachedInputUsdPer1M: 0.1,
+    outputUsdPer1M: 0.2,
+    contextWindowK: 128,
+    affiliateId: 'aimlapi',
+    summary: {
+      en: 'Specialized 32B coding & SQL generation model at ultra-low per-token pricing.',
+      th: 'โมเดลเฉพาะทางสำหรับเขียนโค้ดและสร้างคำสั่ง SQL ในราคาประหยัดที่สุด'
     }
   }
 ];
@@ -272,6 +350,32 @@ export const CLOUD_GPUS: CloudGpuSpec[] = [
     summary: {
       en: 'Lowest-cost dedicated GPU for 8B–32B quantized open-weight models and coding assistants.',
       th: 'การ์ดจอยอดนิยมราคาประหยัดที่สุดสำหรับการรันโมเดล 8B–32B แบบส่วนตัว'
+    }
+  },
+  {
+    id: 'runpod-rtx-a6000-48gb',
+    name: 'RunPod NVIDIA RTX A6000 (48GB)',
+    vramGb: 48,
+    hourlyUsd: 0.49,
+    throughputTokensPerSec: 135,
+    affiliateId: 'runpod',
+    bestForModels: 'Qwen-2.5 32B FP16, Llama-3.3 70B (Q4)',
+    summary: {
+      en: 'Sweet-spot 48GB VRAM workstation GPU capable of holding 70B AWQ/GPTQ models on a single card.',
+      th: 'VRAM 48GB ในราคาประหยัด รันโมเดล 70B แบบบีบอัด (Q4) ได้ในการ์ดใบเดียว'
+    }
+  },
+  {
+    id: 'runpod-l40s-48gb',
+    name: 'RunPod NVIDIA L40S (48GB Ada)',
+    vramGb: 48,
+    hourlyUsd: 0.86,
+    throughputTokensPerSec: 195,
+    affiliateId: 'runpod',
+    bestForModels: 'Fast FP8 32B–70B inference & multimodal vision-language models',
+    summary: {
+      en: 'Ada Lovelace data-center GPU with native FP8 tensor cores for fast mid-size LLM serving.',
+      th: 'การ์ดจอ Data Center สถาปัตยกรรม Ada รองรับ FP8 เร็วแรงสำหรับงาน Production'
     }
   },
   {
@@ -299,6 +403,19 @@ export const CLOUD_GPUS: CloudGpuSpec[] = [
       en: 'Flagship FP8 inference accelerator delivering 500+ tok/s for heavy production workloads.',
       th: 'ความเร็วระดับสูงสุด รองรับ FP8 สำหรับระบบ Production ที่มีทราฟฟิกหนาแน่นตลอด 24 ชม.'
     }
+  },
+  {
+    id: 'runpod-2x-a100-160gb',
+    name: 'RunPod 2x NVIDIA A100 Cluster (160GB VRAM)',
+    vramGb: 160,
+    hourlyUsd: 2.78,
+    throughputTokensPerSec: 410,
+    affiliateId: 'runpod',
+    bestForModels: 'Unquantized 70B FP16 + Long-Context 128k KV Cache',
+    summary: {
+      en: '160GB combined VRAM cluster for full-precision 70B+ models with huge concurrent KV cache.',
+      th: 'คลัสเตอร์ VRAM รวม 160GB สำหรับรันโมเดล 70B แบบเต็มความละเอียดพร้อม Context ยาวพิเศษ'
+    }
   }
 ];
 
@@ -314,6 +431,19 @@ export const CLOUD_VPS_OPTIONS: CloudVpsSpec[] = [
     summary: {
       en: 'Managed global cloud hosting with Singapore/Asia edge routing, automated backups, and 24/7 support.',
       th: 'Managed Cloud ระดับสากล มีโหนดสิงคโปร์ใกล้ไทย ดูแลระบบและสำรองข้อมูลอัตโนมัติ 24 ชม.'
+    }
+  },
+  {
+    id: 'cloudways-vultr-8gb',
+    name: 'Cloudways Managed Vultr High Frequency (8GB RAM / 4 vCPU)',
+    region: 'global',
+    vcpu: 4,
+    ramGb: 8,
+    monthlyUsd: 112,
+    affiliateId: 'cloudways',
+    summary: {
+      en: '3GHz+ NVMe High-Frequency compute engineered for high-traffic SaaS backends and API gateways.',
+      th: 'เซิร์ฟเวอร์ความถี่สูง NVMe สำหรับระบบ SaaS และ API Gateway ที่ต้องการความเร็วตอบสนองสูงสุด'
     }
   },
   {
@@ -353,6 +483,117 @@ export const CLOUD_VPS_OPTIONS: CloudVpsSpec[] = [
     summary: {
       en: 'Fully managed Thai enterprise VPS with DirectAdmin, WAF security, and local SLA.',
       th: 'Managed VPS สเปกสูงในไทย มีทีมวิศวกรดูแลครบวงจร เหมาะกับเว็บธุรกิจและระบบหลังบ้าน AI'
+    }
+  },
+  {
+    id: 'hostatom-enterprise-16gb',
+    name: 'Hostatom Dedicated Cloud Thailand (16GB RAM / 8 vCPU)',
+    region: 'thailand',
+    vcpu: 8,
+    ramGb: 16,
+    monthlyUsd: 88,
+    affiliateId: 'hostatom',
+    summary: {
+      en: 'Dedicated Thai cloud resources for heavy vector databases (Qdrant/pgvector) and enterprise ERP.',
+      th: 'คลาวด์ส่วนตัวสเปกสูงในไทย เหมาะสำหรับรัน Vector Database (RAG) และระบบองค์กรขนาดใหญ่'
+    }
+  }
+];
+
+export const WORKLOAD_ARCHETYPES: WorkloadArchetypeSpec[] = [
+  {
+    id: 'rag-customer-support-bot',
+    name: {
+      en: 'RAG Customer Support Chatbot',
+      th: 'ระบบแชทบอทตอบลูกค้าอัตโนมัติ (RAG Knowledge Base)'
+    },
+    preset: {
+      requestsPerDay: 2500,
+      inputTokensPerReq: 3500,
+      outputTokensPerReq: 450,
+      cacheHitRate: 0.6,
+      agentSteps: 2,
+      activeHoursPerDay: 16
+    },
+    summary: {
+      en: 'High input-to-output token ratio from knowledge base retrieval with strong system-prompt caching.',
+      th: 'เน้นส่งข้อมูลเอกสารอ้างอิง (Input สูง) แต่ประหยัดงบได้มากด้วยการใช้ Prompt Caching'
+    }
+  },
+  {
+    id: 'autonomous-coding-agent',
+    name: {
+      en: 'Multi-Step Autonomous Coding Agent',
+      th: 'ระบบ AI Agent เขียนและตรวจโค้ดอัตโนมัติหลายขั้นตอน'
+    },
+    preset: {
+      requestsPerDay: 4000,
+      inputTokensPerReq: 4500,
+      outputTokensPerReq: 900,
+      cacheHitRate: 0.45,
+      agentSteps: 6,
+      activeHoursPerDay: 12
+    },
+    summary: {
+      en: '6 sequential agent loop steps per user task; prime candidate for dedicated GPU break-even.',
+      th: 'เรียกโมเดลซ้ำ 6 รอบต่อ 1 คำสั่ง ทำให้โวลุ่ม Token พุ่งไวและมักคุ้มทุนเมื่อเช่า GPU รายชั่วโมง'
+    }
+  },
+  {
+    id: 'document-ocr-extraction-pipeline',
+    name: {
+      en: 'PDF & Invoice Data Extraction Pipeline',
+      th: 'ระบบสกัดข้อมูลใบแจ้งหนี้และเอกสาร PDF อัตโนมัติ'
+    },
+    preset: {
+      requestsPerDay: 6000,
+      inputTokensPerReq: 2800,
+      outputTokensPerReq: 350,
+      cacheHitRate: 0.2,
+      agentSteps: 1,
+      activeHoursPerDay: 8
+    },
+    summary: {
+      en: 'Batch back-office document processing running 8 active hours per day.',
+      th: 'ประมวลผลเอกสารหลังบ้านเป็นรอบๆ (ประมาณ 8 ชม./วัน) เน้นความแม่นยำในการดึง JSON'
+    }
+  },
+  {
+    id: 'ecommerce-product-copy-generator',
+    name: {
+      en: 'E-Commerce SEO & Product Catalog Generator',
+      th: 'ระบบสร้างคำบรรยายสินค้าและบทความ SEO สำหรับร้านค้าออนไลน์'
+    },
+    preset: {
+      requestsPerDay: 1200,
+      inputTokensPerReq: 1200,
+      outputTokensPerReq: 1100,
+      cacheHitRate: 0.5,
+      agentSteps: 2,
+      activeHoursPerDay: 10
+    },
+    summary: {
+      en: 'Output-heavy content generation workflow for Shopee, Lazada, TikTok Shop, and Shopify sellers.',
+      th: 'เน้นสร้างข้อความยาว (Output Token สูง) สำหรับแม่ค้าออนไลน์และเอเจนซี่การตลาด'
+    }
+  },
+  {
+    id: 'voice-and-chat-call-center-ai',
+    name: {
+      en: '24/7 AI Call Center & Omnichannel Triage',
+      th: 'ระบบ AI คอลเซ็นเตอร์และคัดกรองแชทลูกค้าตลอด 24 ชั่วโมง'
+    },
+    preset: {
+      requestsPerDay: 12000,
+      inputTokensPerReq: 1800,
+      outputTokensPerReq: 300,
+      cacheHitRate: 0.55,
+      agentSteps: 3,
+      activeHoursPerDay: 24
+    },
+    summary: {
+      en: 'Always-on 24/7 high-concurrency customer triage requiring low latency and predictable monthly bills.',
+      th: 'เปิดระบบตลอด 24 ชม. รองรับลูกค้าจำนวนมาก เน้นความเร็วตอบกลับและคุมงบรายเดือนไม่ให้บานปลาย'
     }
   }
 ];

@@ -2,7 +2,8 @@ import {
   CLOUD_GPUS,
   CLOUD_VPS_OPTIONS,
   LLM_MODELS,
-  type ProgrammaticComparisonPageSpec
+  type ProgrammaticComparisonPageSpec,
+  WORKLOAD_ARCHETYPES
 } from './domain.ts';
 
 export function buildProgrammaticPagesCatalog(): ProgrammaticComparisonPageSpec[] {
@@ -20,16 +21,16 @@ export function buildProgrammaticPagesCatalog(): ProgrammaticComparisonPageSpec[
         primaryModelId: m1.id,
         secondaryModelId: m2.id,
         title: {
-          en: `${m1.name} vs ${m2.name} API Cost Calculator (2026 Token & Caching Pricing)`,
-          th: `คำนวณและเปรียบเทียบราคา ${m1.name} vs ${m2.name} (อัปเดต 2026 คิดเป็นเงินบาท)`
+          en: `${m1.name} vs ${m2.name} — API Token & Caching Cost Ledger (2026)`,
+          th: `${m1.name} เทียบกับ ${m2.name} — ตารางคำนวณต้นทุน API และ Prompt Caching (2026)`
         },
         metaDescription: {
-          en: `Interactive ${m1.name} vs ${m2.name} pricing calculator. Compare monthly token bills with prompt caching, multi-step agent loops, and GPU break-even thresholds.`,
-          th: `เครื่องมือคำนวณค่าใช้จ่าย ${m1.name} เทียบกับ ${m2.name} ตามจำนวน Token จริง พร้อมส่วนลด Prompt Caching และจุดคุ้มทุนเทียบกับการเช่า Cloud GPU`
+          en: `Precision token cost model comparing ${m1.name} ($${m1.inputUsdPer1M}/1M in) and ${m2.name} ($${m2.inputUsdPer1M}/1M in) across cache hit ratios and multi-step agent loops.`,
+          th: `คำนวณค่าใช้จ่ายรายเดือนระหว่าง ${m1.name} และ ${m2.name} ตามจำนวน Token จริง พร้อมส่วนลด Prompt Caching และตัวคูณ Agent หลายขั้นตอน`
         },
         h1: {
-          en: `${m1.name} vs ${m2.name}: Real Monthly API Cost & Break-Even Calculator`,
-          th: `เปรียบเทียบราคา ${m1.name} vs ${m2.name}: คำนวณต้นทุนจริงรายเดือน (USD & THB)`
+          en: `${m1.name} vs. ${m2.name}`,
+          th: `เปรียบเทียบต้นทุน ${m1.name} กับ ${m2.name}`
         },
         presetWorkload: {
           requestsPerDay: 2000,
@@ -42,12 +43,12 @@ export function buildProgrammaticPagesCatalog(): ProgrammaticComparisonPageSpec[
         faq: [
           {
             q: {
-              en: `Is ${m1.name} cheaper than ${m2.name} when prompt caching is enabled?`,
-              th: `${m1.name} ถูกกว่า ${m2.name} หรือไม่เมื่อเปิดใช้ Prompt Caching?`
+              en: `How does prompt caching affect ${m1.name} vs ${m2.name} unit economics?`,
+              th: `Prompt Caching ส่งผลต่อส่วนต่างราคาระหว่าง ${m1.name} กับ ${m2.name} อย่างไร?`
             },
             a: {
-              en: `${m1.name} charges $${m1.inputUsdPer1M}/1M input ($${m1.cachedInputUsdPer1M}/1M cached) and $${m1.outputUsdPer1M}/1M output, whereas ${m2.name} charges $${m2.inputUsdPer1M}/1M input ($${m2.cachedInputUsdPer1M}/1M cached) and $${m2.outputUsdPer1M}/1M output. Use the slider above to test your exact cache hit ratio.`,
-              th: `${m1.name} คิดค่า Input $${m1.inputUsdPer1M}/1M (เมื่อใช้ Cache เหลือ $${m1.cachedInputUsdPer1M}/1M) และ Output $${m1.outputUsdPer1M}/1M ส่วน ${m2.name} คิด Input $${m2.inputUsdPer1M}/1M (Cache $${m2.cachedInputUsdPer1M}/1M) และ Output $${m2.outputUsdPer1M}/1M คุณสามารถเลื่อนสไลเดอร์ด้านบนเพื่อดูผลต่างเป็นเงินบาทได้ทันที`
+              en: `${m1.name} bills $${m1.inputUsdPer1M}/1M uncached input ($${m1.cachedInputUsdPer1M}/1M cached) and $${m1.outputUsdPer1M}/1M output. ${m2.name} bills $${m2.inputUsdPer1M}/1M uncached input ($${m2.cachedInputUsdPer1M}/1M cached) and $${m2.outputUsdPer1M}/1M output.`,
+              th: `${m1.name} คิดราคา Input ปกติ $${m1.inputUsdPer1M}/1M (เมื่อติด Cache เหลือ $${m1.cachedInputUsdPer1M}/1M) และ Output $${m1.outputUsdPer1M}/1M ส่วน ${m2.name} คิด Input $${m2.inputUsdPer1M}/1M (Cache $${m2.cachedInputUsdPer1M}/1M) และ Output $${m2.outputUsdPer1M}/1M`
             }
           }
         ]
@@ -64,16 +65,16 @@ export function buildProgrammaticPagesCatalog(): ProgrammaticComparisonPageSpec[
         primaryModelId: model.id,
         gpuId: gpu.id,
         title: {
-          en: `${model.name} API vs ${gpu.name} Break-Even Calculator (API vs Self-Hosted GPU)`,
-          th: `คำนวณจุดคุ้มทุน ${model.name} API vs เช่า ${gpu.name} (จ่ายตาม Token หรือเช่า GPU คุ้มกว่า?)`
+          en: `${model.name} API vs ${gpu.name} — Break-Even Volume Analysis`,
+          th: `จุดคุ้มทุน ${model.name} API เทียบกับเช่า ${gpu.name} รายชั่วโมง`
         },
         metaDescription: {
-          en: `Calculate the exact daily request & token volume where renting ${gpu.name} ($${gpu.hourlyUsd}/hr) beats paying per token for ${model.name}.`,
-          th: `คำนวณจุดคุ้มทุนแบบเรียลไทม์ว่าต้องมีงานกี่ครั้งต่อวัน การเช่า ${gpu.name} ($${gpu.hourlyUsd}/ชม.) จึงจะประหยัดกว่าใช้ ${model.name} API`
+          en: `Find the exact daily request threshold where dedicated ${gpu.name} rental ($${gpu.hourlyUsd}/hr) undercuts ${model.name} per-token billing.`,
+          th: `คำนวณจุดตัดความคุ้มค่าระหว่างการจ่าย ${model.name} ตามจำนวน Token กับการเช่าเครื่อง ${gpu.name} ($${gpu.hourlyUsd}/ชม.)`
         },
         h1: {
-          en: `${model.name} API vs ${gpu.name}: True Break-Even Calculator`,
-          th: `${model.name} API เทียบกับเช่า ${gpu.name}: คำนวณจุดคุ้มทุนรายเดือน`
+          en: `${model.name} vs. ${gpu.name}`,
+          th: `จุดคุ้มทุน ${model.name} เทียบกับ ${gpu.name}`
         },
         presetWorkload: {
           requestsPerDay: 4500,
@@ -86,12 +87,12 @@ export function buildProgrammaticPagesCatalog(): ProgrammaticComparisonPageSpec[
         faq: [
           {
             q: {
-              en: `At what volume does ${gpu.name} beat ${model.name} API?`,
-              th: `ต้องใช้งานเยอะแค่ไหน การเช่า ${gpu.name} จึงจะถูกกว่า ${model.name} API?`
+              en: `When does ${gpu.name} become cheaper than ${model.name} API?`,
+              th: `ปริมาณงานระดับใดที่การเช่า ${gpu.name} ถูกกว่าการจ่าย ${model.name} API?`
             },
             a: {
-              en: `${gpu.name} costs $${gpu.hourlyUsd}/hour with ${gpu.vramGb}GB VRAM (~${gpu.throughputTokensPerSec} tok/s). When multi-step agents multiply token calls, dedicated GPU rental caps your hourly spend with zero runaway token risk.`,
-              th: `${gpu.name} มีราคาเช่า $${gpu.hourlyUsd}/ชั่วโมง (VRAM ${gpu.vramGb}GB ความเร็ว ~${gpu.throughputTokensPerSec} tok/s) หากระบบของคุณเป็น Agent ที่เรียกซ้ำหลายรอบต่อ 1 งาน การเช่า GPU จะช่วยล็อกเพดานค่าใช้จ่ายไม่ให้บานปลาย`
+              en: `${gpu.name} runs at a flat $${gpu.hourlyUsd}/hr (${gpu.vramGb}GB VRAM, ~${gpu.throughputTokensPerSec} tok/s). Once multi-step agent calls push daily token spend above the hourly rental line, dedicated GPU instances cap your monthly ceiling.`,
+              th: `${gpu.name} มีต้นทุนคงที่ $${gpu.hourlyUsd}/ชั่วโมง (VRAM ${gpu.vramGb}GB ความเร็วประมาณ ${gpu.throughputTokensPerSec} tok/s) เมื่อปริมาณการเรียกซ้ำของ Agent สูงเกินจุดคุ้มทุน การเช่า GPU จะช่วยล็อกงบรายเดือนไม่ให้บานปลาย`
             }
           }
         ]
@@ -110,16 +111,16 @@ export function buildProgrammaticPagesCatalog(): ProgrammaticComparisonPageSpec[
         vpsIdA: v1.id,
         vpsIdB: v2.id,
         title: {
-          en: `${v1.name} vs ${v2.name}: Cloud VPS & AI App Hosting Cost Comparison`,
-          th: `เปรียบเทียบ ${v1.name} vs ${v2.name}: เลือก Cloud VPS ไหนคุ้มสุดสำหรับเว็บและระบบ AI`
+          en: `${v1.name} vs ${v2.name} — Infrastructure Cost & Spec Comparison`,
+          th: `เปรียบเทียบสเปกและราคา ${v1.name} กับ ${v2.name}`
         },
         metaDescription: {
-          en: `Compare ${v1.name} ($${v1.monthlyUsd}/mo) and ${v2.name} ($${v2.monthlyUsd}/mo) for hosting AI web apps, APIs, and SaaS backends in Thailand & globally.`,
-          th: `เทียบสเปกและราคา ${v1.name} ($${v1.monthlyUsd}/เดือน) กับ ${v2.name} ($${v2.monthlyUsd}/เดือน) สำหรับรันเว็บไซต์ ระบบหลังบ้าน และ AI Agent`
+          en: `Side-by-side infrastructure benchmark comparing ${v1.name} ($${v1.monthlyUsd}/mo) and ${v2.name} ($${v2.monthlyUsd}/mo) for AI backends and web workloads.`,
+          th: `เทียบสเปก vCPU, RAM และค่าใช้จ่ายรายเดือนระหว่าง ${v1.name} ($${v1.monthlyUsd}/เดือน) กับ ${v2.name} ($${v2.monthlyUsd}/เดือน)`
         },
         h1: {
-          en: `${v1.name} vs ${v2.name}: Monthly TCO & Specs Comparison`,
-          th: `เปรียบเทียบ ${v1.name} vs ${v2.name}: สเปก ราคา และความคุ้มค่ารายเดือน`
+          en: `${v1.name} vs. ${v2.name}`,
+          th: `เปรียบเทียบ ${v1.name} กับ ${v2.name}`
         },
         presetWorkload: {
           requestsPerDay: 1000,
@@ -132,12 +133,49 @@ export function buildProgrammaticPagesCatalog(): ProgrammaticComparisonPageSpec[
         faq: [
           {
             q: {
-              en: `Should I choose ${v1.name} or ${v2.name} for an AI SaaS application?`,
-              th: `ควรเลือก ${v1.name} หรือ ${v2.name} สำหรับรันระบบเว็บและ AI SaaS?`
+              en: `How do ${v1.name} and ${v2.name} compare on monthly TCO?`,
+              th: `ความแตกต่างด้านต้นทุนและภูมิภาคของ ${v1.name} กับ ${v2.name} คืออะไร?`
             },
             a: {
-              en: `${v1.name} provides ${v1.vcpu} vCPU / ${v1.ramGb}GB RAM at $${v1.monthlyUsd}/mo (${v1.region} region), while ${v2.name} offers ${v2.vcpu} vCPU / ${v2.ramGb}GB RAM at $${v2.monthlyUsd}/mo (${v2.region} region).`,
-              th: `${v1.name} ให้สเปก ${v1.vcpu} vCPU / ${v1.ramGb}GB RAM ในราคา $${v1.monthlyUsd}/เดือน ส่วน ${v2.name} ให้สเปก ${v2.vcpu} vCPU / ${v2.ramGb}GB RAM ในราคา $${v2.monthlyUsd}/เดือน`
+              en: `${v1.name} provides ${v1.vcpu} vCPU / ${v1.ramGb}GB RAM at $${v1.monthlyUsd}/mo (${v1.region}), while ${v2.name} offers ${v2.vcpu} vCPU / ${v2.ramGb}GB RAM at $${v2.monthlyUsd}/mo (${v2.region}).`,
+              th: `${v1.name} ให้สเปก ${v1.vcpu} vCPU / ${v1.ramGb}GB RAM ที่ $${v1.monthlyUsd}/เดือน (${v1.region}) ส่วน ${v2.name} ให้สเปก ${v2.vcpu} vCPU / ${v2.ramGb}GB RAM ที่ $${v2.monthlyUsd}/เดือน (${v2.region})`
+            }
+          }
+        ]
+      });
+    }
+  }
+
+  for (const arch of WORKLOAD_ARCHETYPES) {
+    for (const model of LLM_MODELS) {
+      const slug = `${arch.id}-with-${model.id}-cost-estimator`;
+      pages.push({
+        slug,
+        category: 'workload_usecase',
+        archetypeId: arch.id,
+        primaryModelId: model.id,
+        title: {
+          en: `${arch.name.en} Cost Estimator with ${model.name} (2026 TCO)`,
+          th: `คำนวณงบ ${arch.name.th} ด้วย ${model.name} (ต้นทุนรายเดือน)`
+        },
+        metaDescription: {
+          en: `Estimate monthly token and GPU break-even costs for running a ${arch.name.en} on ${model.name}.`,
+          th: `ประเมินค่าใช้จ่ายรายเดือนและจุดคุ้มทุนสำหรับการรัน${arch.name.th}ด้วยโมเดล ${model.name}`
+        },
+        h1: {
+          en: `${arch.name.en} — ${model.name} Cost Model`,
+          th: `${arch.name.th} ด้วย ${model.name}`
+        },
+        presetWorkload: arch.preset,
+        faq: [
+          {
+            q: {
+              en: `What is the typical token profile for a ${arch.name.en} using ${model.name}?`,
+              th: `รูปแบบการใช้ Token ของ${arch.name.th}เมื่อใช้ ${model.name} เป็นอย่างไร?`
+            },
+            a: {
+              en: `${arch.summary.en} With ${model.name} ($${model.inputUsdPer1M}/1M input, $${model.outputUsdPer1M}/1M output), adjust daily volume and agent steps above to model your exact bill.`,
+              th: `${arch.summary.th} เมื่อรันบน ${model.name} (Input $${model.inputUsdPer1M}/1M, Output $${model.outputUsdPer1M}/1M) คุณสามารถปรับจำนวนงานต่อวันด้านบนเพื่อดูงบประมาณจริงได้ทันที`
             }
           }
         ]

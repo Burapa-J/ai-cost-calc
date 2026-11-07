@@ -54,6 +54,31 @@ export function resolveAffiliateUrl(
   return url.toString();
 }
 
+export function updateAffiliateCode(
+  config: AffiliateConfigFile,
+  affiliateId: string,
+  newCode: string
+): AffiliateConfigFile {
+  const trimmedCode = (newCode || '').trim();
+  if (!trimmedCode) {
+    throw new Error('Affiliate code must not be empty');
+  }
+  if (!(affiliateId in config.programs)) {
+    throw new Error(`Unknown affiliate program ID: ${affiliateId}`);
+  }
+  const typedId = affiliateId as AffiliateId;
+  return {
+    ...config,
+    programs: {
+      ...config.programs,
+      [typedId]: {
+        ...config.programs[typedId],
+        affiliateCode: trimmedCode
+      }
+    }
+  };
+}
+
 export function calculateCostComparison(
   rawInput: Partial<WorkloadInput>,
   affiliateConfig: AffiliateConfigFile,

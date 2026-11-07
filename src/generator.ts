@@ -24,144 +24,349 @@ function escapeHtml(text: string): string {
 function renderSharedStyles(): string {
   return `
     :root {
-      --bg: #0b1020;
-      --card: #131b33;
-      --card-border: #253259;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --emerald: #10b981;
-      --amber: #f59e0b;
+      --paper: #F6F5F0;
+      --surface: #FFFFFF;
+      --surface-alt: #EFECE4;
+      --ink: #141413;
+      --ink-secondary: #575651;
+      --ink-muted: #85837C;
+      --line: #DCD9CF;
+      --line-strong: #141413;
+      --signal: #C83E1D;
+      --ledger-green: #165B33;
+      --mono: "JetBrains Mono", "SF Mono", "Menlo", "Consolas", monospace;
+      --sans: "Inter", -apple-system, BlinkMacSystemFont, "Noto Sans Thai", "Thonburi", sans-serif;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
+      font-family: var(--sans);
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .container { max-width: 1140px; margin: 0 auto; padding: 24px 16px 64px; }
-    .topbar {
+    a { color: var(--ink); text-decoration: none; }
+    .shell {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+    .masthead {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--card-border);
-      margin-bottom: 24px;
+      padding: 20px 0;
+      border-bottom: 1.5px solid var(--line-strong);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
       flex-wrap: wrap;
       gap: 12px;
     }
-    .brand { font-weight: 800; font-size: 1.2rem; color: #fff; letter-spacing: -0.02em; }
-    .nav-links { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .pill {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      font-size: 0.875rem;
+    .brand-mark {
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.06em;
+    }
+    .nav-bar {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .nav-link {
+      color: var(--ink-secondary);
+      padding: 3px 0;
+      border-bottom: 1.5px solid transparent;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--ink);
+      border-bottom-color: var(--ink);
+    }
+    .hero-block {
+      padding: 36px 0 28px;
+      border-bottom: 1px solid var(--line);
+    }
+    .kicker {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--ink-secondary);
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-size: clamp(1.65rem, 3vw, 2.45rem);
       font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin: 0 0 12px;
+      max-width: 28ch;
     }
-    .pill.active { background: var(--accent); color: #0f172a; border-color: var(--accent); }
-    h1 { font-size: 1.9rem; margin: 0 0 8px; line-height: 1.25; }
-    .subtitle { color: var(--muted); margin-bottom: 24px; font-size: 1.02rem; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1.25fr; gap: 20px; }
-    @media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 20px;
+    .lead {
+      color: var(--ink-secondary);
+      font-size: 0.98rem;
+      max-width: 68ch;
+      margin: 0;
     }
-    .control-group { margin-bottom: 16px; }
-    .control-header {
+    .ledger-frame {
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      border: 1px solid var(--line-strong);
+      background: var(--surface);
+      margin-top: 28px;
+    }
+    @media (max-width: 920px) {
+      .ledger-frame { grid-template-columns: 1fr; }
+    }
+    .panel-left {
+      border-right: 1px solid var(--line);
+      padding: 24px;
+      background: var(--paper);
+    }
+    @media (max-width: 920px) {
+      .panel-left { border-right: none; border-bottom: 1px solid var(--line); }
+    }
+    .panel-right {
+      background: var(--surface);
+    }
+    .section-tag {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-secondary);
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 18px;
       display: flex;
       justify-content: space-between;
-      font-size: 0.92rem;
-      font-weight: 600;
-      margin-bottom: 6px;
     }
-    .control-val { color: var(--accent); font-family: monospace; font-size: 1rem; }
-    input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
-    .winner-banner {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(56, 189, 248, 0.12));
-      border: 1px solid var(--emerald);
-      border-radius: 12px;
-      padding: 18px;
-      margin-bottom: 18px;
+    .preset-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--line);
+      margin-bottom: 22px;
+      background: var(--surface);
     }
-    .winner-badge {
-      display: inline-block;
-      background: var(--emerald);
-      color: #052e16;
-      font-weight: 800;
-      font-size: 0.76rem;
-      padding: 3px 10px;
-      border-radius: 99px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .cta-btn {
-      display: inline-block;
-      background: var(--emerald);
-      color: #042f2e;
-      font-weight: 800;
-      padding: 10px 18px;
-      border-radius: 8px;
-      margin-top: 10px;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .cta-btn:hover { filter: brightness(1.1); text-decoration: none; }
-    .cta-secondary {
+    .preset-btn {
       background: transparent;
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      padding: 8px 14px;
-      border-radius: 8px;
+      border: none;
+      border-right: 1px solid var(--line);
+      padding: 8px 6px;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--ink-secondary);
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.12s, color 0.12s;
+    }
+    .preset-btn:last-child { border-right: none; }
+    .preset-btn:hover { background: var(--ink); color: var(--surface); }
+    .field-row {
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .field-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+    .field-label {
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+    .field-readout {
+      font-family: var(--mono);
+      font-size: 0.86rem;
       font-weight: 600;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 2px 8px;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 2px;
+      background: var(--line-strong);
+      outline: none;
       cursor: pointer;
     }
-    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin-top: 10px; }
-    th, td {
-      text-align: left;
-      padding: 10px 8px;
-      border-bottom: 1px solid var(--card-border);
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      background: var(--ink);
+      border: 1.5px solid var(--surface);
+      cursor: pointer;
     }
-    th { color: var(--muted); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; }
-    .price-usd { font-weight: 700; color: #fff; font-family: monospace; }
-    .price-thb { color: var(--amber); font-family: monospace; font-size: 0.86rem; }
-    .seo-links {
+    .verdict-cell {
+      padding: 24px 28px;
+      border-bottom: 1px solid var(--line-strong);
+      background: var(--surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .verdict-meta { max-width: 64ch; }
+    .verdict-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 4px 0 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    .verdict-copy {
+      font-size: 0.88rem;
+      color: var(--ink-secondary);
+      margin: 0;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--ink);
+      color: var(--surface);
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 12px 18px;
+      border: 1px solid var(--ink);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.12s, color 0.12s;
+    }
+    .btn-primary:hover {
+      background: var(--signal);
+      border-color: var(--signal);
+      color: #fff;
+    }
+    .btn-outline {
+      width: 100%;
+      background: var(--surface);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 10px 14px;
+      border: 1px solid var(--line-strong);
+      cursor: pointer;
+    }
+    .btn-outline:hover {
+      background: var(--ink);
+      color: var(--surface);
+    }
+    .table-block {
+      padding: 22px 28px;
+      border-bottom: 1px solid var(--line);
+    }
+    .table-block:last-child { border-bottom: none; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      font-variant-numeric: tabular-nums;
+    }
+    th {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      text-align: left;
+      padding: 8px 10px 8px 0;
+      border-bottom: 1px solid var(--line-strong);
+      font-weight: 500;
+    }
+    th.num, td.num { text-align: right; }
+    td {
+      padding: 11px 10px 11px 0;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    .mono-val {
+      font-family: var(--mono);
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .sub-val {
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      color: var(--ink-secondary);
+      display: block;
+    }
+    .action-link {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--signal);
+      border-bottom: 1px solid currentColor;
+      padding-bottom: 1px;
+    }
+    .action-link:hover { color: var(--ink); }
+    .standalone-section {
+      margin-top: 32px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      padding: 24px 28px;
+    }
+    .index-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 10px;
-      margin-top: 12px;
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
+      margin-top: 14px;
     }
-    .seo-link-card {
-      display: block;
+    .index-cell {
       padding: 10px 12px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      font-size: 0.88rem;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-size: 0.8rem;
+      color: var(--ink-secondary);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
     }
-    .preset-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-    .preset-btn {
-      background: rgba(56, 189, 248, 0.12);
-      color: var(--accent);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      border-radius: 6px;
-      padding: 6px 10px;
-      font-size: 0.82rem;
-      cursor: pointer;
+    .index-cell:hover {
+      background: var(--surface-alt);
+      color: var(--ink);
     }
   `;
+}
+
+function selectRelatedSpecs(
+  currentSlug: string,
+  allPages: ProgrammaticComparisonPageSpec[],
+  isHomeHub: boolean
+): ProgrammaticComparisonPageSpec[] {
+  if (isHomeHub) {
+    return allPages;
+  }
+  const current = allPages.find((p) => p.slug === currentSlug);
+  if (!current) {
+    return allPages.slice(0, 24);
+  }
+  const sameCategory = allPages.filter(
+    (p) =>
+      p.slug !== currentSlug &&
+      (p.category === current.category ||
+        (current.primaryModelId && p.primaryModelId === current.primaryModelId))
+  );
+  return sameCategory.slice(0, 24);
 }
 
 function renderCalculatorPage(
@@ -184,63 +389,71 @@ function renderCalculatorPage(
     ? `${rootPrefix}/${alternateLang}/compare/${pageSlug}.html`
     : `${rootPrefix}/${alternateLang}/index.html`;
 
+  const relatedPages = selectRelatedSpecs(pageSlug, allPages, !isComparisonSubpage);
+
   const labels =
     locale === 'th'
       ? {
+          kicker: 'ตารางวิเคราะห์ต้นทุนโครงสร้างพื้นฐาน AI // อัปเดต 2026',
           subtitle:
-            'คำนวณต้นทุนจริง AI API (พร้อมส่วนลด Prompt Caching & Agent หลายขั้นตอน) เทียบกับการเช่า Cloud GPU และ Cloud VPS ไทย/สากล',
-          workloadTitle: '1. ปรับปริมาณงานของคุณ (Interactive Workload)',
-          presetStartup: 'แชทบอทธุรกิจ (1,500 งาน/วัน)',
-          presetAgent: 'ระบบ AI Agent หลายขั้นตอน (5,000 งาน/วัน)',
-          presetHigh: 'สเกลองค์กร (25,000 งาน/วัน)',
+            'เปรียบเทียบต้นทุนจริงรายเดือนระหว่างการเรียกใช้ LLM API (รวมส่วนลด Prompt Caching และตัวคูณ Agent หลายขั้นตอน) เทียบกับการเช่าเครื่อง Cloud GPU รายชั่วโมง และเซิร์ฟเวอร์ Cloud VPS',
+          workloadTag: '01 // ตัวแปรปริมาณงาน (WORKLOAD PARAMETERS)',
+          presetStartup: '1.5K งาน/วัน',
+          presetAgent: '5K AGENT',
+          presetHigh: '25K องค์กร',
           reqLabel: 'จำนวนงานต่อวัน (Tasks / Day)',
-          agentLabel: 'จำนวนรอบที่ Agent เรียกโมเดลต่อ 1 งาน (Agent Steps)',
-          inTokLabel: 'Input Tokens ต่อรอบ (Prompt + RAG Context)',
-          outTokLabel: 'Output Tokens ต่อรอบ (Response)',
-          cacheLabel: 'สัดส่วน Prompt Caching Hit (%)',
-          hoursLabel: 'ชั่วโมงที่เปิดเครื่อง GPU ต่อวัน (Active GPU Hours/Day)',
-          shareBtn: 'คัดลอกลิงก์ผลคำนวณนี้ (Share Scenario)',
-          winnerTitle: 'คำแนะนำที่คุ้มที่สุดสำหรับปริมาณงานนี้',
-          apiTableTitle: '2. ตารางเปรียบเทียบค่าใช้จ่าย LLM API รายเดือน',
-          gpuTableTitle: '3. ตารางเช่า Cloud GPU (RunPod) และจุดคุ้มทุน (Break-Even)',
-          vpsTableTitle: '4. ตาราง Cloud VPS & โฮสติ้งสำหรับระบบเว็บ/AI (ไทย & สากล)',
-          colModel: 'ผู้ให้บริการ / โมเดล',
-          colMonthly: 'ค่าใช้จ่าย / เดือน',
-          colMetric: 'ต้นทุน / จุดคุ้มทุน',
-          colAction: 'ลิงก์รับสิทธิ์ / ทดลองใช้',
-          ctaTryApi: 'รับเครดิต Router 200+ โมเดล →',
-          ctaRentGpu: 'เช่า GPU รายชั่วโมง →',
-          ctaHostVps: 'ดูโปรโมชั่นเซิร์ฟเวอร์ →',
-          faqTitle: 'คำถามที่พบบ่อย (FAQ)',
-          directoryTitle: 'หน้าเปรียบเทียบและคำนวณเจาะลึก (Programmatic Calculators)'
+          agentLabel: 'จำนวนรอบที่เรียกโมเดลต่อ 1 งาน (Agent Steps)',
+          inTokLabel: 'Input Tokens ต่อรอบ (Prompt + Context)',
+          outTokLabel: 'Output Tokens ต่อรอบ (Completion)',
+          cacheLabel: 'อัตราส่วน Prompt Cache Hit (%)',
+          hoursLabel: 'ชั่วโมงเปิดเครื่อง GPU ต่อวัน (Active Hours)',
+          shareBtn: 'คัดลอกลิงก์พารามิเตอร์ชุดนี้',
+          winnerTag: '02 // ข้อสรุปต้นทุนต่ำสุด (OPTIMAL TCO VERDICT)',
+          apiTableTag: '03 // ตารางต้นทุน MANAGED LLM API (เรียงจากถูกสุด)',
+          gpuTableTag: '04 // ตารางเช่า DEDICATED CLOUD GPU และจุดคุ้มทุน',
+          vpsTableTag: '05 // ตาราง CLOUD VPS สำหรับรันระบบหลังบ้าน (ไทย & สากล)',
+          colModel: 'รุ่นโมเดล / สเปกเครื่อง',
+          colMonthly: 'รายเดือน (USD / THB)',
+          colMetric: 'ต้นทุนต่อหน่วย / จุดคุ้มทุน',
+          colAction: 'ผู้ให้บริการ',
+          ctaTryApi: 'เปิดดูเรทราคา API',
+          ctaRentGpu: 'เช่าเครื่อง GPU',
+          ctaHostVps: 'ดูแพ็กเกจ VPS',
+          faqTag: '06 // ข้อมูลจำเพาะทางเทคนิค (SPECIFICATION NOTES)',
+          directoryTag: isComparisonSubpage
+            ? '07 // หน้าคำนวณที่เกี่ยวข้อง (RELATED MODELS)'
+            : `07 // ดัชนีหน้าคำนวณทั้งหมด (${allPages.length} MODELS)`
         }
       : {
+          kicker: 'INFRASTRUCTURE UNIT ECONOMICS LEDGER // 2026 REVISION',
           subtitle:
-            'Compare real monthly LLM API bills (factoring in Prompt Caching & Multi-Step Agent Loops) against Cloud GPU rental and Managed VPS hosting.',
-          workloadTitle: '1. Configure Your AI Workload',
-          presetStartup: 'SaaS Chatbot (1,500 tasks/day)',
-          presetAgent: 'Autonomous Coding Agent (5,000 tasks/day)',
-          presetHigh: 'Enterprise Production (25,000 tasks/day)',
-          reqLabel: 'User Tasks / Day',
-          agentLabel: 'Agent Loop Steps per Task',
-          inTokLabel: 'Input Tokens per Step (Prompt + Context)',
-          outTokLabel: 'Output Tokens per Step',
-          cacheLabel: 'Prompt Cache Hit Ratio (%)',
-          hoursLabel: 'Active GPU Rental Hours / Day',
-          shareBtn: 'Copy Shareable Scenario Link',
-          winnerTitle: 'Lowest TCO Recommendation',
-          apiTableTitle: '2. Managed LLM API Monthly Cost Breakdown',
-          gpuTableTitle: '3. Dedicated Cloud GPU Rental & Break-Even Volume',
-          vpsTableTitle: '4. Managed Cloud VPS & AI App Hosting (Global & Thailand)',
-          colModel: 'Provider / Spec',
-          colMonthly: 'Monthly Cost (USD / THB)',
-          colMetric: 'Unit Metric / Break-Even',
-          colAction: 'Official Offer',
-          ctaTryApi: 'Try Unified API →',
-          ctaRentGpu: 'Deploy Cloud GPU →',
-          ctaHostVps: 'View Hosting Deal →',
-          faqTitle: 'Frequently Asked Questions',
-          directoryTitle: 'All Interactive Comparison Calculators'
+            'Model monthly production spend across pay-per-token LLM APIs (incorporating prompt caching & sequential agent steps), dedicated Cloud GPU instances, and managed VPS infrastructure.',
+          workloadTag: '01 // WORKLOAD PARAMETERS',
+          presetStartup: '1.5K SAAS',
+          presetAgent: '5K AGENT',
+          presetHigh: '25K SCALE',
+          reqLabel: 'Daily User Tasks',
+          agentLabel: 'Sequential Agent Steps / Task',
+          inTokLabel: 'Input Tokens / Step',
+          outTokLabel: 'Output Tokens / Step',
+          cacheLabel: 'Prompt Cache Hit Rate (%)',
+          hoursLabel: 'Active GPU Hours / Day',
+          shareBtn: 'Copy Parameter Permalink',
+          winnerTag: '02 // LOWEST TCO VERDICT',
+          apiTableTag: '03 // MANAGED LLM API LEDGER',
+          gpuTableTag: '04 // DEDICATED CLOUD GPU BREAK-EVEN LEDGER',
+          vpsTableTag: '05 // CLOUD VPS & APPLICATION HOSTING LEDGER',
+          colModel: 'Model / Hardware Spec',
+          colMonthly: 'Monthly Bill (USD / THB)',
+          colMetric: 'Unit Cost / Break-Even',
+          colAction: 'Provider',
+          ctaTryApi: 'Inspect API Tier',
+          ctaRentGpu: 'Provision GPU',
+          ctaHostVps: 'Inspect VPS',
+          faqTag: '06 // SPECIFICATION NOTES',
+          directoryTag: isComparisonSubpage
+            ? '07 // RELATED COST MODELS'
+            : `07 // COMPLETE CALCULATION INDEX (${allPages.length} MODELS)`
         };
 
   const jsonLd = JSON.stringify({
@@ -254,9 +467,8 @@ function renderCalculatorPage(
   });
 
   const clientCatalogJson = JSON.stringify({
-    models: LLM_MODELS,
-    gpus: CLOUD_GPUS,
-    vps: CLOUD_VPS_OPTIONS,
+    models: LLM_MODELS.map(({ summary: _s, ...rest }) => rest),
+    gpus: CLOUD_GPUS.map(({ summary: _s, bestForModels: _b, ...rest }) => rest),
     affiliates: affiliateConfig,
     locale,
     pageSlug,
@@ -275,108 +487,122 @@ function renderCalculatorPage(
   <style>${renderSharedStyles()}</style>
 </head>
 <body>
-  <div class="container">
-    <header class="topbar">
-      <a class="brand" href="${rootPrefix}/${locale}/index.html">⚡ AI &amp; Cloud ROI Calculator</a>
-      <nav class="nav-links">
-        <a class="pill ${locale === 'th' ? 'active' : ''}" href="${locale === 'th' ? '#' : alternatePath}" data-track="lang-switch">🇹🇭 ภาษาไทย</a>
-        <a class="pill ${locale === 'en' ? 'active' : ''}" href="${locale === 'en' ? '#' : alternatePath}" data-track="lang-switch">🇺🇸 English</a>
-        <a class="pill" href="${rootPrefix}/validation-dashboard.html">📊 Demand Proof Dashboard</a>
+  <div class="shell">
+    <header class="masthead">
+      <a class="brand-mark" href="${rootPrefix}/${locale}/index.html">TCO // BENCHMARK.26</a>
+      <nav class="nav-bar">
+        <a class="nav-link" href="${rootPrefix}/${locale}/index.html">INDEX (${allPages.length})</a>
+        <a class="nav-link" href="${rootPrefix}/validation-dashboard.html">TELEMETRY</a>
+        <span>|</span>
+        <a class="nav-link ${locale === 'th' ? 'active' : ''}" href="${locale === 'th' ? '#' : alternatePath}">TH</a>
+        <a class="nav-link ${locale === 'en' ? 'active' : ''}" href="${locale === 'en' ? '#' : alternatePath}">EN</a>
       </nav>
     </header>
 
-    <h1>${escapeHtml(h1)}</h1>
-    <p class="subtitle">${escapeHtml(labels.subtitle)}</p>
+    <section class="hero-block">
+      <div class="kicker">${escapeHtml(labels.kicker)}</div>
+      <h1>${escapeHtml(h1)}</h1>
+      <p class="lead">${escapeHtml(labels.subtitle)}</p>
+    </section>
 
-    <div class="grid-2">
-      <section class="card">
-        <h2 style="margin-top:0; font-size:1.2rem;">${escapeHtml(labels.workloadTitle)}</h2>
-        <div class="preset-bar">
+    <div class="ledger-frame">
+      <aside class="panel-left">
+        <div class="section-tag">
+          <span>${escapeHtml(labels.workloadTag)}</span>
+          <span>FX: 34.5 THB</span>
+        </div>
+
+        <div class="preset-strip">
           <button type="button" class="preset-btn" onclick="applyPreset(1500, 2, 2000, 500, 45, 12)">${escapeHtml(labels.presetStartup)}</button>
           <button type="button" class="preset-btn" onclick="applyPreset(5000, 5, 3500, 800, 25, 10)">${escapeHtml(labels.presetAgent)}</button>
           <button type="button" class="preset-btn" onclick="applyPreset(25000, 4, 3000, 600, 30, 24)">${escapeHtml(labels.presetHigh)}</button>
         </div>
 
-        <div class="control-group">
-          <div class="control-header">
-            <label for="inp-req">${escapeHtml(labels.reqLabel)}</label>
-            <span class="control-val" id="val-req">${initialWorkload.requestsPerDay.toLocaleString()}</span>
+        <div class="field-row">
+          <div class="field-top">
+            <label class="field-label" for="inp-req">${escapeHtml(labels.reqLabel)}</label>
+            <span class="field-readout" id="val-req">${initialWorkload.requestsPerDay.toLocaleString()}</span>
           </div>
           <input id="inp-req" type="range" min="50" max="50000" step="50" value="${initialWorkload.requestsPerDay}" />
         </div>
 
-        <div class="control-group">
-          <div class="control-header">
-            <label for="inp-steps">${escapeHtml(labels.agentLabel)}</label>
-            <span class="control-val" id="val-steps">${initialWorkload.agentSteps}x</span>
+        <div class="field-row">
+          <div class="field-top">
+            <label class="field-label" for="inp-steps">${escapeHtml(labels.agentLabel)}</label>
+            <span class="field-readout" id="val-steps">${initialWorkload.agentSteps}x</span>
           </div>
           <input id="inp-steps" type="range" min="1" max="15" step="1" value="${initialWorkload.agentSteps}" />
         </div>
 
-        <div class="control-group">
-          <div class="control-header">
-            <label for="inp-intok">${escapeHtml(labels.inTokLabel)}</label>
-            <span class="control-val" id="val-intok">${initialWorkload.inputTokensPerReq.toLocaleString()}</span>
+        <div class="field-row">
+          <div class="field-top">
+            <label class="field-label" for="inp-intok">${escapeHtml(labels.inTokLabel)}</label>
+            <span class="field-readout" id="val-intok">${initialWorkload.inputTokensPerReq.toLocaleString()}</span>
           </div>
           <input id="inp-intok" type="range" min="200" max="20000" step="100" value="${initialWorkload.inputTokensPerReq}" />
         </div>
 
-        <div class="control-group">
-          <div class="control-header">
-            <label for="inp-outtok">${escapeHtml(labels.outTokLabel)}</label>
-            <span class="control-val" id="val-outtok">${initialWorkload.outputTokensPerReq.toLocaleString()}</span>
+        <div class="field-row">
+          <div class="field-top">
+            <label class="field-label" for="inp-outtok">${escapeHtml(labels.outTokLabel)}</label>
+            <span class="field-readout" id="val-outtok">${initialWorkload.outputTokensPerReq.toLocaleString()}</span>
           </div>
           <input id="inp-outtok" type="range" min="100" max="4000" step="50" value="${initialWorkload.outputTokensPerReq}" />
         </div>
 
-        <div class="control-group">
-          <div class="control-header">
-            <label for="inp-cache">${escapeHtml(labels.cacheLabel)}</label>
-            <span class="control-val" id="val-cache">${Math.round(initialWorkload.cacheHitRate * 100)}%</span>
+        <div class="field-row">
+          <div class="field-top">
+            <label class="field-label" for="inp-cache">${escapeHtml(labels.cacheLabel)}</label>
+            <span class="field-readout" id="val-cache">${Math.round(initialWorkload.cacheHitRate * 100)}%</span>
           </div>
           <input id="inp-cache" type="range" min="0" max="90" step="5" value="${Math.round(initialWorkload.cacheHitRate * 100)}" />
         </div>
 
-        <div class="control-group">
-          <div class="control-header">
-            <label for="inp-hours">${escapeHtml(labels.hoursLabel)}</label>
-            <span class="control-val" id="val-hours">${initialWorkload.activeHoursPerDay}h</span>
+        <div class="field-row">
+          <div class="field-top">
+            <label class="field-label" for="inp-hours">${escapeHtml(labels.hoursLabel)}</label>
+            <span class="field-readout" id="val-hours">${initialWorkload.activeHoursPerDay}h</span>
           </div>
           <input id="inp-hours" type="range" min="1" max="24" step="1" value="${initialWorkload.activeHoursPerDay}" />
         </div>
 
-        <button type="button" class="cta-secondary" id="btn-share" onclick="copyScenarioLink()">🔗 ${escapeHtml(labels.shareBtn)}</button>
-      </section>
+        <button type="button" class="btn-outline" id="btn-share" onclick="copyScenarioLink()">${escapeHtml(labels.shareBtn)}</button>
+      </aside>
 
-      <section>
-        <div class="winner-banner" id="winner-box">
-          <span class="winner-badge">${escapeHtml(labels.winnerTitle)}</span>
-          <h3 id="winner-name" style="margin:4px 0; font-size:1.35rem;">${escapeHtml(initialCalc.recommendedWinner.name)} — $${initialCalc.recommendedWinner.monthlyUsd.toLocaleString()}/mo (฿${initialCalc.recommendedWinner.monthlyThb.toLocaleString()})</h3>
-          <p id="winner-verdict" style="margin:6px 0; color:#e2e8f0;">${escapeHtml(initialCalc.recommendedWinner.verdict[locale])}</p>
-          <a id="winner-cta" class="cta-btn" href="${escapeHtml(initialCalc.recommendedWinner.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${initialCalc.recommendedWinner.affiliateId}', ${initialCalc.recommendedWinner.monthlyUsd})">
-            ${initialCalc.recommendedWinner.category === 'cloud_gpu' ? escapeHtml(labels.ctaRentGpu) : escapeHtml(labels.ctaTryApi)}
+      <main class="panel-right">
+        <div class="verdict-cell">
+          <div class="verdict-meta">
+            <div class="kicker" style="margin-bottom:4px;">${escapeHtml(labels.winnerTag)}</div>
+            <div class="verdict-title" id="winner-name">${escapeHtml(initialCalc.recommendedWinner.name)} — $${initialCalc.recommendedWinner.monthlyUsd.toLocaleString()}/mo (฿${initialCalc.recommendedWinner.monthlyThb.toLocaleString()})</div>
+            <p class="verdict-copy" id="winner-verdict">${escapeHtml(initialCalc.recommendedWinner.verdict[locale])}</p>
+          </div>
+          <a id="winner-cta" class="btn-primary" href="${escapeHtml(initialCalc.recommendedWinner.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${initialCalc.recommendedWinner.affiliateId}', ${initialCalc.recommendedWinner.monthlyUsd})">
+            ${initialCalc.recommendedWinner.category === 'cloud_gpu' ? escapeHtml(labels.ctaRentGpu) : escapeHtml(labels.ctaTryApi)} →
           </a>
         </div>
 
-        <div class="card">
-          <h3 style="margin-top:0;">${escapeHtml(labels.apiTableTitle)}</h3>
+        <div class="table-block">
+          <div class="section-tag">
+            <span>${escapeHtml(labels.apiTableTag)}</span>
+            <span>USD / THB</span>
+          </div>
           <table>
             <thead>
               <tr>
                 <th>${escapeHtml(labels.colModel)}</th>
-                <th>${escapeHtml(labels.colMonthly)}</th>
-                <th>${escapeHtml(labels.colMetric)}</th>
-                <th>${escapeHtml(labels.colAction)}</th>
+                <th class="num">${escapeHtml(labels.colMonthly)}</th>
+                <th class="num">${escapeHtml(labels.colMetric)}</th>
+                <th class="num">${escapeHtml(labels.colAction)}</th>
               </tr>
             </thead>
             <tbody id="api-tbody">
               ${initialCalc.apiOptions
                 .map(
                   (api) => `<tr>
-                    <td><strong>${escapeHtml(api.name)}</strong><br/><small style="color:var(--muted)">${escapeHtml(api.provider)}</small></td>
-                    <td><span class="price-usd">$${api.monthlyUsd.toLocaleString()}</span><br/><span class="price-thb">฿${api.monthlyThb.toLocaleString()}</span></td>
-                    <td>$${api.costPer1kTasksUsd}/1k tasks</td>
-                    <td><a href="${escapeHtml(api.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${api.affiliateId}', ${api.monthlyUsd})">${escapeHtml(labels.ctaTryApi)}</a></td>
+                    <td><span class="mono-val">${escapeHtml(api.name)}</span><span class="sub-val">${escapeHtml(api.provider)}</span></td>
+                    <td class="num"><span class="mono-val">$${api.monthlyUsd.toLocaleString()}</span><span class="sub-val">฿${api.monthlyThb.toLocaleString()}</span></td>
+                    <td class="num"><span class="mono-val">$${api.costPer1kTasksUsd}</span><span class="sub-val">per 1k tasks</span></td>
+                    <td class="num"><a class="action-link" href="${escapeHtml(api.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${api.affiliateId}', ${api.monthlyUsd})">${escapeHtml(labels.ctaTryApi)}</a></td>
                   </tr>`
                 )
                 .join('\n')}
@@ -384,69 +610,75 @@ function renderCalculatorPage(
           </table>
         </div>
 
-        <div class="card">
-          <h3 style="margin-top:0;">${escapeHtml(labels.gpuTableTitle)}</h3>
+        <div class="table-block">
+          <div class="section-tag">
+            <span>${escapeHtml(labels.gpuTableTag)}</span>
+            <span>DEDICATED HOURLY</span>
+          </div>
           <table>
             <thead>
               <tr>
                 <th>${escapeHtml(labels.colModel)}</th>
-                <th>${escapeHtml(labels.colMonthly)}</th>
-                <th>${escapeHtml(labels.colMetric)}</th>
-                <th>${escapeHtml(labels.colAction)}</th>
+                <th class="num">${escapeHtml(labels.colMonthly)}</th>
+                <th class="num">${escapeHtml(labels.colMetric)}</th>
+                <th class="num">${escapeHtml(labels.colAction)}</th>
               </tr>
             </thead>
             <tbody id="gpu-tbody">
               ${initialCalc.gpuOptions
                 .map(
                   (gpu) => `<tr>
-                    <td><strong>${escapeHtml(gpu.name)}</strong><br/><small style="color:var(--muted)">${gpu.instancesNeeded}x instance (${gpu.vramGb}GB VRAM)</small></td>
-                    <td><span class="price-usd">$${gpu.monthlyUsd.toLocaleString()}</span><br/><span class="price-thb">฿${gpu.monthlyThb.toLocaleString()}</span></td>
-                    <td>Break-even: ${gpu.breakEvenTasksPerDayVsFlagshipApi.toLocaleString()} tasks/day</td>
-                    <td><a href="${escapeHtml(gpu.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${gpu.affiliateId}', ${gpu.monthlyUsd})">${escapeHtml(labels.ctaRentGpu)}</a></td>
+                    <td><span class="mono-val">${escapeHtml(gpu.name)}</span><span class="sub-val">${gpu.instancesNeeded}x instance // ${gpu.vramGb}GB VRAM</span></td>
+                    <td class="num"><span class="mono-val">$${gpu.monthlyUsd.toLocaleString()}</span><span class="sub-val">฿${gpu.monthlyThb.toLocaleString()}</span></td>
+                    <td class="num"><span class="mono-val">${gpu.breakEvenTasksPerDayVsFlagshipApi.toLocaleString()}</span><span class="sub-val">tasks/day break-even</span></td>
+                    <td class="num"><a class="action-link" href="${escapeHtml(gpu.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${gpu.affiliateId}', ${gpu.monthlyUsd})">${escapeHtml(labels.ctaRentGpu)}</a></td>
                   </tr>`
                 )
                 .join('\n')}
             </tbody>
           </table>
         </div>
-      </section>
-    </div>
 
-    <section class="card">
-      <h3 style="margin-top:0;">${escapeHtml(labels.vpsTableTitle)}</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>${escapeHtml(labels.colModel)}</th>
-            <th>${escapeHtml(labels.colMonthly)}</th>
-            <th>${escapeHtml(labels.colMetric)}</th>
-            <th>${escapeHtml(labels.colAction)}</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${initialCalc.vpsOptions
-            .map(
-              (vps) => `<tr>
-                <td><strong>${escapeHtml(vps.name)}</strong></td>
-                <td><span class="price-usd">$${vps.monthlyUsd.toLocaleString()}/mo</span><br/><span class="price-thb">฿${vps.monthlyThb.toLocaleString()}/เดือน</span></td>
-                <td>${vps.vcpu} vCPU / ${vps.ramGb}GB RAM (${vps.region.toUpperCase()})</td>
-                <td><a href="${escapeHtml(vps.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${vps.affiliateId}', ${vps.monthlyUsd})">${escapeHtml(labels.ctaHostVps)}</a></td>
-              </tr>`
-            )
-            .join('\n')}
-        </tbody>
-      </table>
-    </section>
+        <div class="table-block">
+          <div class="section-tag">
+            <span>${escapeHtml(labels.vpsTableTag)}</span>
+            <span>MANAGED / NVME</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>${escapeHtml(labels.colModel)}</th>
+                <th class="num">${escapeHtml(labels.colMonthly)}</th>
+                <th class="num">${escapeHtml(labels.colMetric)}</th>
+                <th class="num">${escapeHtml(labels.colAction)}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${initialCalc.vpsOptions
+                .map(
+                  (vps) => `<tr>
+                    <td><span class="mono-val">${escapeHtml(vps.name)}</span></td>
+                    <td class="num"><span class="mono-val">$${vps.monthlyUsd.toLocaleString()}</span><span class="sub-val">฿${vps.monthlyThb.toLocaleString()}</span></td>
+                    <td class="num"><span class="mono-val">${vps.vcpu} vCPU / ${vps.ramGb}GB</span><span class="sub-val">${vps.region.toUpperCase()}</span></td>
+                    <td class="num"><a class="action-link" href="${escapeHtml(vps.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${vps.affiliateId}', ${vps.monthlyUsd})">${escapeHtml(labels.ctaHostVps)}</a></td>
+                  </tr>`
+                )
+                .join('\n')}
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
 
     ${
       faqList.length > 0
-        ? `<section class="card">
-            <h3 style="margin-top:0;">${escapeHtml(labels.faqTitle)}</h3>
+        ? `<section class="standalone-section">
+            <div class="section-tag"><span>${escapeHtml(labels.faqTag)}</span><span>QA</span></div>
             ${faqList
               .map(
                 (item) => `<div style="margin-bottom:14px;">
-                  <strong>Q: ${escapeHtml(item.q[locale])}</strong>
-                  <p style="margin:4px 0 0; color:var(--muted);">${escapeHtml(item.a[locale])}</p>
+                  <div style="font-weight:600; font-size:0.9rem;">${escapeHtml(item.q[locale])}</div>
+                  <p style="margin:4px 0 0; color:var(--ink-secondary); font-size:0.86rem;">${escapeHtml(item.a[locale])}</p>
                 </div>`
               )
               .join('\n')}
@@ -454,13 +686,19 @@ function renderCalculatorPage(
         : ''
     }
 
-    <section class="card">
-      <h3 style="margin-top:0;">${escapeHtml(labels.directoryTitle)} (${allPages.length})</h3>
-      <div class="seo-links">
-        ${allPages
+    <section class="standalone-section">
+      <div class="section-tag">
+        <span>${escapeHtml(labels.directoryTag)}</span>
+        <a href="${rootPrefix}/${locale}/index.html" style="text-decoration:underline;">VIEW ALL ${allPages.length}</a>
+      </div>
+      <div class="index-grid">
+        ${relatedPages
           .map(
-            (p) =>
-              `<a class="seo-link-card" href="${rootPrefix}/${locale}/compare/${p.slug}.html">${escapeHtml(p.h1[locale])}</a>`
+            (p, idx) =>
+              `<a class="index-cell" href="${rootPrefix}/${locale}/compare/${p.slug}.html">
+                <span>${escapeHtml(p.h1[locale])}</span>
+                <span style="font-family:var(--mono); font-size:0.7rem; color:var(--ink-muted);">#${String(idx + 1).padStart(2, '0')}</span>
+              </a>`
           )
           .join('\n')}
       </div>
@@ -470,12 +708,18 @@ function renderCalculatorPage(
   <script>
     const APP_DATA = ${clientCatalogJson};
     const STORAGE_KEY = 'ai_cost_calc_telemetry_v1';
+    const GLOBAL_NS = 'burapa_ai_cost_calc_live';
+
+    function hitGlobalCounter(key) {
+      fetch('https://abacus.jasoncameron.dev/hit/' + GLOBAL_NS + '/' + key, { mode: 'cors' }).catch(function(){});
+    }
 
     function getSessionId() {
       let sid = localStorage.getItem('ai_cost_calc_sid');
       if (!sid) {
         sid = 'sess-' + Math.random().toString(36).slice(2, 10) + '-' + Date.now();
         localStorage.setItem('ai_cost_calc_sid', sid);
+        hitGlobalCounter('unique_sessions');
       }
       return sid;
     }
@@ -495,6 +739,14 @@ function renderCalculatorPage(
         list.push(ev);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
       } catch (_) {}
+
+      if (eventType === 'page_view') hitGlobalCounter('page_views');
+      if (eventType === 'calculation_run') hitGlobalCounter('calculation_runs');
+      if (eventType === 'scenario_shared') hitGlobalCounter('scenarios_shared');
+      if (eventType === 'affiliate_cta_click') {
+        hitGlobalCounter('affiliate_clicks_total');
+        if (extra && extra.affiliateId) hitGlobalCounter('aff_' + extra.affiliateId);
+      }
 
       fetch('/api/telemetry', {
         method: 'POST',
@@ -562,17 +814,17 @@ function renderCalculatorPage(
       }).sort(function(a, b) { return a.monthlyUsd - b.monthlyUsd; });
 
       document.getElementById('api-tbody').innerHTML = apiRows.map(function(r) {
-        return '<tr><td><strong>' + r.name + '</strong><br/><small style="color:var(--muted)">' + r.provider + '</small></td>' +
-          '<td><span class="price-usd">$' + r.monthlyUsd.toLocaleString() + '</span><br/><span class="price-thb">฿' + r.monthlyThb.toLocaleString() + '</span></td>' +
-          '<td>$' + r.per1k + '/1k tasks</td>' +
-          '<td><a href="' + r.url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\\'' + r.affiliateId + '\\', ' + r.monthlyUsd + ')">${escapeHtml(labels.ctaTryApi)}</a></td></tr>';
+        return '<tr><td><span class="mono-val">' + r.name + '</span><span class="sub-val">' + r.provider + '</span></td>' +
+          '<td class="num"><span class="mono-val">$' + r.monthlyUsd.toLocaleString() + '</span><span class="sub-val">฿' + r.monthlyThb.toLocaleString() + '</span></td>' +
+          '<td class="num"><span class="mono-val">$' + r.per1k + '</span><span class="sub-val">per 1k tasks</span></td>' +
+          '<td class="num"><a class="action-link" href="' + r.url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\\'' + r.affiliateId + '\\', ' + r.monthlyUsd + ')">${escapeHtml(labels.ctaTryApi)}</a></td></tr>';
       }).join('');
 
       document.getElementById('gpu-tbody').innerHTML = gpuRows.map(function(g) {
-        return '<tr><td><strong>' + g.name + '</strong><br/><small style="color:var(--muted)">' + g.instances + 'x instance (' + g.vramGb + 'GB VRAM)</small></td>' +
-          '<td><span class="price-usd">$' + g.monthlyUsd.toLocaleString() + '</span><br/><span class="price-thb">฿' + g.monthlyThb.toLocaleString() + '</span></td>' +
-          '<td>Break-even: ' + g.breakEven.toLocaleString() + ' tasks/day</td>' +
-          '<td><a href="' + g.url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\\'' + g.affiliateId + '\\', ' + g.monthlyUsd + ')">${escapeHtml(labels.ctaRentGpu)}</a></td></tr>';
+        return '<tr><td><span class="mono-val">' + g.name + '</span><span class="sub-val">' + g.instances + 'x instance // ' + g.vramGb + 'GB VRAM</span></td>' +
+          '<td class="num"><span class="mono-val">$' + g.monthlyUsd.toLocaleString() + '</span><span class="sub-val">฿' + g.monthlyThb.toLocaleString() + '</span></td>' +
+          '<td class="num"><span class="mono-val">' + g.breakEven.toLocaleString() + '</span><span class="sub-val">tasks/day break-even</span></td>' +
+          '<td class="num"><a class="action-link" href="' + g.url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\\'' + g.affiliateId + '\\', ' + g.monthlyUsd + ')">${escapeHtml(labels.ctaRentGpu)}</a></td></tr>';
       }).join('');
 
       const bestGpu = gpuRows[0];
@@ -588,7 +840,7 @@ function renderCalculatorPage(
           ? 'ที่ปริมาณงาน ' + req.toLocaleString() + ' งาน/วัน (คูณ ' + steps + ' ขั้นตอน Agent) การเช่า ' + bestGpu.name + ' ประหยัดได้ถึง ฿' + diffThb.toLocaleString() + '/เดือน เมื่อเทียบกับ ' + flagship.name
           : 'At ' + req.toLocaleString() + ' tasks/day × ' + steps + ' agent steps, renting ' + bestGpu.name + ' saves $' + diffUsd.toLocaleString() + '/mo vs ' + flagship.name + '.';
         winnerCtaEl.href = bestGpu.url;
-        winnerCtaEl.textContent = '${escapeHtml(labels.ctaRentGpu)}';
+        winnerCtaEl.textContent = '${escapeHtml(labels.ctaRentGpu)} →';
         winnerCtaEl.onclick = function() { recordAffiliateClick(bestGpu.affiliateId, bestGpu.monthlyUsd); };
       } else {
         const diffUsd = Number((bestGpu.monthlyUsd - flagship.monthlyUsd).toFixed(2));
@@ -598,7 +850,7 @@ function renderCalculatorPage(
           ? 'หากปริมาณงานต่ำกว่า ' + bestGpu.breakEven.toLocaleString() + ' งาน/วัน การใช้ API จ่ายตามจริง (' + flagship.name + ') ประหยัดกว่าเช่า GPU รายชั่วโมงถึง ฿' + diffThb.toLocaleString() + '/เดือน'
           : 'Below ' + bestGpu.breakEven.toLocaleString() + ' tasks/day, pay-per-token API (' + flagship.name + ') is cheaper than renting dedicated GPUs by $' + diffUsd.toLocaleString() + '/mo.';
         winnerCtaEl.href = flagship.url;
-        winnerCtaEl.textContent = '${escapeHtml(labels.ctaTryApi)}';
+        winnerCtaEl.textContent = '${escapeHtml(labels.ctaTryApi)} →';
         winnerCtaEl.onclick = function() { recordAffiliateClick(flagship.affiliateId, flagship.monthlyUsd); };
       }
 
@@ -632,7 +884,7 @@ function renderCalculatorPage(
       }
       sendTelemetry('scenario_shared', {});
       const btn = document.getElementById('btn-share');
-      btn.textContent = APP_DATA.locale === 'th' ? '✅ คัดลอกลิงก์แล้ว!' : '✅ Scenario Link Copied!';
+      btn.textContent = APP_DATA.locale === 'th' ? 'คัดลอกลิงก์พารามิเตอร์เรียบร้อย' : 'PERMALINK COPIED';
     }
 
     ['inp-req', 'inp-steps', 'inp-intok', 'inp-outtok', 'inp-cache', 'inp-hours'].forEach(function(id) {
@@ -662,98 +914,128 @@ function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): st
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demand Validation &amp; Revenue Proof Dashboard (100,000 THB/mo Tracker)</title>
+  <title>TELEMETRY &amp; DEMAND PROOF LEDGER // 100,000 THB TARGET</title>
   <style>${renderSharedStyles()}</style>
 </head>
 <body>
-  <div class="container">
-    <header class="topbar">
-      <a class="brand" href="./th/index.html">⚡ AI &amp; Cloud ROI Calculator</a>
-      <nav class="nav-links">
-        <a class="pill" href="./th/index.html">🇹🇭 หน้าเครื่องคำนวณ (TH)</a>
-        <a class="pill" href="./en/index.html">🇺🇸 Calculator (EN)</a>
-        <a class="pill active" href="./validation-dashboard.html">📊 Demand Proof Dashboard</a>
+  <div class="shell">
+    <header class="masthead">
+      <a class="brand-mark" href="./th/index.html">TCO // BENCHMARK.26</a>
+      <nav class="nav-bar">
+        <a class="nav-link" href="./th/index.html">CALCULATOR (TH)</a>
+        <a class="nav-link" href="./en/index.html">CALCULATOR (EN)</a>
+        <a class="nav-link active" href="./validation-dashboard.html">TELEMETRY</a>
       </nav>
     </header>
 
-    <h1>📊 ระบบพิสูจน์ความต้องการตลาดจริง (Demand Validation Dashboard)</h1>
-    <p class="subtitle">วัดผลการใช้งานจริงจากผู้เข้าชม (Visitors → การเลื่อนสไลเดอร์คำนวณ → การคลิกลิงก์ Affiliate) เพื่อตัดสินใจแบบมีหลักฐานก่อนจดโดเมนหรือสร้างแอป iOS</p>
+    <section class="hero-block">
+      <div class="kicker">CENTRALIZED LIVE TELEMETRY // GLOBAL + LOCAL FUNNEL</div>
+      <h1>Demand Validation &amp; Revenue Proof Ledger</h1>
+      <p class="lead">ระบบวัดผลผู้เข้าชมจริงจากทั่วโลกแบบรวมศูนย์ (Centralized Live Counter) เพื่อพิสูจน์อัตราการคำนวณ (Interaction Rate) และอัตราคลิกลิงก์พาร์ทเนอร์ (Affiliate CTR) ก่อนขยายระบบ</p>
+    </section>
 
-    <div class="winner-banner" id="verdict-banner">
-      <span class="winner-badge" id="verdict-code">LOADING...</span>
-      <h2 id="verdict-title" style="margin:6px 0;">กำลังประมวลผลข้อมูล Telemetry...</h2>
-      <p id="verdict-desc" style="margin:4px 0;"></p>
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <h3 style="margin-top:0;">ตัวชี้วัดหลัก (Real-User Funnel Metrics)</h3>
-        <table>
-          <tbody>
-            <tr><td>จำนวนผู้เข้าชมไม่ซ้ำ (Unique Sessions)</td><td class="price-usd" id="m-sessions">0</td></tr>
-            <tr><td>จำนวนการเปิดหน้าเว็บทั้งหมด (Page Views)</td><td class="price-usd" id="m-views">0</td></tr>
-            <tr><td>จำนวนครั้งที่ผู้ใช้ปรับตัวเลขคำนวณจริง (Calculator Interactions)</td><td class="price-usd" id="m-calcs">0</td></tr>
-            <tr><td>อัตราส่วนคนที่ใช้งานเครื่องคิดเลขจริง (Interaction Rate — เกณฑ์ &ge; 15%)</td><td class="price-thb" id="m-ir">0%</td></tr>
-            <tr><td>จำนวนคลิกลิงก์รับค่าคอม Affiliate (Affiliate CTA Clicks)</td><td class="price-usd" id="m-clicks">0</td></tr>
-            <tr><td>อัตราคลิกลิงก์ทำเงิน (Affiliate CTR — เกณฑ์ &ge; 2.5%)</td><td class="price-thb" id="m-ctr">0%</td></tr>
-          </tbody>
-        </table>
+    <section class="standalone-section" style="border-color:var(--line-strong);">
+      <div class="section-tag">
+        <span>01 // VERDICT STATUS</span>
+        <span id="telemetry-source">SOURCE: GLOBAL LIVE COUNTER</span>
       </div>
+      <div class="verdict-title" id="verdict-code">LOADING...</div>
+      <p class="verdict-copy" id="verdict-desc">กำลังดึงสถิติรวมจากผู้เข้าชมทั้งหมด...</p>
+    </section>
 
-      <div class="card">
-        <h3 style="margin-top:0;">สมการสู่รายได้ 100,000 บาท/เดือน (Unit Economics)</h3>
-        <table>
-          <tbody>
-            <tr><td>คลิกแยกตามพาร์ทเนอร์ (RunPod / AI-ML API / Cloudways / VPS ไทย)</td><td id="m-byprog">-</td></tr>
-            <tr><td>รายได้คาดการณ์จากทราฟฟิกชุดนี้ (สมมติ Conversion 8% ของคลิก)</td><td class="price-usd" id="m-proj">$0 (฿0)</td></tr>
-            <tr><td>จำนวนผู้เข้าชมต่อเดือนที่ต้องใช้เพื่อแตะ <strong>100,000 บาท/เดือน</strong></td><td class="price-thb" id="m-req-vis">12,500 คน/เดือน</td></tr>
-          </tbody>
-        </table>
-        <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="cta-btn" type="button" onclick="simulateSmokeTestBatch()">🧪 จำลองทราฟฟิกทดสอบ 60 คน (Test Thresholds)</button>
-          <button class="cta-secondary" type="button" onclick="clearLocalTelemetry()">ล้างข้อมูลจำลอง</button>
+    <div class="ledger-frame">
+      <aside class="panel-left">
+        <div class="section-tag"><span>02 // CONTROLS</span><span>TEST HARNESS</span></div>
+        <p style="font-size:0.84rem; color:var(--ink-secondary); margin-top:0;">ระบบจะดึงยอดผู้เข้าชมจริงรวมจาก Global Counter โดยอัตโนมัติ หรือสามารถกดจำลองทราฟฟิก 60 คนในเครื่องเพื่อทดสอบสมการตัดสินผลได้</p>
+        <button class="btn-primary" style="width:100%; margin-bottom:10px;" type="button" onclick="simulateSmokeTestBatch()">SIMULATE 60 VISITORS (LOCAL)</button>
+        <button class="btn-outline" type="button" onclick="clearLocalTelemetry()">SWITCH TO LIVE GLOBAL DATA</button>
+      </aside>
+
+      <main class="panel-right">
+        <div class="table-block">
+          <div class="section-tag"><span>03 // FUNNEL METRICS</span><span>THRESHOLD BENCHMARK</span></div>
+          <table>
+            <tbody>
+              <tr><td>Unique Visitor Sessions</td><td class="num mono-val" id="m-sessions">0</td></tr>
+              <tr><td>Total Page Views</td><td class="num mono-val" id="m-views">0</td></tr>
+              <tr><td>Active Calculator Runs</td><td class="num mono-val" id="m-calcs">0</td></tr>
+              <tr><td>Calculator Interaction Rate (Target &ge; 15.0%)</td><td class="num mono-val" id="m-ir">0.0%</td></tr>
+              <tr><td>Outbound Affiliate Clicks</td><td class="num mono-val" id="m-clicks">0</td></tr>
+              <tr><td>Affiliate Click-Through Rate (Target &ge; 2.5%)</td><td class="num mono-val" id="m-ctr">0.0%</td></tr>
+              <tr><td>Clicks by Partner Program</td><td class="num mono-val" id="m-byprog">-</td></tr>
+              <tr><td>Projected Commission (at 8% conversion)</td><td class="num mono-val" id="m-proj">$0 (฿0)</td></tr>
+              <tr><td>Monthly Visitors Needed for 100,000 THB/mo</td><td class="num mono-val" id="m-req-vis">12,500</td></tr>
+            </tbody>
+          </table>
         </div>
-      </div>
+      </main>
     </div>
   </div>
 
   <script>
     const AFF_CFG = ${cfgJson};
     const STORAGE_KEY = 'ai_cost_calc_telemetry_v1';
+    const GLOBAL_NS = 'burapa_ai_cost_calc_live';
 
-    async function loadEvents() {
+    async function getGlobalKey(key) {
       try {
-        const res = await fetch('/api/validation-report');
-        if (res.ok) {
-          const serverReport = await res.json();
-          if (serverReport && serverReport.totalPageViews > 0) {
-            renderReport(serverReport);
-            return;
-          }
-        }
-      } catch (_) {}
-
-      const localEvents = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      renderReport(computeClientReport(localEvents));
+        const r = await fetch('https://abacus.jasoncameron.dev/get/' + GLOBAL_NS + '/' + key, { mode: 'cors' });
+        if (!r.ok) return 0;
+        const d = await r.json();
+        return Number(d.value || 0);
+      } catch (_) {
+        return 0;
+      }
     }
 
-    function computeClientReport(events) {
-      const sessions = new Set();
-      let views = 0, calcs = 0, shares = 0, clicks = 0;
-      const byProg = { aimlapi: 0, runpod: 0, cloudways: 0, vercel: 0, hostatom: 0, rukcom: 0 };
+    async function loadEvents() {
+      const localSim = localStorage.getItem('ai_cost_calc_use_sim');
+      if (localSim === '1') {
+        document.getElementById('telemetry-source').textContent = 'SOURCE: LOCAL 60-VISITOR SIMULATION';
+        const localEvents = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        renderReport(computeFromCounts(
+          new Set(localEvents.map(function(e){return e.sessionId;})).size,
+          localEvents.filter(function(e){return e.eventType==='page_view';}).length,
+          localEvents.filter(function(e){return e.eventType==='calculation_run';}).length,
+          localEvents.filter(function(e){return e.eventType==='scenario_shared';}).length,
+          {
+            aimlapi: localEvents.filter(function(e){return e.affiliateId==='aimlapi';}).length,
+            runpod: localEvents.filter(function(e){return e.affiliateId==='runpod';}).length,
+            cloudways: localEvents.filter(function(e){return e.affiliateId==='cloudways';}).length,
+            vercel: localEvents.filter(function(e){return e.affiliateId==='vercel';}).length,
+            hostatom: localEvents.filter(function(e){return e.affiliateId==='hostatom';}).length,
+            rukcom: localEvents.filter(function(e){return e.affiliateId==='rukcom';}).length
+          }
+        ));
+        return;
+      }
 
-      events.forEach(function(e) {
-        if (e.sessionId) sessions.add(e.sessionId);
-        if (e.eventType === 'page_view') views++;
-        if (e.eventType === 'calculation_run') calcs++;
-        if (e.eventType === 'scenario_shared') shares++;
-        if (e.eventType === 'affiliate_cta_click') {
-          clicks++;
-          if (e.affiliateId && byProg[e.affiliateId] !== undefined) byProg[e.affiliateId]++;
-        }
-      });
+      document.getElementById('telemetry-source').textContent = 'SOURCE: GLOBAL LIVE COUNTER';
+      const [u, views, calcs, shares, cAiml, cRunpod, cCw, cVercel, cHa, cRuk] = await Promise.all([
+        getGlobalKey('unique_sessions'),
+        getGlobalKey('page_views'),
+        getGlobalKey('calculation_runs'),
+        getGlobalKey('scenarios_shared'),
+        getGlobalKey('aff_aimlapi'),
+        getGlobalKey('aff_runpod'),
+        getGlobalKey('aff_cloudways'),
+        getGlobalKey('aff_vercel'),
+        getGlobalKey('aff_hostatom'),
+        getGlobalKey('aff_rukcom')
+      ]);
 
-      const u = sessions.size;
+      renderReport(computeFromCounts(u, views, calcs, shares, {
+        aimlapi: cAiml,
+        runpod: cRunpod,
+        cloudways: cCw,
+        vercel: cVercel,
+        hostatom: cHa,
+        rukcom: cRuk
+      }));
+    }
+
+    function computeFromCounts(u, views, calcs, shares, byProg) {
+      const clicks = Object.keys(byProg).reduce(function(acc, k) { return acc + (byProg[k] || 0); }, 0);
       const denom = Math.max(1, u);
       const ir = calcs / denom;
       const ctr = clicks / denom;
@@ -768,16 +1050,16 @@ function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): st
       const reqVis = revPerVis > 0 ? Math.ceil(100000 / revPerVis) : 12500;
 
       let verdict = 'INSUFFICIENT_DATA';
-      let th = 'เก็บข้อมูลผู้ใช้จริงได้ ' + u + '/50 คนแรก แนะนำให้นำลิงก์เครื่องคำนวณไปโพสต์ในกลุ่มนักพัฒนา 2–3 แห่งเพื่อสรุปผล';
+      let th = 'เก็บข้อมูลผู้เข้าชมจริงจากทั่วโลกได้ ' + u + '/50 คนแรก แนะนำให้นำลิงก์ไปโพสต์ตามชุดข้อความใน validation-kit.md เพื่อให้ครบ 50 คนแรก';
       if (u >= 50 && ir >= 0.15 && ctr >= 0.025) {
         verdict = 'PROVEN_GO_SCALE';
-        th = 'พิสูจน์แล้วว่ามีคนใช้งานและคลิกจริง! อัตราการคำนวณ (' + (ir*100).toFixed(1) + '%) และอัตราคลิก Affiliate (' + (ctr*100).toFixed(1) + '%) ผ่านเกณฑ์ คุ้มค่าที่จะจดโดเมนและขยายผลสู่ 100,000 บาท/เดือน';
+        th = 'ผ่านเกณฑ์! อัตราการคำนวณ (' + (ir*100).toFixed(1) + '%) และอัตราคลิก Affiliate (' + (ctr*100).toFixed(1) + '%) พิสูจน์แล้วว่ามีคนใช้และคลิกจริง คุ้มค่าที่จะขยายทราฟฟิกสู่ ' + reqVis.toLocaleString() + ' คน/เดือน เพื่อแตะ 100,000 บาท/เดือน';
       } else if (u >= 50 && ir >= 0.15) {
         verdict = 'ITERATE_CTA';
-        th = 'คนชอบใช้เครื่องคิดเลข (' + (ir*100).toFixed(1) + '%) แต่คลิกลิงก์ Affiliate ยังต่ำกว่า 2.5% แนะนำปรับปุ่มเป็นคูปองเครดิตฟรีก่อนขยายผล';
+        th = 'ผู้เข้าชมใช้งานเครื่องคำนวณสูง (' + (ir*100).toFixed(1) + '%) แต่อัตราคลิกลิงก์ Affiliate ยังต่ำกว่า 2.5% แนะนำปรับข้อความปุ่มก่อนขยายผล';
       } else if (u >= 50) {
         verdict = 'KILL_OR_PIVOT';
-        th = 'อัตราการคำนวณต่ำกว่าเกณฑ์ แนะนำสลับไปทดสอบโมเดลที่ 2 โดยยังไม่ต้องเสียเงินจดโดเมน';
+        th = 'อัตราการคำนวณต่ำกว่า 15% แนะนำสลับไปทดสอบโมเดลที่ 2 โดยยังไม่ต้องเสียเงินจดโดเมน';
       }
 
       return {
@@ -799,9 +1081,6 @@ function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): st
 
     function renderReport(r) {
       document.getElementById('verdict-code').textContent = r.verdict;
-      document.getElementById('verdict-title').textContent =
-        r.verdict === 'PROVEN_GO_SCALE' ? '✅ ผ่านเกณฑ์! พิสูจน์แล้วว่ามีคนใช้และคลิกลิงก์ทำเงินจริง' :
-        r.verdict === 'INSUFFICIENT_DATA' ? '⏳ รอเก็บทราฟฟิกทดสอบให้ครบ 50 คนแรก' : '⚠️ ต้องปรับปรุงก่อนขยายผล';
       document.getElementById('verdict-desc').textContent = r.explanation.th;
       document.getElementById('m-sessions').textContent = r.uniqueSessions.toLocaleString();
       document.getElementById('m-views').textContent = r.totalPageViews.toLocaleString();
@@ -811,7 +1090,7 @@ function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): st
       document.getElementById('m-ctr').textContent = (r.affiliateCtr * 100).toFixed(1) + '%';
       document.getElementById('m-byprog').textContent = JSON.stringify(r.clicksByProgram);
       document.getElementById('m-proj').textContent = '$' + r.projectedMonthlyRevenueUsdAtCurrentCtr + ' (฿' + r.projectedMonthlyRevenueThbAtCurrentCtr.toLocaleString() + ')';
-      document.getElementById('m-req-vis').textContent = r.requiredMonthlyVisitorsFor100kThb.toLocaleString() + ' คน/เดือน';
+      document.getElementById('m-req-vis').textContent = r.requiredMonthlyVisitorsFor100kThb.toLocaleString();
     }
 
     function simulateSmokeTestBatch() {
@@ -823,11 +1102,12 @@ function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): st
         if (i <= 4) list.push({ eventId: 'aff-' + i, sessionId: sid, eventType: 'affiliate_cta_click', locale: 'th', pageSlug: 'home', affiliateId: i % 2 === 0 ? 'cloudways' : 'runpod' });
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      localStorage.setItem('ai_cost_calc_use_sim', '1');
       loadEvents();
     }
 
     function clearLocalTelemetry() {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem('ai_cost_calc_use_sim');
       loadEvents();
     }
 
@@ -838,45 +1118,44 @@ function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): st
 }
 
 function renderValidationKitMarkdown(baseUrl: string, pageCount: number): string {
-  return `# ชุดพิสูจน์ตลาดจริง 48 ชั่วโมง (Zero-Cost Demand Validation Kit)
+  return `# Zero-Cost Demand Validation & Affiliate Onboarding Kit
 
-เป้าหมาย: พิสูจน์ว่ามีคนเข้ามาคำนวณจริง (` + '`Interaction Rate >= 15%`' + `) และกดคลิกลิงก์ผู้ให้บริการจริง (` + '`Affiliate CTR >= 2.5%`' + `) โดยใช้ทุน **$0** ก่อนตัดสินใจจดโดเมนหรือทำแอป iOS
-
-- จำนวนหน้าเว็บที่ระบบสร้างอัตโนมัติ (EN + TH): **${pageCount} หน้า**
-- หน้าตรวจสอบผลลัพธ์แบบเรียลไทม์: \`${baseUrl}/validation-dashboard.html\`
+- Total Generated Static Pages (EN + TH): **${pageCount} pages**
+- Live Centralized Telemetry Ledger: \`${baseUrl}/validation-dashboard.html\`
 
 ---
 
-## 1. โพสต์สำหรับกลุ่มนักพัฒนาไทย / AI / Cloud (Facebook Groups / Pantip / Dev Community)
+## Part 1: Direct Affiliate Signup Links (Update in \`config/affiliates.json\`)
 
-**หัวข้อ:** ทำเว็บคำนวณราคา AI API (Claude / GPT-4o / Gemini / DeepSeek) เทียบกับเช่า GPU RunPod + Cloud VPS ไทย คิดเป็นเงินบาทให้ใช้ฟรีครับ
+1. **Cloudways ($50–$125 CPA per sale):** https://www.cloudways.com/en/web-hosting-affiliate-program.php
+2. **RunPod (10% Recurring GPU Spend via PartnerStack):** https://www.runpod.io/ (PartnerStack network)
+3. **AI/ML API (30% Recurring Lifetime):** https://aimlapi.com/affiliate-program
+4. **Vercel (30% Recurring + $5/lead):** https://vercel.com/partners
+5. **Hostatom Thailand (Up to 25% Commission):** https://www.hostatom.com/affiliate/
+6. **Ruk-Com Cloud Thailand (10–20% Commission):** https://ruk-com.in.th/affiliate/
+
+To update any partner code and rebuild:
+\`\`\`bash
+node src/cli-affiliate.ts <partner_id> <your_affiliate_code>
+\`\`\`
+
+---
+
+## Part 2: Launch Copy for Real-User Smoke Test (First 50–200 Visitors)
+
+### Thai Developer / AI Communities (Facebook / Pantip)
+**หัวข้อ:** ทำตารางคำนวณต้นทุน AI API (10 โมเดล) เทียบกับจุดคุ้มทุนเช่า GPU รายชั่วโมง (RunPod) และ Cloud VPS ไทย คิดเป็นเงินบาทให้ใช้ฟรีครับ
 
 **เนื้อหา:**
-ช่วงนี้เห็นหลายคนลังเลว่าทำโปรเจกต์ AI หรือระบบ Agent ที่เรียกโมเดลหลายๆ รอบต่อ 1 งาน ควรจ่ายเป็น Token (API) เปิด Prompt Caching หรือเช่าการ์ดจอแยก (เช่น RTX 4090 / A100 บน RunPod) ตอนไหนถึงจะคุ้มกว่ากัน?
+ทำหน้าตารางคำนวณแบบ Minimal (ไม่มีโฆษณา) สำหรับเทียบต้นทุนจริงเวลาทำระบบ AI ที่มี Prompt Caching หรือ Agent เรียกซ้ำหลายรอบต่อ 1 งาน ว่าจุดไหนใช้ API จ่ายตาม Token คุ้มกว่า และจุดไหนควรเช่า GPU แยก:
+${baseUrl}/th/index.html
 
-ผมเลยทำเครื่องคิดเลขหน้าเดียวที่ปรับตัวแปรพวก:
-- จำนวนงาน/วัน + จำนวนรอบ Agent Step
-- สัดส่วน Prompt Caching (%)
-- ชั่วโมงเปิดใช้งาน GPU จริงต่อวัน
-แล้วคำนวณจุดคุ้มทุน (Break-even) ออกมาเป็นเงินบาทและดอลลาร์ให้ทันที (กดคัดลอกลิงก์ผลคำนวณส่งให้ทีมดูต่อได้ด้วยครับ)
-
-ลองไปเลื่อนปรับตัวเลขเล่นกันได้ที่นี่ครับ (ใช้ฟรี ไม่มีโฆษณา):
-👉 ${baseUrl}/th/index.html
-
----
-
-## 2. โพสต์สำหรับ Reddit (r/LocalLLaMA / r/SideProject) & Hacker News (Show HN)
-
-**Title:** Show HN: Interactive LLM API vs. Cloud GPU Break-Even Calculator (with Prompt Caching & Agent Loop multiplier)
+### Reddit (r/LocalLLaMA / r/SideProject) & Hacker News (Show HN)
+**Title:** Show HN: Minimal LLM API vs. Dedicated GPU Break-Even Ledger (2026 pricing, prompt caching, agent loops)
 
 **Body:**
-Most LLM token calculators only multiply \`input_tokens * price\`, ignoring the two variables that actually swing production bills in 2026:
-1. **Multi-step autonomous agent loops** (1 user prompt triggering 3–10 sequential LLM calls).
-2. **Prompt caching hit rates** vs. **active GPU utilization hours/day** on rented GPUs (RunPod RTX 4090 / A100 / H100).
-
-I built a lightweight, zero-dependency static calculator where you can slide daily tasks, agent steps, cache hit ratio, and active GPU hours to see the exact daily task volume where renting a dedicated GPU beats managed APIs (and share a deep-linked scenario URL).
-
-Live calculator: ${baseUrl}/en/index.html
+Built a clean, zero-dependency tabular cost calculator covering 10 frontier/open models and 6 dedicated GPU tiers (RTX 4090 to 2x A100 160GB), factoring in prompt cache hit rates and sequential agent loop multipliers:
+${baseUrl}/en/index.html
 `;
 }
 
@@ -909,10 +1188,10 @@ export function generateStaticSite(
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="refresh" content="0; url=./th/index.html" />
-  <title>AI, Cloud GPU &amp; SaaS Cost Calculator Hub (TH / EN)</title>
+  <title>TCO // BENCHMARK.26 — AI &amp; Cloud Unit Economics Ledger</title>
 </head>
 <body>
-  <p><a href="./th/index.html">เข้าสู่หน้าภาษาไทย (TH)</a> | <a href="./en/index.html">Enter English Version (EN)</a></p>
+  <p><a href="./th/index.html">THAI LEDGER</a> | <a href="./en/index.html">ENGLISH LEDGER</a></p>
 </body>
 </html>`;
   fs.writeFileSync(path.join(stagingDir, 'index.html'), rootRedirectHtml, 'utf8');
@@ -923,14 +1202,14 @@ export function generateStaticSite(
       locale,
       'home',
       locale === 'th'
-        ? 'คำนวณราคา AI API vs เช่า Cloud GPU & VPS ไทย (2026) — เครื่องมือคำนวณจุดคุ้มทุน'
-        : 'AI API vs Cloud GPU & SaaS Hosting Cost Calculator (2026 Break-Even Tool)',
+        ? 'ตารางคำนวณต้นทุน AI API เทียบกับเช่า Cloud GPU และ VPS (2026)'
+        : 'AI API vs. Cloud GPU & VPS Unit Economics Ledger (2026)',
       locale === 'th'
-        ? 'คำนวณค่าใช้จ่าย Claude, GPT-4o, Gemini, DeepSeek API เทียบกับเช่า GPU RunPod และ Cloud VPS ไทย พร้อมคำนวณส่วนลด Prompt Caching และ Agent Loop'
-        : 'Interactive LLM API vs Cloud GPU rental break-even calculator with Prompt Caching, Multi-Step Agent Loops, and Managed Cloud VPS comparisons.',
+        ? 'คำนวณค่าใช้จ่าย Claude, GPT-4o, Gemini, DeepSeek, Llama, Qwen เทียบกับจุดคุ้มทุนการเช่า GPU RunPod และ Cloud VPS ไทย'
+        : 'Precision LLM API vs. dedicated Cloud GPU break-even calculator with prompt caching, multi-step agent loops, and VPS benchmarks.',
       locale === 'th'
-        ? 'เครื่องคำนวณต้นทุน AI API vs Cloud GPU & โฮสติ้ง (คิดเป็นเงินบาท & USD)'
-        : 'AI API vs. Cloud GPU & Cloud Hosting True Break-Even Calculator',
+        ? 'ตารางคำนวณต้นทุน AI API เทียบกับจุดคุ้มทุน Cloud GPU และ VPS'
+        : 'AI API vs. Dedicated GPU Break-Even Ledger',
       {
         requestsPerDay: 1500,
         inputTokensPerReq: 2500,
@@ -990,11 +1269,12 @@ ${sitemapUrls.map((u) => `  <url><loc>${escapeHtml(u)}</loc></url>`).join('\n')}
     'utf8'
   );
 
-  const llmsTxt = `# AI, Cloud GPU & SaaS Cost Calculator Hub (EN / TH)
-> Interactive break-even calculator for LLM APIs (Claude 3.7 Sonnet, GPT-4o, Gemini 2.5 Flash, DeepSeek R1/V3), Cloud GPUs (RunPod RTX 4090, A100, H100), and Cloud VPS hosting (Cloudways, Vercel, Hostatom, Ruk-Com).
+  const llmsTxt = `# TCO // BENCHMARK.26 — AI, Cloud GPU & VPS Cost Ledger (EN / TH)
+> Precision break-even calculator covering 10 LLM APIs, 6 dedicated Cloud GPU tiers, 6 Cloud VPS tiers, and 5 production workload archetypes (${totalHtmlPages} bilingual pages).
 
-- English Calculator: ${publicBaseUrl}/en/index.html
-- Thai Calculator: ${publicBaseUrl}/th/index.html
+- English Index: ${publicBaseUrl}/en/index.html
+- Thai Index: ${publicBaseUrl}/th/index.html
+- Telemetry Ledger: ${publicBaseUrl}/validation-dashboard.html
 - Sitemap (${sitemapUrls.length} URLs): ${publicBaseUrl}/sitemap.xml
 `;
   fs.writeFileSync(path.join(stagingDir, 'llms.txt'), llmsTxt, 'utf8');

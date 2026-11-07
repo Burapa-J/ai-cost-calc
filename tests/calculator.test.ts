@@ -6,7 +6,8 @@ import {
   calculateCostComparison,
   DemandValidationStore,
   resolveAffiliateUrl,
-  sanitizeWorkloadInput
+  sanitizeWorkloadInput,
+  updateAffiliateCode
 } from '../src/calculator.ts';
 import type { AffiliateConfigFile } from '../src/domain.ts';
 
@@ -86,6 +87,11 @@ test('Pre-mortem #4: resolveAffiliateUrl injects partner parameter and campaign 
   assert.equal(parsed.hostname, 'www.cloudways.com');
   assert.equal(parsed.searchParams.get('id'), 'YOUR_CLOUDWAYS_ID');
   assert.equal(parsed.searchParams.get('utm_campaign'), 'claude-vs-gpt4o');
+
+  const updatedCfg = updateAffiliateCode(affiliateConfig, 'cloudways', 'CW_998877');
+  assert.equal(updatedCfg.programs.cloudways.affiliateCode, 'CW_998877');
+  assert.throws(() => updateAffiliateCode(affiliateConfig, 'invalid_partner', '123'));
+  assert.throws(() => updateAffiliateCode(affiliateConfig, 'cloudways', '   '));
 });
 
 test('Pre-mortem #2: DemandValidationStore deduplicates repeated eventId and computes PROVEN_GO_SCALE verdict', () => {
