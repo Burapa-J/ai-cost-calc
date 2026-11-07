@@ -927,8 +927,8 @@ function renderCalculatorPage(
     <footer id="affiliate-disclosure" style="padding:20px 0 40px; border-top:1px solid var(--hairline); color:var(--ink-muted); font-size:0.78rem; line-height:1.55;">
       ${
         locale === 'th'
-          ? 'การเปิดเผยข้อมูลพาร์ทเนอร์ (Affiliate Disclosure): เว็บไซต์นี้มีลิงก์แนะนำบริการคลาวด์, API และชุดคำสั่ง AI (รวมถึง Agensi.io, RunPod, AI/ML API และผู้ให้บริการ VPS) ซึ่งผู้จัดทำอาจได้รับค่าคอมมิชชันเมื่อคุณสมัครหรือสั่งซื้อผ่านลิงก์ดังกล่าว โดยที่คุณไม่เสียค่าใช้จ่ายเพิ่มใดๆ'
-          : 'Affiliate Disclosure: Some links on this page (including Agensi.io, RunPod, AI/ML API, and cloud hosting providers) are affiliate links. We may earn a commission at no extra cost to you if you sign up or make a purchase through them.'
+          ? 'การเปิดเผยข้อมูลพาร์ทเนอร์ (Affiliate Disclosure): เว็บไซต์นี้มีลิงก์แนะนำบริการคลาวด์, API และชุดคำสั่ง AI (รวมถึง Agensi.io, RunPod, Novita AI และผู้ให้บริการ VPS) ซึ่งผู้จัดทำอาจได้รับค่าคอมมิชชันเมื่อคุณสมัครหรือสั่งซื้อผ่านลิงก์ดังกล่าว โดยที่คุณไม่เสียค่าใช้จ่ายเพิ่มใดๆ'
+          : 'Affiliate Disclosure: Some links on this page (including Agensi.io, RunPod, Novita AI, and cloud hosting providers) are affiliate links. We may earn a commission at no extra cost to you if you sign up or make a purchase through them.'
       }
     </footer>
   </div>
@@ -1382,12 +1382,13 @@ function renderValidationKitMarkdown(baseUrl: string, pageCount: number): string
 
 ## Part 1: Direct Affiliate Signup Links (Update in \`config/affiliates.json\`)
 
-1. **Agensi.io (90% Self-Referred Skill Sales + 20% 6-Month Affiliate):** https://agensi.io/ (Dashboard -> Affiliate)
-2. **Cloudways ($50–$125 CPA per sale):** https://www.cloudways.com/en/partners/cloud-affiliate-program.php
-3. **RunPod (10% Recurring GPU Spend via PartnerStack):** https://www.runpod.io/console/user/referrals
-4. **AI/ML API (30% Recurring Lifetime):** https://aimlapi.com/affiliate
-5. **Ruk-Com Cloud Thailand (33% First-Cycle Commission):** https://ruk-com.in.th/
-6. **Hostatom Thailand (150–500 THB CPA):** https://www.hostatom.com/
+1. **Agensi.io (90% Self-Referred Skill Sales + 20% 6-Month Affiliate — LIVE):** https://www.agensi.io/r/BURAPA
+2. **Novita AI (10% Commission for 180 Days on 200+ Model APIs & Agent Sandbox):** https://novita.ai/affiliate-new
+3. **Apify (20%–30% Recurring Commission on AI Agent & Scraping Cloud):** https://affiliate.apify.com/
+4. **Cloudways ($50–$125 CPA per sale):** https://www.cloudways.com/en/partners/cloud-affiliate-program.php
+5. **RunPod (10% Recurring GPU Spend via PartnerStack):** https://www.runpod.io/console/user/referrals
+6. **Ruk-Com Cloud Thailand (33% First-Cycle Commission):** https://ruk-com.in.th/
+7. **Hostatom Thailand (150–500 THB CPA):** https://www.hostatom.com/
 
 To update any partner code and rebuild:
 \`\`\`bash

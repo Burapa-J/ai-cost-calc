@@ -5,16 +5,16 @@
   "programs": {
     "aimlapi": {
       "id": "aimlapi",
-      "name": "AI/ML API (Unified 200+ LLM Router)",
+      "name": "Novita AI (Unified 200+ Model APIs & Agent Sandbox)",
       "category": "llm_api",
       "commissionLabel": {
-        "en": "30% Recurring Commission (90-day cookie)",
-        "th": "ค่าคอม 30% รายเดือนตลอดอายุลูกค้า (Cookie 90 วัน)"
+        "en": "10% Commission for 180 Days (60-day cookie)",
+        "th": "ค่าคอม 10% นาน 180 วันจากยอดใช้งานจริง (Cookie 60 วัน)"
       },
       "estimatedPayoutUsd": 45,
-      "baseUrl": "https://aimlapi.com/",
-      "paramKey": "via",
-      "affiliateCode": "YOUR_AIMLAPI_ID"
+      "baseUrl": "https://novita.ai/",
+      "paramKey": "ref",
+      "affiliateCode": "YOUR_NOVITA_ID"
     },
     "runpod": {
       "id": "runpod",

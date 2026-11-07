@@ -212,7 +212,7 @@ export const LLM_MODELS: LlmModelSpec[] = [
   {
     id: 'claude-3-7-sonnet',
     name: 'Claude 3.7 Sonnet',
-    provider: 'Anthropic (via AI/ML API)',
+    provider: 'Unified LLM API',
     inputUsdPer1M: 3.0,
     cachedInputUsdPer1M: 0.3,
     outputUsdPer1M: 15.0,
@@ -226,7 +226,7 @@ export const LLM_MODELS: LlmModelSpec[] = [
   {
     id: 'claude-3-5-haiku',
     name: 'Claude 3.5 Haiku',
-    provider: 'Anthropic (via AI/ML API)',
+    provider: 'Unified LLM API',
     inputUsdPer1M: 0.8,
     cachedInputUsdPer1M: 0.08,
     outputUsdPer1M: 4.0,
@@ -240,7 +240,7 @@ export const LLM_MODELS: LlmModelSpec[] = [
   {
     id: 'gpt-4o',
     name: 'OpenAI GPT-4o',
-    provider: 'OpenAI (via AI/ML API)',
+    provider: 'Unified LLM API',
     inputUsdPer1M: 2.5,
     cachedInputUsdPer1M: 1.25,
     outputUsdPer1M: 10.0,
@@ -254,7 +254,7 @@ export const LLM_MODELS: LlmModelSpec[] = [
   {
     id: 'gpt-4o-mini',
     name: 'OpenAI GPT-4o mini',
-    provider: 'OpenAI (via AI/ML API)',
+    provider: 'Unified LLM API',
     inputUsdPer1M: 0.15,
     cachedInputUsdPer1M: 0.075,
     outputUsdPer1M: 0.6,
@@ -268,7 +268,7 @@ export const LLM_MODELS: LlmModelSpec[] = [
   {
     id: 'o3-mini',
     name: 'OpenAI o3-mini (Reasoning)',
-    provider: 'OpenAI (via AI/ML API)',
+    provider: 'Unified LLM API',
     inputUsdPer1M: 1.1,
     cachedInputUsdPer1M: 0.55,
     outputUsdPer1M: 4.4,
@@ -282,7 +282,7 @@ export const LLM_MODELS: LlmModelSpec[] = [
   {
     id: 'gemini-2-5-pro',
     name: 'Gemini 2.5 Pro',
-    provider: 'Google (via AI/ML API)',
+    provider: 'Unified LLM API',
     inputUsdPer1M: 1.25,
     cachedInputUsdPer1M: 0.31,
     outputUsdPer1M: 10.0,
@@ -296,7 +296,7 @@ export const LLM_MODELS: LlmModelSpec[] = [
   {
     id: 'gemini-2-5-flash',
     name: 'Gemini 2.5 Flash',
-    provider: 'Google (via AI/ML API)',
+    provider: 'Unified LLM API',
     inputUsdPer1M: 0.15,
     cachedInputUsdPer1M: 0.0375,
     outputUsdPer1M: 0.6,
@@ -310,7 +310,7 @@ export const LLM_MODELS: LlmModelSpec[] = [
   {
     id: 'deepseek-v3-r1',
     name: 'DeepSeek V3 / R1 (API)',
-    provider: 'DeepSeek (via AI/ML API)',
+    provider: 'Novita AI / Unified API',
     inputUsdPer1M: 0.55,
     cachedInputUsdPer1M: 0.14,
     outputUsdPer1M: 2.19,
