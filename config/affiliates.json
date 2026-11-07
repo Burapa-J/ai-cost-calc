@@ -12,9 +12,9 @@
         "th": "ค่าคอม 10% นาน 180 วันจากยอดใช้งานจริง (Cookie 60 วัน)"
       },
       "estimatedPayoutUsd": 45,
-      "baseUrl": "https://novita.ai/",
+      "baseUrl": "https://novita.ai/?utm_source=affiliate",
       "paramKey": "ref",
-      "affiliateCode": "YOUR_NOVITA_ID"
+      "affiliateCode": "zge5ztg"
     },
     "runpod": {
       "id": "runpod",
