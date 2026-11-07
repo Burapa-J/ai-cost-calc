@@ -1421,10 +1421,14 @@ export function generateStaticSite(
   const catalog = buildProgrammaticPagesCatalog();
   const sitemapUrls: string[] = [];
 
+  const rootGscMeta = affiliateConfig.googleSiteVerification
+    ? `\n  <meta name="google-site-verification" content="${escapeHtml(affiliateConfig.googleSiteVerification)}" />`
+    : '';
+
   const rootRedirectHtml = `<!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8" />${rootGscMeta}
   <meta http-equiv="refresh" content="0; url=./th/index.html" />
   <title>TCO // BENCHMARK.26 — Practical AI Cost &amp; Quota Planner</title>
 </head>
@@ -1433,6 +1437,11 @@ export function generateStaticSite(
 </body>
 </html>`;
   fs.writeFileSync(path.join(stagingDir, 'index.html'), rootRedirectHtml, 'utf8');
+  fs.writeFileSync(
+    path.join(stagingDir, 'google1cb6059c0c3279a4.html'),
+    'google-site-verification: google1cb6059c0c3279a4.html',
+    'utf8'
+  );
 
   const locales: Locale[] = ['en', 'th'];
   for (const locale of locales) {
