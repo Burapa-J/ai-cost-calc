@@ -1511,6 +1511,7 @@ ${sitemapUrls.map((u) => `  <url><loc>${escapeHtml(u)}</loc></url>`).join('\n')}
 </urlset>
 `;
   fs.writeFileSync(path.join(stagingDir, 'sitemap.xml'), sitemapXml, 'utf8');
+  fs.writeFileSync(path.join(stagingDir, 'sitemap.txt'), `${sitemapUrls.join('\n')}\n`, 'utf8');
 
   fs.writeFileSync(
     path.join(stagingDir, 'robots.txt'),
