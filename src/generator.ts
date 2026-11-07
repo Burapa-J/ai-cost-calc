@@ -891,7 +891,7 @@ export interface BuildOutputSummary {
 export function generateStaticSite(
   outputDir: string,
   affiliateConfig: AffiliateConfigFile,
-  publicBaseUrl = 'https://ai-cost-calc.pages.dev'
+  publicBaseUrl = 'https://burapa-j.github.io/ai-cost-calc'
 ): BuildOutputSummary {
   const parentDir = path.dirname(outputDir);
   fs.mkdirSync(parentDir, { recursive: true });
@@ -899,6 +899,7 @@ export function generateStaticSite(
 
   fs.mkdirSync(path.join(stagingDir, 'en', 'compare'), { recursive: true });
   fs.mkdirSync(path.join(stagingDir, 'th', 'compare'), { recursive: true });
+  fs.writeFileSync(path.join(stagingDir, '.nojekyll'), '', 'utf8');
 
   const catalog = buildProgrammaticPagesCatalog();
   const sitemapUrls: string[] = [];

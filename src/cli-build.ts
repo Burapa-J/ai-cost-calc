@@ -8,5 +8,6 @@ const configPath = path.join(rootDir, 'config', 'affiliates.json');
 const outputDir = path.join(rootDir, 'dist');
 
 const affiliateConfig = JSON.parse(fs.readFileSync(configPath, 'utf8')) as AffiliateConfigFile;
-const summary = generateStaticSite(outputDir, affiliateConfig);
+const publicBaseUrl = process.env.PUBLIC_BASE_URL ?? 'https://burapa-j.github.io/ai-cost-calc';
+const summary = generateStaticSite(outputDir, affiliateConfig, publicBaseUrl);
 console.log(JSON.stringify(summary));
