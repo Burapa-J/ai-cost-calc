@@ -613,6 +613,21 @@ export const WORKLOAD_ARCHETYPES: WorkloadArchetypeSpec[] = [
 
 export const AGENT_SKILLS_CATALOG: AgentSkillSpec[] = [
   {
+    id: 'devguard',
+    name: 'devguard',
+    priceUsd: 19,
+    tokenSavingsFraction: 0.35,
+    affiliateId: 'agensi',
+    tagline: {
+      en: 'Evidence-first workflow (verified-dev) and token-saving verification gate. Prevents unverified agent claims and stops wasted subagent tokens on small edits.',
+      th: 'ป้องกัน AI มั่วงานและลดโควต้าที่เสียเปล่า: บังคับให้ตรวจผลรันจริงก่อนแจ้งว่างานเสร็จ และห้ามแตก Subagent เปลือง Token ในงานแก้ไฟล์เดียว'
+    },
+    metricNote: {
+      en: 'Cuts ~35% wasted rework & subagent tokens',
+      th: 'ลด Token จากการสั่งแก้ซ้ำและ Subagent ~35%'
+    }
+  },
+  {
     id: 'token-budget-architect',
     name: 'token-budget-architect',
     priceUsd: 14,

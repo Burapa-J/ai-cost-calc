@@ -98,6 +98,10 @@ test('Pre-mortem #4: resolveAffiliateUrl injects partner parameter and campaign 
   assert.equal(sanitizeIndexNowKey('a8f4c2e91b6d40789e3c5a12f08d6b4e'), 'a8f4c2e91b6d40789e3c5a12f08d6b4e');
   assert.equal(sanitizeIndexNowKey('bad key!@#'), 'a8f4c2e91b6d40789e3c5a12f08d6b4e');
 
+  const skill0Content = fs.readFileSync(
+    path.resolve(import.meta.dirname, '../agensi-skills-pack/devguard/SKILL.md'),
+    'utf8'
+  );
   const skill1Content = fs.readFileSync(
     path.resolve(import.meta.dirname, '../agensi-skills-pack/token-budget-architect/SKILL.md'),
     'utf8'
@@ -110,6 +114,7 @@ test('Pre-mortem #4: resolveAffiliateUrl injects partner parameter and campaign 
     path.resolve(import.meta.dirname, '../agensi-skills-pack/cloud-gpu-breakeven-auditor/SKILL.md'),
     'utf8'
   );
+  assert.equal(validateSkillMarkdown('devguard', skill0Content).valid, true);
   assert.equal(validateSkillMarkdown('token-budget-architect', skill1Content).valid, true);
   assert.equal(validateSkillMarkdown('swiss-minimal-ui-ledger', skill2Content).valid, true);
   assert.equal(validateSkillMarkdown('cloud-gpu-breakeven-auditor', skill3Content).valid, true);
