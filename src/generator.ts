@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { calculateCostComparison, sanitizeWorkloadInput } from './calculator.ts';
+import { calculateCostComparison, sanitizeIndexNowKey, sanitizeWorkloadInput } from './calculator.ts';
 import {
   type AffiliateConfigFile,
   CLOUD_GPUS,
@@ -379,7 +379,8 @@ function renderCalculatorPage(
   faqList: Array<{ q: { en: string; th: string }; a: { en: string; th: string } }>,
   allPages: ProgrammaticComparisonPageSpec[],
   affiliateConfig: AffiliateConfigFile,
-  isComparisonSubpage: boolean
+  isComparisonSubpage: boolean,
+  publicBaseUrl: string
 ): string {
   const initialWorkload = sanitizeWorkloadInput(presetInput);
   const initialCalc = calculateCostComparison(initialWorkload, affiliateConfig, pageSlug);
@@ -456,15 +457,44 @@ function renderCalculatorPage(
             : `07 // COMPLETE CALCULATION INDEX (${allPages.length} MODELS)`
         };
 
+  const canonicalUrl = isComparisonSubpage
+    ? `${publicBaseUrl}/${locale}/compare/${pageSlug}.html`
+    : `${publicBaseUrl}/${locale}/index.html`;
+
+  const graphEntities: Array<Record<string, unknown>> = [
+    {
+      '@type': 'SoftwareApplication',
+      name: title,
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      url: canonicalUrl,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      description: metaDescription
+    }
+  ];
+
+  if (faqList.length > 0) {
+    graphEntities.push({
+      '@type': 'FAQPage',
+      mainEntity: faqList.map((item) => ({
+        '@type': 'Question',
+        name: item.q[locale],
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.a[locale]
+        }
+      }))
+    });
+  }
+
   const jsonLd = JSON.stringify({
     '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: title,
-    applicationCategory: 'BusinessApplication',
-    operatingSystem: 'Web',
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    description: metaDescription
+    '@graph': graphEntities
   });
+
+  const gscMeta = affiliateConfig.googleSiteVerification
+    ? `\n  <meta name="google-site-verification" content="${escapeHtml(affiliateConfig.googleSiteVerification)}" />`
+    : '';
 
   const clientCatalogJson = JSON.stringify({
     models: LLM_MODELS.map(({ summary: _s, ...rest }) => rest),
@@ -482,7 +512,12 @@ function renderCalculatorPage(
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${escapeHtml(title)}</title>
   <meta name="description" content="${escapeHtml(metaDescription)}" />
+  <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />
   <link rel="alternate" hreflang="${alternateLang}" href="${alternatePath}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="${escapeHtml(title)}" />
+  <meta property="og:description" content="${escapeHtml(metaDescription)}" />
+  <meta property="og:url" content="${escapeHtml(canonicalUrl)}" />${gscMeta}
   <script type="application/ld+json">${jsonLd}</script>
   <style>${renderSharedStyles()}</style>
 </head>
@@ -1221,7 +1256,8 @@ export function generateStaticSite(
       [],
       catalog,
       affiliateConfig,
-      false
+      false,
+      publicBaseUrl
     );
     fs.writeFileSync(path.join(stagingDir, locale, 'index.html'), homeHtml, 'utf8');
     sitemapUrls.push(`${publicBaseUrl}/${locale}/index.html`);
@@ -1237,7 +1273,8 @@ export function generateStaticSite(
         spec.faq,
         catalog,
         affiliateConfig,
-        true
+        true,
+        publicBaseUrl
       );
       fs.writeFileSync(
         path.join(stagingDir, locale, 'compare', `${spec.slug}.html`),
@@ -1278,6 +1315,9 @@ ${sitemapUrls.map((u) => `  <url><loc>${escapeHtml(u)}</loc></url>`).join('\n')}
 - Sitemap (${sitemapUrls.length} URLs): ${publicBaseUrl}/sitemap.xml
 `;
   fs.writeFileSync(path.join(stagingDir, 'llms.txt'), llmsTxt, 'utf8');
+
+  const indexNowKey = sanitizeIndexNowKey(affiliateConfig.indexNowKey);
+  fs.writeFileSync(path.join(stagingDir, `${indexNowKey}.txt`), indexNowKey, 'utf8');
 
   fs.writeFileSync(
     path.join(stagingDir, 'validation-kit.md'),

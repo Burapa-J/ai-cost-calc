@@ -79,6 +79,16 @@ export function updateAffiliateCode(
   };
 }
 
+const DEFAULT_INDEXNOW_KEY = 'a8f4c2e91b6d40789e3c5a12f08d6b4e';
+
+export function sanitizeIndexNowKey(rawKey?: string): string {
+  const candidate = (rawKey || '').trim();
+  if (!/^[a-zA-Z0-9-]{8,128}$/.test(candidate)) {
+    return DEFAULT_INDEXNOW_KEY;
+  }
+  return candidate;
+}
+
 export function calculateCostComparison(
   rawInput: Partial<WorkloadInput>,
   affiliateConfig: AffiliateConfigFile,

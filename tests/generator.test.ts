@@ -29,7 +29,17 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
     assert.equal(thHome.includes('--paper: #F6F5F0'), true);
     assert.equal(thHome.includes('https://abacus.jasoncameron.dev/hit/'), true);
     assert.equal(thHome.includes('burapa_ai_cost_calc_live'), true);
+    assert.equal(
+      thHome.includes('<link rel="canonical" href="https://burapa-j.github.io/ai-cost-calc/th/index.html" />'),
+      true
+    );
     assert.equal(thHome.includes('⚡'), false);
+
+    const keyFileContent = fs.readFileSync(
+      path.join(distPath, 'a8f4c2e91b6d40789e3c5a12f08d6b4e.txt'),
+      'utf8'
+    );
+    assert.equal(keyFileContent, 'a8f4c2e91b6d40789e3c5a12f08d6b4e');
 
     const enSubpagePath = path.join(
       distPath,

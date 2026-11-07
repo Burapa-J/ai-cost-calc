@@ -28,6 +28,8 @@ export interface AffiliateProgram {
 
 export interface AffiliateConfigFile {
   usdToThbDefault: number;
+  indexNowKey?: string;
+  googleSiteVerification?: string;
   programs: Record<AffiliateId, AffiliateProgram>;
 }
 

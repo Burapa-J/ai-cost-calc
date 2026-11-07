@@ -1,5 +1,7 @@
 {
   "usdToThbDefault": 34.5,
+  "indexNowKey": "a8f4c2e91b6d40789e3c5a12f08d6b4e",
+  "googleSiteVerification": "",
   "programs": {
     "aimlapi": {
       "id": "aimlapi",

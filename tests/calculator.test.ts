@@ -6,6 +6,7 @@ import {
   calculateCostComparison,
   DemandValidationStore,
   resolveAffiliateUrl,
+  sanitizeIndexNowKey,
   sanitizeWorkloadInput,
   updateAffiliateCode
 } from '../src/calculator.ts';
@@ -92,6 +93,9 @@ test('Pre-mortem #4: resolveAffiliateUrl injects partner parameter and campaign 
   assert.equal(updatedCfg.programs.cloudways.affiliateCode, 'CW_998877');
   assert.throws(() => updateAffiliateCode(affiliateConfig, 'invalid_partner', '123'));
   assert.throws(() => updateAffiliateCode(affiliateConfig, 'cloudways', '   '));
+
+  assert.equal(sanitizeIndexNowKey('a8f4c2e91b6d40789e3c5a12f08d6b4e'), 'a8f4c2e91b6d40789e3c5a12f08d6b4e');
+  assert.equal(sanitizeIndexNowKey('bad key!@#'), 'a8f4c2e91b6d40789e3c5a12f08d6b4e');
 });
 
 test('Pre-mortem #2: DemandValidationStore deduplicates repeated eventId and computes PROVEN_GO_SCALE verdict', () => {
