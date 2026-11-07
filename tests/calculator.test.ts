@@ -87,7 +87,7 @@ test('Pre-mortem #4: resolveAffiliateUrl injects partner parameter and campaign 
   const url = resolveAffiliateUrl(affiliateConfig, 'cloudways', 'claude-vs-gpt4o');
   const parsed = new URL(url);
   assert.equal(parsed.hostname, 'www.cloudways.com');
-  assert.equal(parsed.searchParams.get('id'), 'YOUR_CLOUDWAYS_ID');
+  assert.equal(parsed.searchParams.get('id'), '2225344');
   assert.equal(parsed.searchParams.get('utm_campaign'), 'claude-vs-gpt4o');
 
   const updatedCfg = updateAffiliateCode(affiliateConfig, 'cloudways', 'CW_998877');
