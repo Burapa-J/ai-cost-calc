@@ -106,9 +106,18 @@ test('Pre-mortem #4: resolveAffiliateUrl injects partner parameter and campaign 
     path.resolve(import.meta.dirname, '../agensi-skills-pack/swiss-minimal-ui-ledger/SKILL.md'),
     'utf8'
   );
+  const skill3Content = fs.readFileSync(
+    path.resolve(import.meta.dirname, '../agensi-skills-pack/cloud-gpu-breakeven-auditor/SKILL.md'),
+    'utf8'
+  );
   assert.equal(validateSkillMarkdown('token-budget-architect', skill1Content).valid, true);
   assert.equal(validateSkillMarkdown('swiss-minimal-ui-ledger', skill2Content).valid, true);
+  assert.equal(validateSkillMarkdown('cloud-gpu-breakeven-auditor', skill3Content).valid, true);
   assert.equal(validateSkillMarkdown('wrong-folder-name', skill1Content).valid, false);
+
+  const agensiCfg = updateAffiliateCode(affiliateConfig, 'agensi', 'https://www.agensi.io/r/burapa');
+  const agensiUrl = resolveAffiliateUrl(agensiCfg, 'agensi', 'home-token-budget-architect');
+  assert.equal(agensiUrl, 'https://www.agensi.io/r/burapa?utm_campaign=home-token-budget-architect');
 });
 
 test('Pre-mortem #2: DemandValidationStore deduplicates repeated eventId and computes PROVEN_GO_SCALE verdict', () => {

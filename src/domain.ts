@@ -615,7 +615,7 @@ export const AGENT_SKILLS_CATALOG: AgentSkillSpec[] = [
   {
     id: 'token-budget-architect',
     name: 'token-budget-architect',
-    priceUsd: 9.99,
+    priceUsd: 14,
     tokenSavingsFraction: 0.3,
     affiliateId: 'agensi',
     tagline: {
@@ -630,7 +630,7 @@ export const AGENT_SKILLS_CATALOG: AgentSkillSpec[] = [
   {
     id: 'swiss-minimal-ui-ledger',
     name: 'swiss-minimal-ui-ledger',
-    priceUsd: 14.99,
+    priceUsd: 19,
     tokenSavingsFraction: 0.2,
     affiliateId: 'agensi',
     tagline: {
@@ -643,18 +643,18 @@ export const AGENT_SKILLS_CATALOG: AgentSkillSpec[] = [
     }
   },
   {
-    id: 'agensi-verified-marketplace',
-    name: 'Agensi.io Skill Catalog',
-    priceUsd: 0,
-    tokenSavingsFraction: 0.2,
+    id: 'cloud-gpu-breakeven-auditor',
+    name: 'cloud-gpu-breakeven-auditor',
+    priceUsd: 24,
+    tokenSavingsFraction: 0.25,
     affiliateId: 'agensi',
     tagline: {
-      en: 'One-stop library of tested workflows for Claude Code, Cursor, and Copilot. Plug in what you need in seconds instead of writing rules from scratch.',
-      th: 'สะดวกจบในที่เดียว: เลือกชุดคำสั่งที่คนทำงานจริงทดสอบแล้วไปเสียบใช้กับโปรแกรมที่ใช้อยู่ได้ทันที ไม่ต้องลองผิดลองถูกเขียนเอง'
+      en: 'Audits your repo LLM calls and calculates the exact daily request & VRAM threshold where hourly Cloud GPUs cost less than API billing.',
+      th: 'รู้จุดคุ้มทุนชัดเจนก่อนย้ายเซิร์ฟเวอร์: สั่ง AI ตรวจโค้ดในโปรเจกต์เพื่อคำนวณว่าต้องมีงานกี่ครั้งต่อวัน การเช่า GPU รายชั่วโมงถึงจะถูกกว่าจ่ายรายคำ'
     },
     metricNote: {
-      en: 'Works with 20+ coding agents',
-      th: 'รองรับโปรแกรมเขียนโค้ดหลักครบ'
+      en: 'Exact API vs GPU break-even audit',
+      th: 'คำนวณจุดสลับ API เป็น GPU ตามงานจริง'
     }
   }
 ];

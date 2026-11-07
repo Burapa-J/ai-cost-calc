@@ -1,46 +1,65 @@
-# คู่มือวางขายแพ็กเกจ SKILL.md บน Agensi.io และรับรหัส Affiliate (Approve-Only Copy & Paste)
+# คู่มือวางขายแพ็กเกจ SKILL.md บน Agensi.io/sell และรับรหัส Affiliate (ตามคำแนะนำของ Joeri Brons)
 
-ไฟล์สกิลทั้ง 2 ชิ้นถูกสร้างและตรวจสอบความถูกต้องตามมาตรฐาน `SKILL.md` ของ Agensi.io เรียบร้อยแล้วที่โฟลเดอร์:
-- `agensi-skills-pack/token-budget-architect/SKILL.md` (และไฟล์ ZIP พร้อมอัปโหลด `agensi-skills-pack/token-budget-architect.zip`)
-- `agensi-skills-pack/swiss-minimal-ui-ledger/SKILL.md` (และไฟล์ ZIP พร้อมอัปโหลด `agensi-skills-pack/swiss-minimal-ui-ledger.zip`)
-
----
-
-## ขั้นตอนที่ 1: เปิดรับรหัส Affiliate 20% + ส่วนแบ่ง 90% (ใช้เวลา 1 นาที)
-1. ตอบกลับอีเมลของ `Joeri Brons <joeri@agensi.io>` หรือเข้าเว็บ **https://agensi.io** แล้วล็อกอิน
-2. ไปที่เมนู **Dashboard → Affiliate**
-3. คัดลอกลิงก์ Affiliate ของคุณ (เช่น `https://agensi.io/?ref=XXXX`) มาวางในแชทให้ผมอัปเดตลงเว็บ 344 หน้าทันที
+ไฟล์ ZIP ทั้ง **3 ชิ้น** ถูกจัดโครงสร้างใหม่ให้มีไฟล์ **`SKILL.md` อยู่ชั้นนอกสุด (Root of the ZIP)** ตามที่ระบบอัปโหลดของ `https://www.agensi.io/sell` กำหนดทุกประการ และปรับราคาให้อยู่ในช่วงขายดี `$10–$30` สำหรับ Single-Purpose Skill เรียบร้อยแล้วครับ:
+1. `agensi-skills-pack/token-budget-architect.zip` (`SKILL.md` อยู่ที่ Root ของ ZIP) — ราคาแนะนำ **`$14`**
+2. `agensi-skills-pack/swiss-minimal-ui-ledger.zip` (`SKILL.md` อยู่ที่ Root ของ ZIP) — ราคาแนะนำ **`$19`**
+3. `agensi-skills-pack/cloud-gpu-breakeven-auditor.zip` (`SKILL.md` อยู่ที่ Root ของ ZIP) — ราคาแนะนำ **`$24`**
 
 ---
 
-## ขั้นตอนที่ 2: ข้อมูลสำหรับก๊อปปี้ไปวางตอนกด Publish Skill บน Agensi.io (เน้นประโยชน์จริง ไม่คุยโวเกินจริง)
+## ขั้นตอนที่ 1 (สำคัญที่สุด): ผูกบัญชีรับเงิน (Payout Method) ก่อนแชร์ลิงก์หรือวางขาย
+> **ทำไมต้องทำเป็นอันดับแรก:** Joeri แจ้งชัดเจนว่า **ค่าคอมมิชชัน Affiliate 20% จะเริ่มนับก็ต่อเมื่อตั้งค่า Payout Method เรียบร้อยแล้วเท่านั้น** และการวางขายสกิลแบบมีราคา (`Paid Skill`) ต้องผูกช่องทางรับเงินก่อนจึงจะอนุมัติขึ้นหน้าเว็บได้
 
-### สินค้าชิ้นที่ 1: `token-budget-architect`
-- **Skill Name / Slug:** `token-budget-architect`
-- **Recommended Price:** `$9.99` (จ่ายครั้งเดียวจบ / One-time)
-- **Short Summary (เน้นประโยชน์ลูกค้าเข้าใจง่าย):**
-  `Work longer on the same Claude Code or Cursor quota and cut API bills by 35–55%. Enforces prompt-cache prefix stability, 0-token pre-read search, and subagent spawn thresholds based on real repo workloads.`
-- **Customer Benefits Description (สำหรับช่องรายละเอียดบน Agensi.io):**
+1. เข้าไปที่ **https://www.agensi.io** แล้วล็อกอินเข้า **Dashboard → Affiliate** (และ **Creator Settings / Payouts**)
+2. เลือกผูกช่องทางรับเงิน (**Stripe** เข้าบัญชีธนาคาร หรือรับเป็นเหรียญ **USDC บนเครือข่าย Solana ผ่าน Zoneless** ซึ่งโอนไวภายใน 72 ชม. หลังขายได้ ขั้นต่ำเพียง `$3.50`)
+3. คัดลอกลิงก์ Affiliate ของคุณ (รูปแบบ `https://www.agensi.io/r/ชื่อของคุณ`) มาวางในแชทนี้เพื่อให้ผมอัปเดตลงทั้ง **344 หน้า** ทันที (หน้าเว็บทั้ง 344 หน้าได้เพิ่มข้อความ `Affiliate Disclosure` ตามกฎ `Agensi.io/affiliates` ไว้ที่ส่วนท้ายของทุกหน้าเรียบร้อยแล้ว)
+
+---
+
+## ขั้นตอนที่ 2: อัปโหลดไฟล์ ZIP ขึ้นขายที่ https://www.agensi.io/sell
+
+### สินค้าชิ้นที่ 1: `token-budget-architect` (เน้นยืดโควต้าใช้งาน & ลดค่าไฟ API 35–55%)
+- **ไฟล์ที่ใช้อัปโหลด:** `agensi-skills-pack/token-budget-architect.zip`
+- **ราคาแนะนำ (One-time Price):** **`$14`** (รับส่วนแบ่ง 70% = `$9.80` ต่อการขาย หรือ **90% = `$12.60`** เมื่อลูกค้าซื้อผ่านลิงก์ Affiliate ของคุณเอง)
+- **Title / Name:** `token-budget-architect`
+- **Description (ก๊อปปี้ไปวางได้เลย):**
   ```markdown
-  ### What You Get (Practical Benefits)
-  - **Work Longer Before Quota Lockouts:** Keeps your system and tool prefixes static so 85%+ of multi-turn coding sessions read from cached tokens instead of burning fresh quota.
-  - **Lower Monthly API Bills:** Uses 0-token local grep/line-range rules before reading large files—preventing a typical 50-file refactor from re-sending 180k tokens on every turn.
-  - **Pay Once, Use Across Every Project:** Works immediately in Claude Code, Cursor, Windsurf, and Cline with zero external dependencies or subscriptions.
+  Work longer on the same Claude Code, Cursor, or Codex quota and cut monthly LLM API bills by 35–55%.
+
+  ### What This Single-Purpose Skill Does
+  - **Locks Prompt-Cache Prefixes:** Keeps system instructions and tool schemas static so 85%+ of multi-turn coding sessions read from discounted cached tokens instead of burning fresh quota.
+  - **Enforces 0-Token Pre-Read Filtering:** Guides your coding agent to locate exact symbol line ranges with local search before reading files—preventing a 50-file refactor from re-sending 180k tokens on every turn.
+  - **Subagent Spawn Gate:** Calculates exact token break-even before spawning background subagents.
   ```
-- **File to Upload:** อัปโหลดไฟล์ `agensi-skills-pack/token-budget-architect.zip` หรือ `agensi-skills-pack/token-budget-architect/SKILL.md`
 
 ---
 
-### สินค้าชิ้นที่ 2: `swiss-minimal-ui-ledger`
-- **Skill Name / Slug:** `swiss-minimal-ui-ledger`
-- **Recommended Price:** `$14.99` (จ่ายครั้งเดียวจบ / One-time)
-- **Short Summary (เน้นประโยชน์ลูกค้าเข้าใจง่าย):**
-  `Build clean, Apple-inspired minimalist web UIs on the first prompt without spending hours fixing generic AI gradients, neon purple cards, or misaligned number tables.`
-- **Customer Benefits Description (สำหรับช่องรายละเอียดบน Agensi.io):**
+### สินค้าชิ้นที่ 2: `swiss-minimal-ui-ledger` (เน้นสั่ง AI สร้างหน้าเว็บ Minimalist สไตล์ Apple ตั้งแต่รอบแรก)
+- **ไฟล์ที่ใช้อัปโหลด:** `agensi-skills-pack/swiss-minimal-ui-ledger.zip`
+- **ราคาแนะนำ (One-time Price):** **`$19`** (รับส่วนแบ่ง 70% = `$13.30` ต่อการขาย หรือ **90% = `$17.10`** เมื่อลูกค้าซื้อผ่านลิงก์ของคุณเอง)
+- **Title / Name:** `swiss-minimal-ui-ledger`
+- **Description (ก๊อปปี้ไปวางได้เลย):**
   ```markdown
-  ### What You Get (Practical Benefits)
-  - **Save Hours of CSS Cleanup:** Stops coding agents from generating purple-cyan neon gradients, random emojis, and cluttered cards on the first pass.
-  - **Apple-Grade Minimalist Layout:** Applies a ready-to-use `#FBFBFD` paper palette, frosted glass sticky header (`backdrop-filter: blur(20px)`), smooth comparative bars, and `tabular-nums` alignment for financial and SaaS dashboards.
-  - **One-Stop Design Rules:** Drop into any web project so every page generated by your agent stays visually consistent.
+  Stop wasting 3–4 prompts fixing generic AI purple gradients, neon glow cards, and misaligned financial tables.
+
+  ### What This Single-Purpose Skill Does
+  - **Apple-Inspired Minimalist Palette:** Enforces a clean `#FBFBFD` architectural paper surface, frosted glass sticky header (`backdrop-filter: saturate(180%) blur(20px)`), and crisp `1px` hairlines.
+  - **Tabular-Nums Financial Alignment:** Automatically formats pricing calculators, SaaS dashboards, and telemetry tables with strict right-aligned `tabular-nums` numbers and smooth `cubic-bezier(0.22, 1, 0.36, 1)` comparison bars.
+  - **Zero AI Slop:** Bans decorative emojis, neon gradients, and fake glassmorphism out of the box.
   ```
-- **File to Upload:** อัปโหลดไฟล์ `agensi-skills-pack/swiss-minimal-ui-ledger.zip` หรือ `agensi-skills-pack/swiss-minimal-ui-ledger/SKILL.md`
+
+---
+
+### สินค้าชิ้นที่ 3: `cloud-gpu-breakeven-auditor` (เน้นตรวจโค้ดเพื่อหาจุดคุ้มทุนสลับจาก API ไปเช่า Cloud GPU)
+- **ไฟล์ที่ใช้อัปโหลด:** `agensi-skills-pack/cloud-gpu-breakeven-auditor.zip`
+- **ราคาแนะนำ (One-time Price):** **`$24`** (รับส่วนแบ่ง 70% = `$16.80` ต่อการขาย หรือ **90% = `$21.60`** เมื่อลูกค้าซื้อผ่านลิงก์ของคุณเอง)
+- **Title / Name:** `cloud-gpu-breakeven-auditor`
+- **Description (ก๊อปปี้ไปวางได้เลย):**
+  ```markdown
+  Audit any repository's LLM SDK calls and compute the exact daily request and VRAM break-even point between pay-per-token APIs and dedicated hourly Cloud GPUs.
+
+  ### What This Single-Purpose Skill Does
+  - **Scans Real Repo Call Sites:** Extracts prompt lengths, cache hit ratios, and multi-step agent multipliers across OpenAI, Anthropic, Gemini, and DeepSeek SDK calls.
+  - **Sizes Dedicated GPU VRAM & Throughput:** Calculates exact `vLLM` instance counts and monthly costs across RTX 4090, A6000, L40S, A100, and H100 GPUs.
+  - **Outputs a Clear Decision Ledger:** Shows the exact daily request threshold where switching from pay-per-token API billing to dedicated GPU rental saves money.
+  ```

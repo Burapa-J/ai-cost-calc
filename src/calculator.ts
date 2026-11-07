@@ -45,8 +45,21 @@ export function resolveAffiliateUrl(
   if (!program || !program.baseUrl) {
     throw new Error(`Unknown or unconfigured affiliate program: ${String(affiliateId)}`);
   }
-  const url = new URL(program.baseUrl);
   const code = (program.affiliateCode || '').trim() || 'ai-cost-calc';
+  if (affiliateId === 'agensi') {
+    const cleanHandle =
+      code
+        .replace(/^https?:\/\/(www\.)?agensi\.io\/r\//i, '')
+        .replace(/^agensi\.io\/r\//i, '')
+        .replace(/^\/?r\//i, '')
+        .replace(/[^a-zA-Z0-9_-]/g, '') || 'YOUR_AGENSI_ID';
+    const agensiUrl = new URL(`https://www.agensi.io/r/${cleanHandle}`);
+    if (subIdSlug) {
+      agensiUrl.searchParams.set('utm_campaign', subIdSlug.replace(/[^a-zA-Z0-9_-]/g, ''));
+    }
+    return agensiUrl.toString();
+  }
+  const url = new URL(program.baseUrl);
   url.searchParams.set(program.paramKey || 'ref', code);
   if (subIdSlug) {
     url.searchParams.set('utm_campaign', subIdSlug.replace(/[^a-zA-Z0-9_-]/g, ''));

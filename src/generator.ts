@@ -453,7 +453,7 @@ function selectRelatedSpecs(
   }
   const current = allPages.find((p) => p.slug === currentSlug);
   if (!current) {
-    return allPages.slice(0, 8);
+    return allPages.slice(0, 6);
   }
   const sameCategory = allPages.filter(
     (p) =>
@@ -461,7 +461,7 @@ function selectRelatedSpecs(
       (p.category === current.category ||
         (current.primaryModelId && p.primaryModelId === current.primaryModelId))
   );
-  return sameCategory.slice(0, 8);
+  return sameCategory.slice(0, 6);
 }
 
 function renderCalculatorPage(
@@ -628,7 +628,11 @@ function renderCalculatorPage(
   const clientCatalogJson = JSON.stringify({
     models: LLM_MODELS.map(({ summary: _s, ...rest }) => rest),
     gpus: CLOUD_GPUS.map(({ summary: _s, bestForModels: _b, ...rest }) => rest),
-    skills: AGENT_SKILLS_CATALOG,
+    skills: AGENT_SKILLS_CATALOG.map((s) => ({
+      ...s,
+      tagline: { [locale]: s.tagline[locale] },
+      metricNote: { [locale]: s.metricNote[locale] }
+    })),
     affiliates: { usdToThbDefault: affiliateConfig.usdToThbDefault, programs: compactPrograms },
     locale,
     pageSlug,
@@ -919,6 +923,14 @@ function renderCalculatorPage(
           .join('\n')}
       </div>
     </section>
+
+    <footer id="affiliate-disclosure" style="padding:20px 0 40px; border-top:1px solid var(--hairline); color:var(--ink-muted); font-size:0.78rem; line-height:1.55;">
+      ${
+        locale === 'th'
+          ? 'การเปิดเผยข้อมูลพาร์ทเนอร์ (Affiliate Disclosure): เว็บไซต์นี้มีลิงก์แนะนำบริการคลาวด์, API และชุดคำสั่ง AI (รวมถึง Agensi.io, RunPod, AI/ML API และผู้ให้บริการ VPS) ซึ่งผู้จัดทำอาจได้รับค่าคอมมิชชันเมื่อคุณสมัครหรือสั่งซื้อผ่านลิงก์ดังกล่าว โดยที่คุณไม่เสียค่าใช้จ่ายเพิ่มใดๆ'
+          : 'Affiliate Disclosure: Some links on this page (including Agensi.io, RunPod, AI/ML API, and cloud hosting providers) are affiliate links. We may earn a commission at no extra cost to you if you sign up or make a purchase through them.'
+      }
+    </footer>
   </div>
 
   <script>
@@ -977,8 +989,15 @@ function renderCalculatorPage(
 
     function buildAffiliateLink(affiliateId, itemSlug) {
       const prog = APP_DATA.affiliates.programs[affiliateId];
+      const code = (prog.affiliateCode || 'ai-cost-calc').trim();
+      if (affiliateId === 'agensi') {
+        const cleanHandle = code.replace(/^https?:\/\/(www\.)?agensi\.io\/r\//i, '').replace(/^agensi\.io\/r\//i, '').replace(/^\/?r\//i, '').replace(/[^a-zA-Z0-9_-]/g, '') || 'YOUR_AGENSI_ID';
+        const agUrl = new URL('https://www.agensi.io/r/' + cleanHandle);
+        agUrl.searchParams.set('utm_campaign', APP_DATA.pageSlug + '-' + itemSlug);
+        return agUrl.toString();
+      }
       const u = new URL(prog.baseUrl);
-      u.searchParams.set(prog.paramKey || 'ref', prog.affiliateCode || 'ai-cost-calc');
+      u.searchParams.set(prog.paramKey || 'ref', code);
       u.searchParams.set('utm_campaign', APP_DATA.pageSlug + '-' + itemSlug);
       return u.toString();
     }
