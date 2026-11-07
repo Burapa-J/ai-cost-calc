@@ -64,9 +64,9 @@
         "th": "ค่าคอมสูงสุด 25% โฮสติ้งและ Cloud VPS ในไทย"
       },
       "estimatedPayoutUsd": 25,
-      "baseUrl": "https://www.hostatom.com/cloud-vps/",
+      "baseUrl": "https://support.hostatom.com/aff.php",
       "paramKey": "aff",
-      "affiliateCode": "YOUR_HOSTATOM_ID"
+      "affiliateCode": "4643"
     },
     "rukcom": {
       "id": "rukcom",
