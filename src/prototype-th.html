@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ai-cost.dev — คำนวณงบ AI ตามงานจริง เทียบ API vs เช่า GPU</title>
+<meta name="description" content="คำนวณงบ AI แบบเรียลไทม์ เทียบ API จ่ายตามจริง 9 โมเดล, เช่า GPU รายชั่วโมง 4 รุ่น, VPS หลังบ้าน 3 แพ็กเกจ พร้อมคู่มือจัดสเปกจากเคสจริง" />
+<style>
+  :root[data-theme="dark"]{
+    --bg:#0A0A0D; --bg-elev:#131318; --bg-elev-2:#1C1C24; --bg-hover:#20202A;
+    --border:rgba(255,255,255,0.08); --border-strong:rgba(255,255,255,0.16);
+    --text:#F2F2F5; --text-secondary:#A6A6B3; --text-muted:#6E6E7A;
+    --accent:#6C79F0; --accent-strong:#8690FF; --accent-soft:rgba(108,121,240,0.14);
+    --green:#3DD68C; --green-soft:rgba(61,214,140,0.12);
+    --amber:#F2A33C; --amber-soft:rgba(242,163,60,0.12);
+    --blue:#56A8FF; --blue-soft:rgba(86,168,255,0.12);
+    --shadow:0 8px 28px rgba(0,0,0,0.45);
+  }
+  :root[data-theme="light"]{
+    --bg:#F7F7F9; --bg-elev:#FFFFFF; --bg-elev-2:#F0F0F4; --bg-hover:#E9E9EF;
+    --border:rgba(15,15,20,0.09); --border-strong:rgba(15,15,20,0.16);
+    --text:#15151A; --text-secondary:#53535F; --text-muted:#8A8A96;
+    --accent:#4F5BD5; --accent-strong:#3C47C2; --accent-soft:rgba(79,91,213,0.09);
+    --green:#1A9A5B; --green-soft:rgba(26,154,91,0.09);
+    --amber:#B5690A; --amber-soft:rgba(181,105,10,0.09);
+    --blue:#1C6FD9; --blue-soft:rgba(28,111,217,0.09);
+    --shadow:0 8px 24px rgba(15,15,20,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",sans-serif;
+    font-size:14.5px; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    transition:background .2s ease,color .2s ease;
+  }
+  .mono{font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace;}
+  a{color:inherit; text-decoration:none;}
+
+  /* Topbar */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 24px; background:var(--bg); border-bottom:1px solid var(--border);
+    backdrop-filter:blur(10px);
+  }
+  .brand{display:flex; align-items:center; gap:8px; font-weight:700; font-size:15px; letter-spacing:-0.01em;}
+  .brand svg{display:block;}
+  .nav{display:flex; align-items:center; gap:22px;}
+  .nav-link{font-size:13.5px; font-weight:500; color:var(--text-secondary); padding:6px 2px; border-bottom:2px solid transparent;}
+  .nav-link:hover{color:var(--text);}
+  .nav-link.active{color:var(--text); border-bottom-color:var(--accent);}
+  .theme-btn{
+    width:32px; height:32px; border-radius:8px; border:1px solid var(--border);
+    background:var(--bg-elev); color:var(--text); font-size:14px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .theme-btn:hover{background:var(--bg-hover);}
+
+  /* Status bar */
+  .statusbar{
+    padding:7px 24px; font-size:12px; color:var(--text-muted);
+    border-bottom:1px solid var(--border); background:var(--bg-elev);
+    text-align:center;
+  }
+  .statusbar .mono{color:var(--text-secondary);}
+
+  .shell{max-width:1180px; margin:0 auto; padding:24px 24px 64px;}
+
+  /* Grid layout */
+  .layout{display:grid; grid-template-columns:300px 1fr; gap:22px; align-items:start;}
+  @media (max-width:900px){ .layout{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--bg-elev); border:1px solid var(--border); border-radius:14px;
+    padding:18px;
+  }
+  .panel-left{position:sticky; top:84px;}
+  @media (max-width:900px){ .panel-left{position:static;} }
+
+  .section-label{
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--text-muted); margin-bottom:12px;
+  }
+
+  .preset-strip{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px;}
+  .preset-chip{
+    font-size:12px; font-weight:600; padding:6px 10px; border-radius:999px;
+    border:1px solid var(--border-strong); background:var(--bg-elev-2); color:var(--text-secondary);
+    cursor:pointer;
+  }
+  .preset-chip:hover{color:var(--text); border-color:var(--accent);}
+  .preset-chip.active{background:var(--accent-soft); color:var(--accent-strong); border-color:var(--accent);}
+
+  .field-row{margin-bottom:16px;}
+  .field-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;}
+  .field-label{font-size:12.5px; color:var(--text-secondary); font-weight:500;}
+  .field-val{font-family:"SF Mono",monospace; font-size:12.5px; font-weight:700; color:var(--text);}
+  input[type=range]{
+    width:100%; height:4px; border-radius:2px; background:var(--bg-elev-2);
+    accent-color:var(--accent); cursor:pointer; appearance:none; -webkit-appearance:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:14px; height:14px; border-radius:50%;
+    background:var(--accent); border:2px solid var(--bg-elev); box-shadow:0 0 0 1px var(--accent);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px; height:14px; border-radius:50%; background:var(--accent); border:2px solid var(--bg-elev);
+  }
+
+  .btn-outline{
+    width:100%; padding:10px 12px; border-radius:9px; border:1px solid var(--border-strong);
+    background:transparent; color:var(--text); font-size:12.5px; font-weight:600; cursor:pointer;
+    margin-top:4px;
+  }
+  .btn-outline:hover{background:var(--bg-elev-2);}
+
+  /* Answer bar */
+  .answer-bar{
+    background:linear-gradient(135deg, var(--accent-soft), transparent);
+    border:1px solid var(--border-strong); border-radius:12px; padding:16px 18px; margin-bottom:16px;
+  }
+  .answer-tag{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--accent-strong); margin-bottom:6px;}
+  .answer-text{font-size:14.5px; font-weight:500; line-height:1.55;}
+  .answer-text .mono{color:var(--text); font-weight:700;}
+
+  .compare-bars{margin-top:14px; display:flex; flex-direction:column; gap:8px;}
+  .cbar-row{display:grid; grid-template-columns:120px 1fr 110px; gap:8px; align-items:center;}
+  .cbar-label{font-size:11.5px; font-weight:600; color:var(--text-secondary);}
+  .cbar-track{height:10px; border-radius:5px; background:var(--bg-elev-2); overflow:hidden;}
+  .cbar-fill{height:100%; border-radius:5px; transition:width .25s ease;}
+  .cbar-val{font-family:"SF Mono",monospace; font-size:11.5px; font-weight:700; text-align:right;}
+
+  /* Tabs */
+  .tabs{display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:14px; flex-wrap:wrap;}
+  .tab-btn{
+    font-size:12.5px; font-weight:600; padding:9px 12px; color:var(--text-muted);
+    border:none; background:transparent; cursor:pointer; border-bottom:2px solid transparent;
+    margin-bottom:-1px;
+  }
+  .tab-btn:hover{color:var(--text-secondary);}
+  .tab-btn.active{color:var(--text); border-bottom-color:var(--accent);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  table{width:100%; border-collapse:collapse;}
+  th{
+    text-align:left; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--text-muted); padding:8px 10px; border-bottom:1px solid var(--border);
+  }
+  th.num,td.num{text-align:right;}
+  td{padding:10px 10px; border-bottom:1px solid var(--border); vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .mono-val{display:block; font-family:"SF Mono",monospace; font-size:13px; font-weight:600;}
+  .sub-val{display:block; font-size:11px; color:var(--text-muted); margin-top:2px;}
+  .bar-track{height:4px; border-radius:2px; background:var(--bg-elev-2); margin-top:6px; width:140px; overflow:hidden;}
+  .bar-fill{height:100%; background:var(--accent); border-radius:2px;}
+  .provider-link{font-size:12.5px; font-weight:700; color:var(--accent-strong); white-space:nowrap;}
+  .provider-link:hover{color:var(--accent);}
+
+  .standalone{margin-top:40px;}
+  .standalone-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;}
+  .standalone-title{font-size:15px; font-weight:700;}
+
+  .guide-list{display:flex; flex-direction:column; border:1px solid var(--border); border-radius:12px; overflow:hidden;}
+  .guide-row{
+    display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid var(--border);
+    background:var(--bg-elev);
+  }
+  .guide-row:last-child{border-bottom:none;}
+  .guide-row:hover{background:var(--bg-elev-2);}
+  .guide-badge{
+    font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--accent-strong); background:var(--accent-soft); padding:4px 7px; border-radius:6px;
+    white-space:nowrap;
+  }
+  .guide-body{flex:1; min-width:0;}
+  .guide-title{font-size:13.5px; font-weight:600; display:block;}
+  .guide-takeaway{font-size:12px; color:var(--text-muted); margin:3px 0 0; display:block; line-height:1.4;}
+  .guide-read{font-size:11px; color:var(--text-muted); white-space:nowrap;}
+  .guide-arrow{color:var(--accent); font-weight:700;}
+
+  .case-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  @media (max-width:900px){ .case-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:620px){ .case-grid{grid-template-columns:1fr;} }
+  .case-card{
+    border:1px solid var(--border); border-radius:12px; padding:14px; background:var(--bg-elev);
+  }
+  .case-title{font-size:12.5px; font-weight:700; margin-bottom:8px; line-height:1.4;}
+  .case-stat{font-size:11.5px; color:var(--text-secondary); margin-bottom:4px;}
+  .case-stat .mono{font-weight:700; color:var(--text);}
+  .case-cta{font-size:11.5px; font-weight:700; color:var(--accent-strong); margin-top:8px; display:inline-block;}
+
+  footer{margin-top:48px; padding-top:20px; border-top:1px solid var(--border); color:var(--text-muted); font-size:11.5px; line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="#">
+    <svg width="22" height="22" viewBox="0 0 28 28" role="img" aria-label="ai-cost.dev logo"><rect width="28" height="28" rx="7" fill="#6C79F0"/><rect x="5" y="15" width="3.5" height="7.5" rx="1.2" fill="#0A0A0D" opacity="0.85"/><rect x="10.5" y="11" width="3.5" height="11.5" rx="1.2" fill="#0A0A0D" opacity="0.85"/><rect x="16" y="6.5" width="3.5" height="16" rx="1.2" fill="#0A0A0D" opacity="0.85"/></svg>
+    <span>ai-cost.dev</span>
+  </a>
+  <nav class="nav">
+    <a class="nav-link active" href="#calculator">คำนวณงบ</a>
+    <a class="nav-link" href="#playbooks">คู่มือจัดสเปก</a>
+    <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()" aria-label="สลับธีม">🌙</button>
+    <a class="nav-link" href="#" title="English version">EN</a>
+  </nav>
+</div>
+
+<div class="statusbar">
+  อัปเดตราคาล่าสุด: <span class="mono">พ.ย. 2026</span> · อัตราแลกเปลี่ยน <span class="mono">1 USD = 34.5 THB</span> · เทียบราคา API ตามการใช้งานจริง vs เช่า GPU เอง
+</div>
+
+<div class="shell" id="calculator">
+  <div class="layout">
+
+    <!-- LEFT: Controls -->
+    <aside class="panel panel-left">
+      <div class="section-label">ปรับตามลักษณะงานจริงของคุณ</div>
+      <div class="preset-strip" id="preset-strip">
+        <button type="button" class="preset-chip" data-preset="0" onclick="applyPreset(0)">แชทบอททั่วไป</button>
+        <button type="button" class="preset-chip" data-preset="1" onclick="applyPreset(1)">LINE OA + ค้นเอกสาร (RAG)</button>
+        <button type="button" class="preset-chip" data-preset="2" onclick="applyPreset(2)">Agent หลายขั้นตอน</button>
+        <button type="button" class="preset-chip" data-preset="3" onclick="applyPreset(3)">ประมวลผลหนัก 24 ชม.</button>
+      </div>
+
+      <div class="field-row">
+        <div class="field-top">
+          <label class="field-label" for="inp-req">งานต่อวัน (ครั้ง/วัน)</label>
+          <span class="field-val" id="val-req">2,000</span>
+        </div>
+        <input id="inp-req" type="range" min="50" max="50000" step="50" value="2000" />
+      </div>
+
+      <div class="field-row">
+        <div class="field-top">
+          <label class="field-label" for="inp-steps">รอบคิดต่อ 1 งาน (Steps)</label>
+          <span class="field-val" id="val-steps">1x</span>
+        </div>
+        <input id="inp-steps" type="range" min="1" max="15" step="1" value="1" />
+      </div>
+
+      <div class="field-row">
+        <div class="field-top">
+          <label class="field-label" for="inp-intok">Input Tokens ต่อรอบ</label>
+          <span class="field-val" id="val-intok">1,500</span>
+        </div>
+        <input id="inp-intok" type="range" min="200" max="20000" step="100" value="1500" />
+      </div>
+
+      <div class="field-row">
+        <div class="field-top">
+          <label class="field-label" for="inp-outtok">Output Tokens ต่อรอบ</label>
+          <span class="field-val" id="val-outtok">400</span>
+        </div>
+        <input id="inp-outtok" type="range" min="100" max="4000" step="50" value="400" />
+      </div>
+
+      <div class="field-row">
+        <div class="field-top">
+          <label class="field-label" for="inp-cache">Cache Hit Rate (%)</label>
+          <span class="field-val" id="val-cache">30%</span>
+        </div>
+        <input id="inp-cache" type="range" min="0" max="90" step="5" value="30" />
+      </div>
+
+      <div class="field-row">
+        <div class="field-top">
+          <label class="field-label" for="inp-hours">ชั่วโมงเปิดระบบต่อวัน</label>
+          <span class="field-val" id="val-hours">14h</span>
+        </div>
+        <input id="inp-hours" type="range" min="1" max="24" step="1" value="14" />
+      </div>
+
+      <button type="button" class="btn-outline" id="btn-share" onclick="copyScenarioLink()">คัดลอกลิงก์พารามิเตอร์นี้</button>
+    </aside>
+
+    <!-- RIGHT: Results -->
+    <main class="panel">
+      <div class="answer-bar">
+        <div class="answer-tag">สรุปต้นทุนตามพารามิเตอร์ของคุณ</div>
+        <div class="answer-text" id="answer-text">กำลังคำนวณ…</div>
+        <div class="compare-bars">
+          <div class="cbar-row">
+            <span class="cbar-label">API ถูกสุด</span>
+            <div class="cbar-track"><div class="cbar-fill" id="bar-cheap" style="width:0%;background:var(--green);"></div></div>
+            <span class="cbar-val mono" id="val-bar-cheap">—</span>
+          </div>
+          <div class="cbar-row">
+            <span class="cbar-label">API เรือธง</span>
+            <div class="cbar-track"><div class="cbar-fill" id="bar-flag" style="width:0%;background:var(--amber);"></div></div>
+            <span class="cbar-val mono" id="val-bar-flag">—</span>
+          </div>
+          <div class="cbar-row">
+            <span class="cbar-label">เช่า GPU เอง</span>
+            <div class="cbar-track"><div class="cbar-fill" id="bar-gpu" style="width:0%;background:var(--blue);"></div></div>
+            <span class="cbar-val mono" id="val-bar-gpu">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+        <span>คลิกสลับหมวดเพื่อดูรายละเอียดรายรุ่น</span>
+        <span>ลิงก์ผู้ให้บริการบางส่วนเป็นลิงก์พาร์ทเนอร์ (ไม่มีค่าใช้จ่ายเพิ่ม)</span>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="api" onclick="switchTab('api')">API จ่ายตามจริง (9 โมเดล)</button>
+        <button class="tab-btn" data-tab="gpu" onclick="switchTab('gpu')">เช่า GPU รายชั่วโมง (4 รุ่น)</button>
+        <button class="tab-btn" data-tab="vps" onclick="switchTab('vps')">VPS รันระบบหลังบ้าน (3 แพ็กเกจ)</button>
+        <button class="tab-btn" data-tab="guides" onclick="switchTab('guides')">เทคนิคลดค่า Token & คู่มือ (5 บทความ)</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-api">
+        <table>
+          <thead><tr><th>โมเดล</th><th class="num">ค่าใช้จ่าย/เดือน</th><th class="num">ต่อ 1,000 งาน</th><th class="num">ผู้ให้บริการ</th></tr></thead>
+          <tbody id="api-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="tab-panel" id="tab-gpu">
+        <table>
+          <thead><tr><th>การ์ดจอ (RunPod)</th><th class="num">ค่าใช้จ่าย/เดือน</th><th class="num">จุดคุ้มทุน</th><th class="num">ผู้ให้บริการ</th></tr></thead>
+          <tbody id="gpu-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="tab-panel" id="tab-vps">
+        <table>
+          <thead><tr><th>แพ็กเกจเซิร์ฟเวอร์</th><th class="num">ค่าใช้จ่าย/เดือน</th><th class="num">สเปก</th><th class="num">ผู้ให้บริการ</th></tr></thead>
+          <tbody id="vps-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="tab-panel" id="tab-guides">
+        <div class="guide-list" id="guides-compact"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom: Guides + Popular Cases -->
+  <section class="standalone" id="playbooks">
+    <div class="standalone-head">
+      <div class="standalone-title">คู่มือจัดสเปกจากเคสจริง (5 บทความ)</div>
+    </div>
+    <div class="guide-list" id="guides-full"></div>
+  </section>
+
+  <section class="standalone">
+    <div class="standalone-head">
+      <div class="standalone-title">เปรียบเทียบเคสยอดนิยม (6 รายการ)</div>
+    </div>
+    <div class="case-grid" id="popular-cases"></div>
+  </section>
+
+  <footer>
+    การเปิดเผยข้อมูลพาร์ทเนอร์ (Affiliate Disclosure): เว็บไซต์นี้มีลิงก์แนะนำบริการคลาวด์, API และเซิร์ฟเวอร์ (รวมถึง Novita AI, RunPod, Hostatom, Ruk-Com และ Cloudways) ซึ่งผู้จัดทำอาจได้รับค่าคอมมิชชันเมื่อคุณสมัครหรือสั่งซื้อผ่านลิงก์ดังกล่าว โดยที่คุณไม่เสียค่าใช้จ่ายเพิ่มใดๆ
+  </footer>
+</div>
+
+<script>
+  var APP_DATA = {
+    locale: 'th',
+    pageSlug: 'prototype-th',
+    fx: 34.5,
+    models: [
+      { id:'claude-3-7-sonnet', name:'Claude 3.7 Sonnet', provider:'Unified LLM API', inputUsdPer1M:3.0, cachedInputUsdPer1M:0.3, outputUsdPer1M:15.0, contextWindowK:200, affiliateId:'aimlapi' },
+      { id:'claude-3-5-haiku', name:'Claude 3.5 Haiku', provider:'Unified LLM API', inputUsdPer1M:0.8, cachedInputUsdPer1M:0.08, outputUsdPer1M:4.0, contextWindowK:200, affiliateId:'aimlapi' },
+      { id:'gpt-4o', name:'OpenAI GPT-4o', provider:'Unified LLM API', inputUsdPer1M:2.5, cachedInputUsdPer1M:1.25, outputUsdPer1M:10.0, contextWindowK:128, affiliateId:'aimlapi' },
+      { id:'gpt-4o-mini', name:'OpenAI GPT-4o mini', provider:'Unified LLM API', inputUsdPer1M:0.15, cachedInputUsdPer1M:0.075, outputUsdPer1M:0.6, contextWindowK:128, affiliateId:'aimlapi' },
+      { id:'o3-mini', name:'OpenAI o3-mini (Reasoning)', provider:'Unified LLM API', inputUsdPer1M:1.1, cachedInputUsdPer1M:0.55, outputUsdPer1M:4.4, contextWindowK:200, affiliateId:'aimlapi' },
+      { id:'gemini-2-5-pro', name:'Gemini 2.5 Pro', provider:'Unified LLM API', inputUsdPer1M:1.25, cachedInputUsdPer1M:0.31, outputUsdPer1M:10.0, contextWindowK:2000, affiliateId:'aimlapi' },
+      { id:'gemini-2-5-flash', name:'Gemini 2.5 Flash', provider:'Unified LLM API', inputUsdPer1M:0.15, cachedInputUsdPer1M:0.0375, outputUsdPer1M:0.6, contextWindowK:1000, affiliateId:'aimlapi' },
+      { id:'deepseek-v3-r1', name:'DeepSeek V3 / R1 (API)', provider:'Novita AI / Unified API', inputUsdPer1M:0.55, cachedInputUsdPer1M:0.14, outputUsdPer1M:2.19, contextWindowK:128, affiliateId:'aimlapi' },
+      { id:'llama-3-3-70b-api', name:'Llama 3.3 70B Instruct (API)', provider:'Meta / Unified Router', inputUsdPer1M:0.4, cachedInputUsdPer1M:0.2, outputUsdPer1M:0.6, contextWindowK:128, affiliateId:'aimlapi' }
+    ],
+    gpus: [
+      { id:'runpod-rtx-4090', name:'RunPod NVIDIA RTX 4090 (24GB)', vramGb:24, hourlyUsd:0.44, throughputTokensPerSec:110, affiliateId:'runpod' },
+      { id:'runpod-rtx-a6000-48gb', name:'RunPod NVIDIA RTX A6000 (48GB)', vramGb:48, hourlyUsd:0.49, throughputTokensPerSec:135, affiliateId:'runpod' },
+      { id:'runpod-l40s-48gb', name:'RunPod NVIDIA L40S (48GB Ada)', vramGb:48, hourlyUsd:0.86, throughputTokensPerSec:195, affiliateId:'runpod' },
+      { id:'runpod-a100-80gb', name:'RunPod NVIDIA A100 PCIe (80GB)', vramGb:80, hourlyUsd:1.39, throughputTokensPerSec:220, affiliateId:'runpod' }
+    ],
+    vps: [
+      { id:'hostatom-vps-4gb', name:'Hostatom Cloud VPS Thailand (4GB/2vCPU)', region:'thailand', vcpu:2, ramGb:4, monthlyUsd:24, affiliateId:'hostatom', brandLabel:'Hostatom' },
+      { id:'rukcom-managed-vps', name:'Ruk-Com Managed Cloud VPS (8GB/4vCPU)', region:'thailand', vcpu:4, ramGb:8, monthlyUsd:46, affiliateId:'rukcom', brandLabel:'Ruk-Com' },
+      { id:'cloudways-vultr-8gb', name:'Cloudways Managed Vultr HF (8GB/4vCPU)', region:'global', vcpu:4, ramGb:8, monthlyUsd:112, affiliateId:'cloudways', brandLabel:'Vultr' }
+    ],
+    affiliates: {
+      aimlapi: { baseUrl:'https://novita.ai/', paramKey:'ref', affiliateCode:'zge5ztg' },
+      runpod: { baseUrl:'https://runpod.io/', paramKey:'ref', affiliateCode:'gk3w1fiy' },
+      cloudways: { baseUrl:'https://www.cloudways.com/en/', paramKey:'id', affiliateCode:'2225344' },
+      hostatom: { baseUrl:'https://support.hostatom.com/aff.php', paramKey:'aff', affiliateCode:'4643' },
+      rukcom: { baseUrl:'https://portal.ruk-com.cloud/aff.php', paramKey:'aff', affiliateCode:'1874' }
+    },
+    presets: [
+      { req:2000, steps:1, inTok:1500, outTok:400, cache:30, hours:14 },
+      { req:2500, steps:1, inTok:3000, outTok:400, cache:70, hours:24 },
+      { req:4000, steps:6, inTok:4500, outTok:900, cache:45, hours:12 },
+      { req:12000, steps:3, inTok:1800, outTok:300, cache:55, hours:24 }
+    ],
+    playbooks: [
+      { slug:'thai-tokenizer-cost-benchmark', badge:'BENCHMARK ภาษาไทย', title:'เจาะลึก "ตัวคูณโทเค็นภาษาไทย" — ข้อความไทย 1 หน้า A4 ใช้ค่ายไหนถูกสุด?', takeaway:'งานอ่านเอกสารไทย สรุปแชท หรือคัดกรองข้อมูล ให้ใช้ Gemini 2.5 Flash หรือ DeepSeek V3 ประหยัดกว่าโมเดลเรือธงถึง 12–40 เท่า', readTime:'อ่านจบใน 3 นาที' },
+      { slug:'line-oa-rag-chatbot-blueprint', badge:'BLUEPRINT ธุรกิจไทย', title:'สูตรจัดสเปกทำระบบแชทบอท LINE OA + ค้นเอกสารองค์กร (RAG) ในงบไม่เกิน ฿1,200/เดือน', takeaway:'วาง Webhook + Qdrant บน VPS ในไทย (Hostatom/Ruk-Com) แล้วเรียก Gemini 2.5 Flash / DeepSeek V3 แบบเปิด Prompt Cache 75%', readTime:'อ่านจบใน 4 นาที' },
+      { slug:'claude-code-cursor-cost-cut', badge:'DEV PLAYBOOK', title:'คู่มือลดค่าไฟ Claude Code & Cursor 50–70%', takeaway:'เลิกอ่านไฟล์ทั้งโปรเจกต์ทุกเทิร์นและเลิกแตก Subagent พร่ำเพรื่อ ตัดส่วนสูญเปล่าทันที 50–65%', readTime:'อ่านจบใน 3 นาที' },
+      { slug:'api-to-runpod-vllm-migration', badge:'CLOUD GPU PLAYBOOK', title:'คู่มือย้ายจาก OpenAI/Claude API มารันโมเดลส่วนตัวบน RunPod GPU', takeaway:'เมื่อบิล API เกิน ~$160–300/เดือน การเช่า RTX 4090 หรือ RTX A6000 จะช่วยล็อกเพดานรายจ่ายทันที', readTime:'อ่านจบใน 4 นาที' },
+      { slug:'thai-vps-vs-global-cloud-ai-backend', badge:'INFRASTRUCTURE GUIDE', title:'คู่มือเลือกเซิร์ฟเวอร์วางระบบเว็บและ AI Backend (ไทย vs ต่างประเทศ)', takeaway:'ถ้าลูกค้า 90% อยู่ในไทย ใช้ Hostatom/Ruk-Com เร็วกว่า 4 เท่า (<8ms) ในราคาเริ่มต้นเพียง ฿828/เดือน', readTime:'อ่านจบใน 3 นาที' }
+    ]
+  };
+
+  var FLAGSHIP_ID = 'claude-3-7-sonnet';
+
+  /* ---------- Calculation engine (mirrors calculateCostComparison in src/calculator.ts) ---------- */
+  function calcApiMonthly(model, req, steps, inTok, outTok, cachePct) {
+    var cacheHit = cachePct / 100;
+    var monthlyCalls = req * steps * 30;
+    var inM = (monthlyCalls * inTok) / 1000000;
+    var outM = (monthlyCalls * outTok) / 1000000;
+    var blendedIn = (1 - cacheHit) * model.inputUsdPer1M + cacheHit * model.cachedInputUsdPer1M;
+    var monthlyUsd = Number((inM * blendedIn + outM * model.outputUsdPer1M).toFixed(2));
+    var monthlyThb = Math.round(monthlyUsd * APP_DATA.fx);
+    var per1k = Number(((monthlyUsd / (req * 30)) * 1000).toFixed(2));
+    return { monthlyUsd: monthlyUsd, monthlyThb: monthlyThb, per1k: per1k };
+  }
+
+  function calcGpuMonthly(gpu, req, steps, outTok, hours, flagshipCostPerTask) {
+    var reqTokPerSec = (req * steps * outTok) / Math.max(1, hours * 3600);
+    var instances = Math.max(1, Math.ceil(reqTokPerSec / gpu.throughputTokensPerSec));
+    var monthlyUsd = Number((instances * gpu.hourlyUsd * hours * 30).toFixed(2));
+    var monthlyThb = Math.round(monthlyUsd * APP_DATA.fx);
+    var singleGpuMo = gpu.hourlyUsd * hours * 30;
+    var breakEven = Math.max(1, Math.ceil(singleGpuMo / Math.max(0.000001, flagshipCostPerTask * 30)));
+    return { monthlyUsd: monthlyUsd, monthlyThb: monthlyThb, instances: instances, breakEven: breakEven };
+  }
+
+  function computeAll(req, steps, inTok, outTok, cachePct, hours) {
+    var apiRows = APP_DATA.models.map(function (m) {
+      var c = calcApiMonthly(m, req, steps, inTok, outTok, cachePct);
+      return Object.assign({}, m, c);
+    }).sort(function (a, b) { return a.monthlyUsd - b.monthlyUsd; });
+
+    var cheapest = apiRows[0];
+    var flagship = apiRows.filter(function (r) { return r.id === FLAGSHIP_ID; })[0] || apiRows[apiRows.length - 1];
+    var flagshipCostPerTask = flagship.monthlyUsd / (req * 30);
+
+    var gpuRows = APP_DATA.gpus.map(function (g) {
+      var c = calcGpuMonthly(g, req, steps, outTok, hours, flagshipCostPerTask);
+      return Object.assign({}, g, c);
+    }).sort(function (a, b) { return a.monthlyUsd - b.monthlyUsd; });
+
+    return { apiRows: apiRows, gpuRows: gpuRows, cheapest: cheapest, flagship: flagship, bestGpu: gpuRows[0] };
+  }
+
+  /* ---------- Affiliate link builder (mirrors resolveAffiliateUrl in src/calculator.ts) ---------- */
+  function buildAffiliateLink(affiliateId, itemSlug) {
+    var prog = APP_DATA.affiliates[affiliateId];
+    var code = (prog.affiliateCode || 'ai-cost-calc').trim();
+    var u = new URL(prog.baseUrl);
+    u.searchParams.set(prog.paramKey || 'ref', code);
+    if (affiliateId === 'aimlapi') u.searchParams.set('utm_source', 'affiliate');
+    u.searchParams.set('utm_campaign', APP_DATA.pageSlug + '-' + itemSlug);
+    return u.toString();
+  }
+
+  var BRAND_LABEL = { aimlapi: 'Novita AI', runpod: 'RunPod', hostatom: 'Hostatom', rukcom: 'Ruk-Com' };
+
+  /* ---------- Telemetry (ported as-is) ---------- */
+  var STORAGE_KEY = 'ai_cost_calc_telemetry_v1';
+  var GLOBAL_NS = 'burapa_ai_cost_calc_live';
+
+  function hitGlobalCounter(key) {
+    fetch('https://abacus.jasoncameron.dev/hit/' + GLOBAL_NS + '/' + key, { mode: 'cors' }).catch(function () {});
+  }
+
+  function getSessionId() {
+    var sid = localStorage.getItem('ai_cost_calc_sid');
+    if (!sid) {
+      sid = 'sess-' + Math.random().toString(36).slice(2, 10) + '-' + Date.now();
+      localStorage.setItem('ai_cost_calc_sid', sid);
+      hitGlobalCounter('unique_sessions');
+    }
+    return sid;
+  }
+
+  function sendTelemetry(eventType, extra) {
+    var ev = Object.assign({
+      eventId: eventType + '-' + getSessionId() + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+      sessionId: getSessionId(),
+      timestampIso: new Date().toISOString(),
+      eventType: eventType,
+      locale: APP_DATA.locale,
+      pageSlug: APP_DATA.pageSlug
+    }, extra || {});
+
+    try {
+      var list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      list.push(ev);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    } catch (_) {}
+
+    if (eventType === 'page_view') hitGlobalCounter('page_views');
+    if (eventType === 'calculation_run') hitGlobalCounter('calculation_runs');
+    if (eventType === 'scenario_shared') hitGlobalCounter('scenarios_shared');
+    if (eventType === 'affiliate_cta_click') {
+      hitGlobalCounter('affiliate_clicks_total');
+      if (extra && extra.affiliateId) hitGlobalCounter('aff_' + extra.affiliateId);
+    }
+
+    fetch('/api/telemetry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ev)
+    }).catch(function () {});
+  }
+
+  function recordAffiliateClick(affiliateId, estimatedMonthlySpendUsd) {
+    sendTelemetry('affiliate_cta_click', { affiliateId: affiliateId, estimatedMonthlySpendUsd: estimatedMonthlySpendUsd });
+  }
+
+  /* ---------- Rendering ---------- */
+  var hasLoggedCalcInteraction = false;
+
+  function readSliders() {
+    return {
+      req: Number(document.getElementById('inp-req').value),
+      steps: Number(document.getElementById('inp-steps').value),
+      inTok: Number(document.getElementById('inp-intok').value),
+      outTok: Number(document.getElementById('inp-outtok').value),
+      cache: Number(document.getElementById('inp-cache').value),
+      hours: Number(document.getElementById('inp-hours').value)
+    };
+  }
+
+  function recalcAll(fromUserInput) {
+    var s = readSliders();
+    document.getElementById('val-req').textContent = s.req.toLocaleString('th-TH');
+    document.getElementById('val-steps').textContent = s.steps + 'x';
+    document.getElementById('val-intok').textContent = s.inTok.toLocaleString('th-TH');
+    document.getElementById('val-outtok').textContent = s.outTok.toLocaleString('th-TH');
+    document.getElementById('val-cache').textContent = s.cache + '%';
+    document.getElementById('val-hours').textContent = s.hours + 'h';
+
+    var r = computeAll(s.req, s.steps, s.inTok, s.outTok, s.cache, s.hours);
+
+    renderApiTable(r);
+    renderGpuTable(r);
+    renderAnswerBar(r, s);
+
+    if (fromUserInput && !hasLoggedCalcInteraction) {
+      hasLoggedCalcInteraction = true;
+      sendTelemetry('calculation_run', { estimatedMonthlySpendUsd: Math.min(r.bestGpu.monthlyUsd, r.flagship.monthlyUsd) });
+    }
+  }
+
+  function renderApiTable(r) {
+    var maxUsd = Math.max.apply(null, r.apiRows.map(function (x) { return x.monthlyUsd; }).concat([1]));
+    document.getElementById('api-tbody').innerHTML = r.apiRows.map(function (m) {
+      var pct = Math.max(4, Math.round((m.monthlyUsd / maxUsd) * 100));
+      var url = buildAffiliateLink(m.affiliateId, m.id);
+      return '<tr><td><span class="mono-val">' + m.name + '</span><span class="sub-val">' + m.provider + ' • Context ' + m.contextWindowK + 'K</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></td>' +
+        '<td class="num"><span class="mono-val">$' + m.monthlyUsd.toLocaleString() + '</span><span class="sub-val">฿' + m.monthlyThb.toLocaleString() + '</span></td>' +
+        '<td class="num"><span class="mono-val">$' + m.per1k + '</span><span class="sub-val">ต่อ 1,000 งาน</span></td>' +
+        '<td class="num"><a class="provider-link" href="' + url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\'' + m.affiliateId + '\', ' + m.monthlyUsd + ')">' + BRAND_LABEL[m.affiliateId] + ' ↗</a></td></tr>';
+    }).join('');
+  }
+
+  function renderGpuTable(r) {
+    document.getElementById('gpu-tbody').innerHTML = r.gpuRows.map(function (g) {
+      var url = buildAffiliateLink(g.affiliateId, g.id);
+      return '<tr><td><span class="mono-val">' + g.name + '</span><span class="sub-val">' + g.instances + 'x เครื่อง • VRAM ' + g.vramGb + 'GB • ' + g.throughputTokensPerSec + ' tok/s</span></td>' +
+        '<td class="num"><span class="mono-val">$' + g.monthlyUsd.toLocaleString() + '</span><span class="sub-val">฿' + g.monthlyThb.toLocaleString() + '</span></td>' +
+        '<td class="num"><span class="mono-val">' + g.breakEven.toLocaleString() + '</span><span class="sub-val">งาน/วัน จุดคุ้มทุน</span></td>' +
+        '<td class="num"><a class="provider-link" href="' + url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\'' + g.affiliateId + '\', ' + g.monthlyUsd + ')">' + BRAND_LABEL[g.affiliateId] + ' ↗</a></td></tr>';
+    }).join('');
+  }
+
+  function renderVpsTable() {
+    document.getElementById('vps-tbody').innerHTML = APP_DATA.vps.map(function (v) {
+      var url = buildAffiliateLink(v.affiliateId, v.id);
+      var monthlyThb = Math.round(v.monthlyUsd * APP_DATA.fx);
+      return '<tr><td><span class="mono-val">' + v.name + '</span><span class="sub-val">' + (v.region === 'thailand' ? 'ประเทศไทย' : 'ทั่วโลก') + '</span></td>' +
+        '<td class="num"><span class="mono-val">$' + v.monthlyUsd + '</span><span class="sub-val">฿' + monthlyThb.toLocaleString() + '</span></td>' +
+        '<td class="num"><span class="mono-val">' + v.vcpu + ' vCPU / ' + v.ramGb + 'GB</span></td>' +
+        '<td class="num"><a class="provider-link" href="' + url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\'' + v.affiliateId + '\', ' + v.monthlyUsd + ')">' + v.brandLabel + ' ↗</a></td></tr>';
+    }).join('');
+  }
+
+  function renderAnswerBar(r, s) {
+    var gpuBeats = r.bestGpu.monthlyUsd < r.flagship.monthlyUsd;
+    var text;
+    if (gpuBeats) {
+      var saveUsd = Number((r.flagship.monthlyUsd - r.bestGpu.monthlyUsd).toFixed(2));
+      var saveThb = Math.round(saveUsd * APP_DATA.fx);
+      text = 'ที่โหลดงานนี้ <span class="mono">' + r.cheapest.name + '</span> ถูกสุดที่ <span class="mono">$' + r.cheapest.monthlyUsd.toLocaleString() + '/เดือน (฿' + r.cheapest.monthlyThb.toLocaleString() + ')</span> — แต่ถ้าปริมาณงานสูงขนาดนี้ การเช่า <span class="mono">' + r.bestGpu.name.replace('RunPod NVIDIA ', 'RunPod ') + '</span> ล็อกงบไว้ที่ <span class="mono">฿' + r.bestGpu.monthlyThb.toLocaleString() + '/เดือน</span> ประหยัดกว่า API เรือธงถึง <span class="mono">฿' + saveThb.toLocaleString() + '/เดือน</span> (จุดคุ้มทุนอยู่ที่ <span class="mono">' + r.bestGpu.breakEven.toLocaleString() + ' งาน/วัน</span>)';
+    } else {
+      var diffUsd = Number((r.bestGpu.monthlyUsd - r.flagship.monthlyUsd).toFixed(2));
+      var diffThb = Math.round(diffUsd * APP_DATA.fx);
+      text = 'ที่โหลดงานนี้ <span class="mono">' + r.cheapest.name + '</span> ถูกสุดที่ <span class="mono">$' + r.cheapest.monthlyUsd.toLocaleString() + '/เดือน (฿' + r.cheapest.monthlyThb.toLocaleString() + ')</span> — การจ่ายตามจริงยังคุ้มกว่าเช่า GPU เอง จนกว่างานจะทะลุ <span class="mono">' + r.bestGpu.breakEven.toLocaleString() + ' งาน/วัน</span> (ตอนนั้นเช่า GPU จะประหยัดกว่า API เรือธงราว <span class="mono">฿' + diffThb.toLocaleString() + '/เดือน</span>)';
+    }
+    document.getElementById('answer-text').innerHTML = text;
+
+    var maxVal = Math.max(r.cheapest.monthlyUsd, r.flagship.monthlyUsd, r.bestGpu.monthlyUsd, 1);
+    document.getElementById('bar-cheap').style.width = Math.max(4, Math.round((r.cheapest.monthlyUsd / maxVal) * 100)) + '%';
+    document.getElementById('bar-flag').style.width = Math.max(4, Math.round((r.flagship.monthlyUsd / maxVal) * 100)) + '%';
+    document.getElementById('bar-gpu').style.width = Math.max(4, Math.round((r.bestGpu.monthlyUsd / maxVal) * 100)) + '%';
+    document.getElementById('val-bar-cheap').textContent = '$' + r.cheapest.monthlyUsd.toLocaleString();
+    document.getElementById('val-bar-flag').textContent = '$' + r.flagship.monthlyUsd.toLocaleString();
+    document.getElementById('val-bar-gpu').textContent = '$' + r.bestGpu.monthlyUsd.toLocaleString();
+  }
+
+  function renderGuideLists() {
+    var compactHtml = APP_DATA.playbooks.map(function (p) {
+      return '<a class="guide-row" href="guides/' + p.slug + '.html">' +
+        '<span class="guide-badge">' + p.badge + '</span>' +
+        '<span class="guide-body"><span class="guide-title">' + p.title + '</span></span>' +
+        '<span class="guide-arrow">→</span></a>';
+    }).join('');
+    document.getElementById('guides-compact').innerHTML = compactHtml;
+
+    var fullHtml = APP_DATA.playbooks.map(function (p) {
+      return '<a class="guide-row" href="guides/' + p.slug + '.html">' +
+        '<span class="guide-badge">' + p.badge + '</span>' +
+        '<span class="guide-body"><span class="guide-title">' + p.title + '</span><span class="guide-takeaway">' + p.takeaway + '</span></span>' +
+        '<span class="guide-read">' + p.readTime + '</span>' +
+        '<span class="guide-arrow">→</span></a>';
+    }).join('');
+    document.getElementById('guides-full').innerHTML = fullHtml;
+  }
+
+  function findModel(id) { return APP_DATA.models.filter(function (m) { return m.id === id; })[0]; }
+  function findGpu(id) { return APP_DATA.gpus.filter(function (g) { return g.id === id; })[0]; }
+  function findVps(id) { return APP_DATA.vps.filter(function (v) { return v.id === id; })[0]; }
+
+  function renderPopularCases() {
+    var apiPreset = { req: 2000, steps: 3, inTok: 2500, outTok: 600, cache: 40, hours: 12 };
+    var gpuPreset = { req: 4500, steps: 4, inTok: 3000, outTok: 700, cache: 25, hours: 10 };
+
+    function apiVsApiCard(idA, idB, title, slug) {
+      var mA = findModel(idA), mB = findModel(idB);
+      var cA = calcApiMonthly(mA, apiPreset.req, apiPreset.steps, apiPreset.inTok, apiPreset.outTok, apiPreset.cache);
+      var cB = calcApiMonthly(mB, apiPreset.req, apiPreset.steps, apiPreset.inTok, apiPreset.outTok, apiPreset.cache);
+      return '<a class="case-card" style="display:block;" href="compare/' + slug + '.html"><div class="case-title">' + title + '</div>' +
+        '<div class="case-stat">' + mA.name + ': <span class="mono">$' + cA.monthlyUsd.toLocaleString() + '/mo</span></div>' +
+        '<div class="case-stat">' + mB.name + ': <span class="mono">$' + cB.monthlyUsd.toLocaleString() + '/mo</span></div>' +
+        '<span class="case-cta">ดูตารางเปรียบเทียบเคสนี้ →</span></a>';
+    }
+
+    function apiVsGpuCard(modelId, gpuId, title, slug) {
+      var m = findModel(modelId), g = findGpu(gpuId);
+      var cA = calcApiMonthly(m, gpuPreset.req, gpuPreset.steps, gpuPreset.inTok, gpuPreset.outTok, gpuPreset.cache);
+      var flagship = calcApiMonthly(findModel(FLAGSHIP_ID), gpuPreset.req, gpuPreset.steps, gpuPreset.inTok, gpuPreset.outTok, gpuPreset.cache);
+      var flagshipCostPerTask = flagship.monthlyUsd / (gpuPreset.req * 30);
+      var cG = calcGpuMonthly(g, gpuPreset.req, gpuPreset.steps, gpuPreset.outTok, gpuPreset.hours, flagshipCostPerTask);
+      return '<a class="case-card" style="display:block;" href="compare/' + slug + '.html"><div class="case-title">' + title + '</div>' +
+        '<div class="case-stat">' + m.name + ' (API): <span class="mono">$' + cA.monthlyUsd.toLocaleString() + '/mo</span></div>' +
+        '<div class="case-stat">' + g.name + ': <span class="mono">$' + cG.monthlyUsd.toLocaleString() + '/mo</span> (คุ้มทุน ' + cG.breakEven.toLocaleString() + ' งาน/วัน)</div>' +
+        '<span class="case-cta">ดูจุดคุ้มทุนละเอียด →</span></a>';
+    }
+
+    function vpsVsVpsCard(idA, idB, title, slug) {
+      var vA = findVps(idA), vB = findVps(idB);
+      return '<a class="case-card" style="display:block;" href="compare/' + slug + '.html"><div class="case-title">' + title + '</div>' +
+        '<div class="case-stat">' + vA.name + ': <span class="mono">$' + vA.monthlyUsd + '/mo</span> (฿' + Math.round(vA.monthlyUsd * APP_DATA.fx).toLocaleString() + ')</div>' +
+        '<div class="case-stat">' + vB.name + ': <span class="mono">$' + vB.monthlyUsd + '/mo</span> (฿' + Math.round(vB.monthlyUsd * APP_DATA.fx).toLocaleString() + ')</div>' +
+        '<span class="case-cta">เทียบสเปกเซิร์ฟเวอร์ →</span></a>';
+    }
+
+    var html = [
+      apiVsApiCard('gemini-2-5-flash', 'claude-3-7-sonnet', 'Gemini 2.5 Flash vs Claude 3.7 Sonnet', 'claude-3-7-sonnet-vs-gemini-2-5-flash-cost-calculator'),
+      apiVsApiCard('deepseek-v3-r1', 'gpt-4o', 'DeepSeek V3 vs GPT-4o', 'gpt-4o-vs-deepseek-v3-r1-cost-calculator'),
+      apiVsGpuCard('deepseek-v3-r1', 'runpod-rtx-4090', 'DeepSeek V3 API vs RunPod RTX 4090', 'deepseek-v3-r1-vs-runpod-rtx-4090-break-even'),
+      apiVsGpuCard('claude-3-7-sonnet', 'runpod-rtx-a6000-48gb', 'Claude 3.7 Sonnet API vs RunPod RTX A6000', 'claude-3-7-sonnet-vs-runpod-rtx-a6000-48gb-break-even'),
+      vpsVsVpsCard('hostatom-vps-4gb', 'cloudways-vultr-8gb', 'Hostatom VPS (ไทย) vs Cloudways Vultr HF (ทั่วโลก)', 'cloudways-vultr-8gb-vs-hostatom-vps-4gb-hosting-comparison'),
+      vpsVsVpsCard('hostatom-vps-4gb', 'rukcom-managed-vps', 'Hostatom VPS vs Ruk-Com Managed VPS (ไทย)', 'hostatom-vps-4gb-vs-rukcom-managed-vps-hosting-comparison')
+    ].join('');
+    document.getElementById('popular-cases').innerHTML = html;
+  }
+
+  /* ---------- Interactions ---------- */
+  function applyPreset(idx) {
+    var p = APP_DATA.presets[idx];
+    document.getElementById('inp-req').value = p.req;
+    document.getElementById('inp-steps').value = p.steps;
+    document.getElementById('inp-intok').value = p.inTok;
+    document.getElementById('inp-outtok').value = p.outTok;
+    document.getElementById('inp-cache').value = p.cache;
+    document.getElementById('inp-hours').value = p.hours;
+    var chips = document.querySelectorAll('.preset-chip');
+    for (var i = 0; i < chips.length; i++) chips[i].classList.toggle('active', i === idx);
+    recalcAll(true);
+  }
+
+  function switchTab(name) {
+    var btns = document.querySelectorAll('.tab-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('active', btns[i].getAttribute('data-tab') === name);
+    var panels = document.querySelectorAll('.tab-panel');
+    for (var j = 0; j < panels.length; j++) panels[j].classList.toggle('active', panels[j].id === 'tab-' + name);
+  }
+
+  function copyScenarioLink() {
+    var s = readSliders();
+    var params = new URLSearchParams();
+    params.set('req', s.req); params.set('steps', s.steps); params.set('inTok', s.inTok);
+    params.set('outTok', s.outTok); params.set('cache', s.cache); params.set('hours', s.hours);
+    var shareUrl = window.location.origin + window.location.pathname + '?' + params.toString();
+    if (navigator.clipboard) navigator.clipboard.writeText(shareUrl).catch(function () {});
+    sendTelemetry('scenario_shared', {});
+    var btn = document.getElementById('btn-share');
+    btn.textContent = 'คัดลอกลิงก์เรียบร้อยแล้ว';
+    setTimeout(function () { btn.textContent = 'คัดลอกลิงก์พารามิเตอร์นี้'; }, 2000);
+  }
+
+  function toggleTheme() {
+    var root = document.documentElement;
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    document.getElementById('theme-toggle').textContent = next === 'dark' ? '🌙' : '☀️';
+    try { localStorage.setItem('ai_cost_calc_theme', next); } catch (_) {}
+  }
+
+  (function init() {
+    try {
+      var savedTheme = localStorage.getItem('ai_cost_calc_theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-toggle').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+      }
+    } catch (_) {}
+
+    var q = new URLSearchParams(window.location.search);
+    if (q.has('req')) document.getElementById('inp-req').value = q.get('req');
+    if (q.has('steps')) document.getElementById('inp-steps').value = q.get('steps');
+    if (q.has('inTok')) document.getElementById('inp-intok').value = q.get('inTok');
+    if (q.has('outTok')) document.getElementById('inp-outtok').value = q.get('outTok');
+    if (q.has('cache')) document.getElementById('inp-cache').value = q.get('cache');
+    if (q.has('hours')) document.getElementById('inp-hours').value = q.get('hours');
+
+    ['inp-req', 'inp-steps', 'inp-intok', 'inp-outtok', 'inp-cache', 'inp-hours'].forEach(function (id) {
+      document.getElementById(id).addEventListener('input', function () { recalcAll(true); });
+    });
+
+    renderVpsTable();
+    renderGuideLists();
+    renderPopularCases();
+    recalcAll(false);
+    sendTelemetry('page_view', {});
+  })();
+</script>
+</body>
+</html>

@@ -1809,6 +1809,11 @@ ${sitemapUrls.map((u) => `  <url><loc>${escapeHtml(u)}</loc></url>`).join('\n')}
     'utf8'
   );
 
+  const prototypeSourcePath = path.resolve(import.meta.dirname, 'prototype-th.html');
+  if (fs.existsSync(prototypeSourcePath)) {
+    fs.copyFileSync(prototypeSourcePath, path.join(stagingDir, 'th', 'prototype.html'));
+  }
+
   if (fs.existsSync(outputDir)) {
     fs.rmSync(outputDir, { recursive: true, force: true });
   }
