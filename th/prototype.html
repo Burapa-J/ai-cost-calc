@@ -235,19 +235,22 @@
 
   /* Hero line-of-sight banner */
   .hero-los{
-    position:relative; overflow:hidden; display:flex; align-items:stretch; gap:22px;
-    height:178px; padding:18px 22px; margin-bottom:20px;
+    position:relative; overflow:hidden; display:grid; grid-template-columns:245px 1fr; align-items:center; gap:20px;
+    min-height:178px; padding:18px 22px; margin-bottom:20px;
     border:1px solid var(--border); border-radius:14px; background:var(--bg-elev);
     background-image:radial-gradient(var(--border-strong) 1px, transparent 1px);
     background-size:18px 18px; background-position:-4px -4px;
   }
-  .hero-los-copy{position:relative; z-index:2; flex:0 0 228px; display:flex; flex-direction:column; justify-content:center;}
+  .hero-los-copy{position:relative; z-index:2; display:flex; flex-direction:column; justify-content:center; min-width:0;}
   .hero-los-eyebrow{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--accent-strong); margin-bottom:8px;}
-  .hero-los-title{font-size:19px; font-weight:800; line-height:1.28; letter-spacing:-0.01em; margin:0 0 8px; color:var(--text);}
+  .hero-los-title{font-size:18.5px; font-weight:800; line-height:1.28; letter-spacing:-0.01em; margin:0 0 8px; color:var(--text);}
   .hero-los-sub{font-size:12px; line-height:1.45; color:var(--text-secondary); margin:0;}
 
-  .hero-los-visual{position:relative; z-index:2; flex:1; min-width:0;}
-  .hero-los-lines{position:absolute; left:155px; top:0; width:calc(51% - 155px); height:100%; display:block; overflow:visible;}
+  .hero-los-visual{
+    position:relative; z-index:2; min-width:0;
+    display:grid; grid-template-columns:158px minmax(70px, 1fr) minmax(270px, 345px); align-items:center;
+  }
+  .hero-los-lines{width:100%; height:140px; display:block; overflow:visible;}
   .hero-path{fill:none; stroke-width:1.8; stroke-linecap:round;}
   .hero-path-green{stroke:var(--green); opacity:.65;}
   .hero-path-blue{stroke:var(--blue); opacity:.65;}
@@ -257,22 +260,21 @@
   .hero-flow-violet{fill:var(--violet); filter:drop-shadow(0 0 4px var(--violet));}
 
   .hero-source{
-    position:absolute; left:0; top:50%; transform:translateY(-50%); width:155px;
-    padding:9px 11px; border-radius:10px; background:var(--bg-elev-2);
+    width:158px; padding:10px 12px; border-radius:10px; background:var(--bg-elev-2);
     border:1px solid var(--accent); box-shadow:0 0 0 3px var(--accent-soft);
   }
   .hero-source-tag{font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent-strong); display:block; margin-bottom:3px;}
   .hero-source-val{font-family:"SF Mono",monospace; font-size:11px; font-weight:700; color:var(--text); display:block; line-height:1.35;}
   .hero-source-sub{font-size:10px; color:var(--text-muted); display:block; margin-top:2px;}
 
+  .hero-nodes-stack{display:flex; flex-direction:column; gap:8px; min-width:0;}
   .hero-node{
-    position:absolute; left:51%; right:4px; transform:translateY(-50%);
-    display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:10px;
+    width:100%; display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:10px;
     background:var(--bg-elev-2); border:1px solid var(--border); cursor:pointer;
-    text-align:left; font:inherit; color:inherit;
+    text-align:left; font:inherit; color:inherit; min-width:0;
     transition:border-color .15s ease, background .15s ease, transform .15s ease;
   }
-  .hero-node:hover{transform:translateY(-50%) translateX(-2px);}
+  .hero-node:hover{transform:translateX(-2px);}
   .hero-node-green.active, .hero-node-green:hover{border-color:var(--green); background:var(--green-soft);}
   .hero-node-blue.active, .hero-node-blue:hover{border-color:var(--blue); background:var(--blue-soft);}
   .hero-node-violet.active, .hero-node-violet:hover{border-color:var(--violet); background:var(--violet-soft);}
@@ -281,9 +283,9 @@
     width:30px; height:30px; border-radius:8px; background:var(--bg-elev); border:1px solid var(--border);
     display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative;
   }
-  .hero-node-copy{display:flex; flex-direction:column; min-width:0;}
-  .hero-node-title{font-size:11px; font-weight:700; color:var(--text); line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .hero-node-sub{font-size:9.5px; color:var(--text-muted); line-height:1.3; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .hero-node-copy{display:flex; flex-direction:column; min-width:0; flex:1;}
+  .hero-node-title{font-size:11.5px; font-weight:700; color:var(--text); line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .hero-node-sub{font-size:10px; color:var(--text-muted); line-height:1.3; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
   .hero-bars{display:flex; align-items:flex-end; gap:2px; height:16px;}
   .hero-bars span{display:block; width:3px; border-radius:1px; background:var(--green);}
@@ -308,14 +310,17 @@
   @keyframes heroFlash{ 0%{box-shadow:0 0 0 2px var(--accent);} 100%{box-shadow:0 0 0 0 rgba(0,0,0,0);} }
   .answer-bar.hero-flash{animation:heroFlash 900ms ease-out;}
 
-  @media (max-width:900px){
-    .hero-los{flex-direction:column; height:auto; padding:18px;}
-    .hero-los-copy{flex:none;}
-    .hero-los-visual{width:100%; height:190px;}
+  @media (max-width:960px){
+    .hero-los{grid-template-columns:1fr; height:auto; padding:16px;}
+    .hero-los-visual{grid-template-columns:1fr; gap:10px;}
+    .hero-los-lines{display:none;}
+    .hero-source{width:100%;}
   }
   @media (max-width:480px){
-    .hero-node-sub{display:none;}
-    .hero-los-visual{height:170px;}
+    .shell{padding:14px 12px 48px;}
+    .topbar{padding:10px 14px;}
+    .nav{gap:12px;}
+    .hero-node-sub{white-space:normal;}
   }
 </style>
 </head>
@@ -330,7 +335,7 @@
     <a class="nav-link active" href="#calculator">คำนวณงบ</a>
     <a class="nav-link" href="#playbooks">คู่มือจัดสเปก</a>
     <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()" aria-label="สลับธีม">🌙</button>
-    <a class="nav-link" href="#" title="English version">EN</a>
+    <a class="nav-link" href="../en/index.html" title="English version">EN</a>
   </nav>
 </div>
 
@@ -362,37 +367,39 @@
         <circle r="3.5" class="hero-flow-violet"><animateMotion dur="3.1s" repeatCount="indefinite" path="M2,70 C110,70 120,118 258,118"></animateMotion></circle>
       </svg>
 
-      <button type="button" class="hero-node hero-node-green active" data-tab="api" style="top:16%;" onclick="activateHeroPath(0,'api')" aria-label="เปิดแท็บ API จ่ายตามจริง และโหลดพรีเซ็ตแชทบอททั่วไป">
-        <span class="hero-node-icon">
-          <span class="hero-bars">
-            <span style="height:14px;"></span><span style="height:11px;opacity:.8;"></span><span style="height:7px;opacity:.6;"></span><span style="height:4px;opacity:.4;"></span>
+      <div class="hero-nodes-stack">
+        <button type="button" class="hero-node hero-node-green active" data-tab="api" onclick="activateHeroPath(0,'api')" aria-label="เปิดแท็บ API จ่ายตามจริง และโหลดพรีเซ็ตแชทบอททั่วไป">
+          <span class="hero-node-icon">
+            <span class="hero-bars">
+              <span style="height:14px;"></span><span style="height:11px;opacity:.8;"></span><span style="height:7px;opacity:.6;"></span><span style="height:4px;opacity:.4;"></span>
+            </span>
           </span>
-        </span>
-        <span class="hero-node-copy">
-          <span class="hero-node-title">1. จ่ายตาม Token (API)</span>
-          <span class="hero-node-sub">9 โมเดล · Cache ลดสูงสุด 40x · เริ่ม ~฿850/ด.</span>
-        </span>
-      </button>
+          <span class="hero-node-copy">
+            <span class="hero-node-title">1. จ่ายตาม Token (API)</span>
+            <span class="hero-node-sub">9 โมเดล · Cache ลดสูงสุด 40x · เริ่ม ~฿850/ด.</span>
+          </span>
+        </button>
 
-      <button type="button" class="hero-node hero-node-blue" data-tab="gpu" style="top:50%;" onclick="activateHeroPath(3,'gpu')" aria-label="เปิดแท็บเช่า GPU และโหลดพรีเซ็ตประมวลผลหนัก 24 ชม.">
-        <span class="hero-node-icon">
-          <span class="hero-gauge"><span class="hero-gauge-fill" style="width:65%;"></span></span>
-        </span>
-        <span class="hero-node-copy">
-          <span class="hero-node-title">2. เช่า GPU / ซื้อเครื่องตั้งเอง</span>
-          <span class="hero-node-sub">เช็ก VRAM 24–160GB · จุดคุ้มทุน RunPod vs PC/Mac</span>
-        </span>
-      </button>
+        <button type="button" class="hero-node hero-node-blue" data-tab="gpu" onclick="activateHeroPath(3,'gpu')" aria-label="เปิดแท็บเช่า GPU และโหลดพรีเซ็ตประมวลผลหนัก 24 ชม.">
+          <span class="hero-node-icon">
+            <span class="hero-gauge"><span class="hero-gauge-fill" style="width:65%;"></span></span>
+          </span>
+          <span class="hero-node-copy">
+            <span class="hero-node-title">2. เช่า GPU / ซื้อเครื่องตั้งเอง</span>
+            <span class="hero-node-sub">เช็ก VRAM 24–160GB · จุดคุ้มทุน RunPod vs PC/Mac</span>
+          </span>
+        </button>
 
-      <button type="button" class="hero-node hero-node-violet" data-tab="vps" style="top:84%;" onclick="activateHeroPath(1,'vps')" aria-label="เปิดแท็บ VPS หลังบ้าน และโหลดพรีเซ็ต LINE OA + RAG">
-        <span class="hero-node-icon">
-          <span class="hero-rack"><span></span><span></span><span></span><span class="hero-ping"></span></span>
-        </span>
-        <span class="hero-node-copy">
-          <span class="hero-node-title">3. เซิร์ฟเวอร์ LINE OA / n8n / RAG</span>
-          <span class="hero-node-sub">VPS ไทย Ping ~5ms · ใบกำกับภาษี VAT 7% เริ่ม ฿828/ด.</span>
-        </span>
-      </button>
+        <button type="button" class="hero-node hero-node-violet" data-tab="vps" onclick="activateHeroPath(1,'vps')" aria-label="เปิดแท็บ VPS หลังบ้าน และโหลดพรีเซ็ต LINE OA + RAG">
+          <span class="hero-node-icon">
+            <span class="hero-rack"><span></span><span></span><span></span><span class="hero-ping"></span></span>
+          </span>
+          <span class="hero-node-copy">
+            <span class="hero-node-title">3. เซิร์ฟเวอร์ LINE OA / n8n / RAG</span>
+            <span class="hero-node-sub">VPS ไทย Ping ~5ms · ใบกำกับภาษี VAT 7% เริ่ม ฿828/ด.</span>
+          </span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -518,10 +525,12 @@
       </div>
 
       <div class="tab-panel active" id="tab-api">
+        <div class="table-wrap">
         <table>
           <thead><tr><th>โมเดล</th><th class="num">เรต In / Out (1M)</th><th class="num">ต่อ 1,000 งาน</th><th class="num">รวม/เดือน</th><th class="num">ช่องทางใช้งาน</th></tr></thead>
           <tbody id="api-tbody"></tbody>
         </table>
+        </div>
       </div>
 
       <div class="tab-panel" id="tab-gpu">
