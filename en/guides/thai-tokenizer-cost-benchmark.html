@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,15 +14,16 @@
 <meta name="google-site-verification" content="0BpLINOsguphSm_6-JsDTcU7dLvSmAUZ2S4jvY1FUPU" />
 <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Thai Tokenizer Benchmark: Why Thai Text Costs up to 2.3x More Tokens (and How to Fix It)","description":"Empirical benchmark measuring how many tokens 1 page of Thai text (2,500 characters) consumes across Gemini 2.5 Flash, DeepSeek V3, GPT-4o, and Claude 3.7 Sonnet.","url":"https://burapa-j.github.io/ai-cost-calc/en/guides/thai-tokenizer-cost-benchmark.html"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why does Thai text consume more tokens than English?","acceptedAnswer":{"@type":"Answer","text":"Thai script has no spaces between words and stacks vowels/tone marks vertically. Western-centric BPE tokenizers split Thai words into byte fragments (2–4 tokens per word), whereas Gemini 2.5 and Qwen 2.5 include dedicated multilingual vocabulary entries for whole Thai words."}}]}]}</script>
-<style>:root{--paper: #FBFBFD;--surface: #FFFFFF;--surface-alt: #F5F5F7;--ink: #1D1D1F;--ink-secondary: #515154;--ink-muted: #86868B;--line: rgba(0,0,0,0.08);--line-strong: rgba(0,0,0,0.14);--accent: #0066CC;--ledger-green: #1D7D3F;--mono: "SF Mono","JetBrains Mono","Menlo",monospace;--sans: -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter","Noto Sans Thai",sans-serif;--ease-out: cubic-bezier(0.22,1,0.36,1);}*{box-sizing: border-box;}body{margin: 0;font-family: var(--sans);background: var(--paper);color: var(--ink);line-height: 1.55;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;}a{color: var(--accent);text-decoration: none;transition: opacity 0.2s var(--ease-out);}a:hover{opacity: 0.78;}@keyframes settleIn{from{opacity: 0;transform: translateY(10px);}to{opacity: 1;transform: translateY(0);}}.nav-glass{position: sticky;top: 0;z-index: 40;background: rgba(251,251,253,0.8);backdrop-filter: saturate(180%) blur(20px);-webkit-backdrop-filter: saturate(180%) blur(20px);border-bottom: 1px solid var(--line);}.masthead{max-width: 1160px;margin: 0 auto;padding: 0 24px;height: 52px;display: flex;justify-content: space-between;align-items: center;font-size: 0.8rem;}.brand-mark{display: inline-flex;align-items: center;gap: 9px;font-weight: 600;color: var(--ink);letter-spacing: -0.01em;font-size: 0.9rem;}.brand-logo-svg{flex-shrink: 0;display: block;}.nav-bar{display: flex;gap: 20px;align-items: center;flex-wrap: wrap;}.nav-link{color: var(--ink-secondary);font-size: 0.78rem;transition: color 0.2s var(--ease-out);}.nav-link:hover,.nav-link.active{color: var(--ink);font-weight: 500;opacity: 1;}.shell{max-width: 1160px;margin: 0 auto;padding: 0 24px 96px;animation: settleIn 0.55s var(--ease-out) both;}.hero-block{padding: 44px 0 26px;}.kicker{font-size: 0.75rem;font-weight: 600;text-transform: uppercase;letter-spacing: 0.06em;color: var(--ink-muted);margin-bottom: 10px;}h1{font-size: clamp(1.9rem,3.5vw,2.85rem);font-weight: 600;letter-spacing: -0.032em;line-height: 1.12;margin: 0 0 14px;max-width: 28ch;color: var(--ink);}.lead{color: var(--ink-secondary);font-size: 1.04rem;line-height: 1.58;max-width: 66ch;margin: 0;font-weight: 400;}.benefit-title{font-size: 0.94rem;font-weight: 600;color: var(--ink);margin: 0 0 6px;letter-spacing: -0.01em;}.benefit-desc{font-size: 0.84rem;color: var(--ink-secondary);margin: 0;line-height: 1.5;}.matchup-spotlight{margin-top: 22px;background: var(--surface);border: 1px solid var(--line-strong);border-radius: 20px;padding: 24px 26px;box-shadow: 0 8px 28px rgba(0,0,0,0.03);}.matchup-decision-grid{display: grid;grid-template-columns: repeat(2,1fr);gap: 14px;}@media (max-width: 780px){.matchup-decision-grid{grid-template-columns: 1fr;}}.decision-box{background: var(--surface-alt);border-radius: 14px;padding: 16px 18px;}.decision-badge{font-size: 0.86rem;font-weight: 600;color: var(--ink);margin-bottom: 6px;}.ledger-frame{display: grid;grid-template-columns: 370px 1fr;gap: 24px;margin-top: 24px;align-items: start;}@media (max-width: 940px){.ledger-frame{grid-template-columns: 1fr;}}.panel-left{position: sticky;top: 72px;background: var(--surface);border: 1px solid var(--line);border-radius: 20px;padding: 26px;box-shadow: 0 8px 30px rgba(0,0,0,0.03);}@media (max-width: 940px){.panel-left{position: static;}}.panel-right{display: flex;flex-direction: column;gap: 20px;}.section-tag{font-size: 0.72rem;font-weight: 600;text-transform: uppercase;letter-spacing: 0.06em;color: var(--ink-muted);padding-bottom: 12px;border-bottom: 1px solid var(--line);margin-bottom: 18px;display: flex;justify-content: space-between;align-items: center;}.preset-strip{display: grid;grid-template-columns: repeat(3,1fr);gap: 6px;background: var(--surface-alt);padding: 4px;border-radius: 12px;margin-bottom: 22px;}.preset-btn{background: transparent;border: none;border-radius: 9px;padding: 8px 6px;font-family: var(--sans);font-size: 0.74rem;font-weight: 500;color: var(--ink-secondary);cursor: pointer;transition: background 0.25s var(--ease-out),color 0.25s var(--ease-out),box-shadow 0.25s var(--ease-out);}.preset-btn:hover{background: var(--surface);color: var(--ink);box-shadow: 0 2px 8px rgba(0,0,0,0.06);}.field-row{margin-bottom: 18px;}.field-top{display: flex;justify-content: space-between;align-items: baseline;margin-bottom: 8px;gap: 8px;}.field-label{font-size: 0.84rem;font-weight: 500;color: var(--ink);}.field-readout{font-family: var(--mono);font-size: 0.84rem;font-weight: 600;color: var(--ink);font-variant-numeric: tabular-nums;background: var(--surface-alt);padding: 3px 9px;border-radius: 8px;}input[type="range"]{-webkit-appearance: none;appearance: none;width: 100%;height: 4px;background: #E5E5EA;border-radius: 999px;outline: none;cursor: pointer;}input[type="range"]::-webkit-slider-thumb{-webkit-appearance: none;appearance: none;width: 20px;height: 20px;border-radius: 50%;background: var(--surface);border: 1px solid rgba(0,0,0,0.12);box-shadow: 0 2px 6px rgba(0,0,0,0.15);cursor: pointer;transition: transform 0.2s var(--ease-out),box-shadow 0.2s var(--ease-out);}input[type="range"]::-webkit-slider-thumb:hover{transform: scale(1.08);box-shadow: 0 3px 10px rgba(0,0,0,0.2);}.verdict-cell{padding: 26px 28px;border-radius: 20px;background: var(--surface);border: 1px solid var(--line);box-shadow: 0 8px 30px rgba(0,0,0,0.03);display: flex;flex-direction: column;gap: 18px;}.verdict-top{display: flex;justify-content: space-between;align-items: center;gap: 20px;flex-wrap: wrap;}.verdict-meta{max-width: 60ch;}.verdict-title{font-size: 1.42rem;font-weight: 600;letter-spacing: -0.025em;margin: 4px 0 8px;font-variant-numeric: tabular-nums;color: var(--ink);}.verdict-copy{font-size: 0.9rem;color: var(--ink-secondary);margin: 0;line-height: 1.55;}.live-chart-box{background: #F8FAFC;border: 1px solid rgba(0,0,0,0.06);border-radius: 14px;padding: 14px 16px;}.btn-primary{display: inline-block;background: var(--ink);color: var(--surface);font-size: 0.84rem;font-weight: 500;padding: 12px 22px;border-radius: 999px;border: none;cursor: pointer;white-space: nowrap;transition: transform 0.25s var(--ease-out),background 0.25s var(--ease-out),opacity 0.25s var(--ease-out);}.btn-primary:hover{background: #333336;color: #fff;transform: scale(1.015);opacity: 1;}.btn-outline{width: 100%;background: var(--surface-alt);color: var(--ink);font-size: 0.82rem;font-weight: 500;padding: 11px 16px;border-radius: 12px;border: 1px solid transparent;cursor: pointer;transition: background 0.2s var(--ease-out);}.btn-outline:hover{background: #E8E8ED;}.table-block{padding: 26px 28px;border-radius: 20px;background: var(--surface);border: 1px solid var(--line);box-shadow: 0 4px 20px rgba(0,0,0,0.02);}table{width: 100%;border-collapse: collapse;font-size: 0.88rem;font-variant-numeric: tabular-nums;}th{font-size: 0.72rem;text-transform: uppercase;letter-spacing: 0.05em;color: var(--ink-muted);text-align: left;padding: 8px 10px 10px 0;border-bottom: 1px solid var(--line-strong);font-weight: 600;}th.num,td.num{text-align: right;}td{padding: 14px 10px 14px 0;border-bottom: 1px solid var(--line);vertical-align: middle;}tr:last-child td{border-bottom: none;}.mono-val{font-family: var(--mono);font-weight: 600;color: var(--ink);}.savings-val{font-family: var(--mono);font-weight: 600;color: var(--ledger-green);}.sub-val{font-size: 0.78rem;color: var(--ink-secondary);display: block;margin-top: 2px;}.bar-track{width: 100%;max-width: 140px;height: 4px;background: var(--surface-alt);border-radius: 999px;margin-top: 6px;overflow: hidden;}.bar-fill{height: 100%;background: var(--ink);border-radius: 999px;transition: width 0.45s var(--ease-out);}.action-link{font-size: 0.82rem;font-weight: 500;color: var(--accent);white-space: nowrap;}.standalone-section{margin-top: 24px;border-radius: 20px;border: 1px solid var(--line);background: var(--surface);padding: 26px 28px;}.index-grid{display: grid;grid-template-columns: repeat(auto-fill,minmax(270px,1fr));gap: 10px;margin-top: 14px;}.index-cell{padding: 12px 14px;border-radius: 12px;background: var(--surface-alt);font-size: 0.82rem;color: var(--ink);display: flex;justify-content: space-between;align-items: center;gap: 8px;transition: background 0.2s var(--ease-out),transform 0.2s var(--ease-out);}.index-cell:hover{background: #E8E8ED;transform: translateY(-1px);opacity: 1;}.visual-trio-grid{display: grid;grid-template-columns: repeat(3,1fr);gap: 16px;margin-top: 24px;}@media (max-width: 860px){.visual-trio-grid{grid-template-columns: 1fr;}}.visual-card{background: var(--surface);border: 1px solid var(--line);border-radius: 18px;padding: 18px 20px;box-shadow: 0 4px 16px rgba(0,0,0,0.02);transition: transform 0.3s var(--ease-out);}.visual-card:hover{transform: translateY(-2px);}.visual-svg-wrap{background: #F8FAFC;border: 1px solid rgba(0,0,0,0.06);border-radius: 12px;padding: 6px 8px;margin-bottom: 12px;}.playbook-grid{display: grid;grid-template-columns: repeat(auto-fit,minmax(310px,1fr));gap: 16px;margin-top: 14px;}.playbook-card{display: flex;flex-direction: column;justify-content: space-between;background: var(--surface);border: 1px solid var(--line);border-radius: 18px;padding: 20px 22px;color: var(--ink);transition: transform 0.25s var(--ease-out),border-color 0.25s var(--ease-out),box-shadow 0.25s var(--ease-out);}.playbook-card:hover{transform: translateY(-3px);border-color: var(--accent);box-shadow: 0 10px 28px rgba(0,102,204,0.08);opacity: 1;}.playbook-badge{display: inline-block;font-family: var(--mono);font-size: 0.68rem;font-weight: 600;color: var(--accent);background: #EFF6FF;padding: 3px 9px;border-radius: 999px;margin-bottom: 10px;width: fit-content;}.playbook-title{font-size: 1.02rem;font-weight: 600;color: var(--ink);margin: 0 0 8px;line-height: 1.38;}.playbook-takeaway{font-size: 0.83rem;color: var(--ink-secondary);margin: 0 0 14px;line-height: 1.5;}.guide-takeaway{background: #F0FDF4;border: 1px solid #86EFAC;border-radius: 16px;padding: 18px 22px;margin: 20px 0 24px;font-size: 0.95rem;color: #14532D;font-weight: 500;}.guide-step{background: var(--surface-alt);border-radius: 16px;padding: 20px 24px;margin-bottom: 14px;}.guide-step-title{font-size: 1rem;font-weight: 600;color: var(--ink);margin: 0 0 6px;}.guide-code{background: #1D1D1F;color: #F5F5F7;padding: 14px 16px;border-radius: 10px;font-family: var(--mono);font-size: 0.78rem;overflow-x: auto;margin: 12px 0 0;line-height: 1.5;}.stack-grid{display: grid;grid-template-columns: repeat(auto-fit,minmax(260px,1fr));gap: 14px;margin-top: 14px;}.stack-card{background: var(--surface-alt);border: 1px solid var(--line);border-radius: 16px;padding: 18px 20px;display: flex;flex-direction: column;justify-content: space-between;gap: 10px;}</style>
+<style>:root{--paper: #FBFBFD;--mono:"SF Mono","JetBrains Mono",ui-monospace,monospace;--sans:-apple-system,BlinkMacSystemFont,"Inter","Noto Sans Thai",sans-serif}:root,:root[data-theme="dark"]{--bg:#0D0D0C;--bg-elev:#141413;--bg-elev-2:#1C1C1A;--border:#262623;--border-strong:#3A3935;--text:#EDEDEB;--text-secondary:#A3A19A;--text-muted:#6E6D67;--accent:#EDEDEB;--accent-strong:#EDEDEB;--accent-soft:rgba(237,237,235,.06);--btn-bg:#EDEDEB;--btn-fg:#0D0D0C;--green:#4E9F76;--green-soft:rgba(78,159,118,.12);--amber:#C48B3F}:root[data-theme="light"]{--bg:#F6F5F1;--bg-elev:#FFFFFF;--bg-elev-2:#EEECE6;--border:#DFDDD6;--border-strong:#C5C2B8;--text:#141413;--text-secondary:#4D4C48;--text-muted:#787670;--accent:#141413;--accent-strong:#141413;--accent-soft:rgba(20,20,19,.05);--btn-bg:#141413;--btn-fg:#FFFFFF;--green:#1F6F4A;--green-soft:rgba(31,111,74,.09);--amber:#946016}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased}svg text{font-family:var(--sans)}.mono,svg .mono{font-family:var(--mono)}a{color:inherit;text-decoration:none}.nav-glass{position:sticky;top:0;z-index:40;background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter: saturate(180%) blur(20px)}.masthead{max-width:1180px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand-mark{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text)}.brand-logo-svg{flex-shrink:0;display:block}.nav-bar{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.nav-link{font-size:13px;font-weight:500;color:var(--text-secondary);padding:4px 2px;border-bottom:2px solid #0000}.nav-link:hover,.nav-link.active{color:var(--text);border-bottom-color:var(--text)}.theme-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border-strong);background:var(--bg-elev-2);color:var(--text);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--mono)}.statusbar{padding:6px 24px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--bg-elev);text-align:center}.statusbar .mono{color:var(--text-secondary)}.shell{max-width:1180px;margin:0 auto;padding:22px 24px 64px}.hero-block{margin-bottom:18px}.kicker{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px}h1{font-size:clamp(1.55rem,2.8vw,2.15rem);font-weight:800;letter-spacing:-.02em;line-height:1.2;margin:0 0 8px;color:var(--text)}.lead,.benefit-desc{color:var(--text-secondary);font-size:13.5px;line-height:1.5;max-width:72ch;margin:0}.matchup-spotlight{margin-top:14px;background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;padding:18px 20px}.matchup-decision-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}@media (max-width:780px){.matchup-decision-grid{grid-template-columns:1fr}}.decision-box{background:var(--bg-elev-2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}.decision-badge{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}.ledger-frame{display:grid;grid-template-columns:305px minmax(0,1fr);gap:20px;align-items:start}@media (max-width:900px){.ledger-frame{grid-template-columns:1fr}}.panel-left,.panel-right{background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;padding:18px;min-width:0}.panel-left{position:sticky;top:74px}@media (max-width:900px){.panel-left{position:static}}.section-tag{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}.preset-strip{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}.preset-chip{font-size:11.5px;font-weight:600;padding:5px 9px;border-radius:6px;border:1px solid var(--border);background:var(--bg-elev-2);color:var(--text-secondary);cursor:pointer;font-family:inherit}.preset-chip:hover,.preset-chip.active{background:var(--btn-bg);color:var(--btn-fg);border-color:var(--btn-bg)}.field-row{margin-bottom:14px}.field-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;gap:6px}.field-label{font-size:12px;color:var(--text-secondary);font-weight:500}.field-readout{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text)}input[type=range]{width:100%;height:3px;border-radius:2px;background:var(--border-strong);accent-color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none}input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--text);border:2px solid var(--bg-elev)}select,.tool-input{width:100%;padding:7px 9px;border-radius:6px;border:1px solid var(--border-strong);background:var(--bg-elev);color:var(--text);font-size:12px;font-family:inherit}.tool-inline-row{display:flex;gap:8px;align-items:center}.tool-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px}@media (max-width:720px){.tool-grid-2{grid-template-columns:1fr}}.sub-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin:14px 0 8px;padding-top:12px;border-top:1px solid var(--border)}.btn-outline{width:100%;padding:9px 12px;border-radius:6px;border:1px solid var(--border-strong);background:var(--bg-elev-2);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;margin-top:4px}.btn-primary{display:inline-block;background:var(--btn-bg);color:var(--btn-fg);font-size:12.5px;font-weight:700;padding:8px 15px;border-radius:6px;white-space:nowrap}.verdict-cell{background:var(--bg-elev-2);border:1px solid var(--border-strong);border-left:3px solid var(--text);border-radius:8px;padding:15px 17px;margin-bottom:14px}.verdict-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:10px}.verdict-title{font-size:15.5px;font-weight:800;color:var(--text);margin:2px 0 5px;font-family:var(--mono)}.verdict-copy{font-size:13px;color:var(--text-secondary);margin:0;line-height:1.5}.live-chart-box{background:var(--bg-elev);border:1px solid var(--border);border-radius:6px;padding:10px 12px}.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:12px;flex-wrap:wrap}.tab-btn{font-size:12.5px;font-weight:600;padding:8px 11px;color:var(--text-muted);border:none;background:none;cursor:pointer;border-bottom:2px solid #0000;margin-bottom:-1px;font-family:inherit}.tab-btn.active{color:var(--text);border-bottom-color:var(--text)}.tab-panel{display:none}.tab-panel.active{display:block}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);padding:7px 8px;border-bottom:1px solid var(--border)}th.num,td.num{text-align:right}td{padding:9px 8px;border-bottom:1px solid var(--border);vertical-align:middle}tr:last-child td{border-bottom:none}.mono-val{display:block;font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--text)}.savings-val{display:block;font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--green)}.sub-val{display:block;font-size:11px;color:var(--text-muted);margin-top:2px}.bar-track{height:3px;border-radius:1.5px;background:var(--bg-elev-2);margin-top:5px;width:130px;overflow:hidden}.bar-fill{height:100%;background:var(--text-secondary)}.provider-link,.action-link{font-size:12px;font-weight:700;color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--border-strong);white-space:nowrap}.vram-bar{background:var(--bg-elev-2);border:1px solid var(--border);border-left:3px solid var(--text-secondary);border-radius:6px;padding:11px 14px;margin-bottom:12px}.checkbox-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-secondary);margin-bottom:12px;cursor:pointer}.checkbox-row input{accent-color:var(--text);width:14px;height:14px;cursor:pointer}.badge-pill{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap;border:1px solid #0000}.badge-green{background:var(--green-soft);color:var(--green);border-color:rgba(78,159,118,.22)}.badge-amber{background:var(--bg-elev-2);color:var(--text-secondary);border-color:var(--border-strong)}.code-box{display:flex;align-items:center;gap:8px;background:var(--bg-elev-2);border:1px solid var(--border);border-radius:6px;padding:8px 11px}.code-box code{flex:1;font-size:11.5px;overflow-x:auto;white-space:nowrap;color:var(--text);font-family:var(--mono)}.btn-copy{flex-shrink:0;font-size:11px;font-weight:700;padding:5px 9px;border-radius:5px;border:1px solid var(--border-strong);background:var(--bg-elev);color:var(--text);cursor:pointer}.buyrent-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}@media (max-width:860px){.buyrent-grid{grid-template-columns:1fr}}.buyrent-card{border:1px solid var(--border);border-radius:8px;padding:12px;background:var(--bg-elev-2)}.buyrent-title{font-size:12px;font-weight:700;margin-bottom:6px;color:var(--text)}.buyrent-stat{font-size:11px;color:var(--text-secondary);margin-bottom:3px}.buyrent-stat .mono{font-weight:700;color:var(--text)}.buyrent-payback{font-size:13.5px;font-weight:800;color:var(--green);margin-top:6px;font-family:var(--mono)}.buyrent-warn{font-size:10.5px;color:var(--amber);margin-top:5px;font-weight:600;font-family:var(--mono)}.standalone-section{margin-top:24px;border-radius:10px;border:1px solid var(--border);background:var(--bg-elev);padding:20px}.guide-list{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:8px;overflow:hidden}.guide-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--bg-elev)}.guide-row:last-child{border-bottom:none}.guide-badge{font-family:var(--mono);font-size:9.5px;font-weight:700;text-transform:uppercase;color:var(--text-secondary);background:var(--bg-elev-2);border:1px solid var(--border);padding:2px 6px;border-radius:4px;white-space:nowrap}.guide-body{flex:1;min-width:0}.guide-title{font-size:13px;font-weight:600;display:block;color:var(--text)}.guide-arrow{color:var(--text-secondary);font-weight:700}.index-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-top:10px}.index-cell{padding:10px 12px;border-radius:6px;background:var(--bg-elev-2);border:1px solid var(--border);font-size:12px;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:6px}.hero-los{position:relative;overflow:hidden;display:grid;grid-template-columns:255px minmax(0,1fr);align-items:center;gap:20px;min-height:172px;padding:18px 22px;margin-bottom:18px;border:1px solid var(--border);border-radius:10px;background:var(--bg-elev)}.hero-los-copy{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:center;min-width:0}.hero-los-eyebrow{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px}.hero-los-title{font-size:18px;font-weight:800;line-height:1.26;margin:0 0 6px;color:var(--text)}.hero-los-sub{font-size:12px;line-height:1.45;color:var(--text-secondary);margin:0}.hero-los-visual{position:relative;z-index:2;min-width:0;display:grid;grid-template-columns:156px minmax(64px,1fr) minmax(260px,340px);align-items:center}.hero-los-lines{width:100%;height:136px;display:block;overflow:visible}.hero-path{fill:none;stroke:var(--border-strong);stroke-width:1.4;stroke-linecap:round}.hero-flow{fill:var(--text-secondary)}.hero-source{width:156px;padding:10px 12px;border-radius:8px;background:var(--bg-elev-2);border:1px solid var(--border-strong)}.hero-source-tag{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);display:block;margin-bottom:3px}.hero-source-val{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);display:block;line-height:1.35}.hero-source-sub{font-size:10px;color:var(--text-muted);display:block;margin-top:2px}.hero-nodes-stack{display:flex;flex-direction:column;gap:7px;min-width:0}.hero-node{width:100%;display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;background:var(--bg-elev-2);border:1px solid var(--border);cursor:pointer;text-align:left;font:inherit;color:inherit;min-width:0}.hero-node.active,.hero-node:hover{border-color:var(--text);background:var(--accent-soft)}.hero-node-icon{width:28px;height:28px;border-radius:6px;background:var(--bg-elev);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}.hero-node-copy{display:flex;flex-direction:column;min-width:0;flex:1}.hero-node-title{font-size:11.5px;font-weight:700;color:var(--text);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hero-node-sub{font-size:10px;color:var(--text-muted);line-height:1.3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hero-bars{display:flex;align-items:flex-end;gap:2px;height:14px}.hero-bars span{display:block;width:3px;border-radius:1px;background:var(--text)}.hero-gauge{width:18px;height:8px;border:1.2px solid var(--text-secondary);border-radius:2px;overflow:hidden;background:var(--bg-elev-2)}.hero-gauge-fill{display:block;height:100%;background:var(--text)}.hero-rack{display:flex;flex-direction:column;gap:2px;position:relative}.hero-rack span{display:block;width:16px;height:2.5px;border-radius:1px;background:var(--text-secondary)}@media (max-width:960px){.hero-los{grid-template-columns:minmax(0,1fr)}.hero-los-visual{grid-template-columns:minmax(0,1fr);gap:10px}.hero-los-lines{display:none}.hero-source{width:100%}}.playbook-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:12px}.playbook-card{display:flex;flex-direction:column;justify-content:space-between;background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;padding:18px;color:var(--text)}.playbook-card:hover{border-color:var(--text)}.playbook-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text-secondary);background:var(--bg-elev-2);border:1px solid var(--border);padding:2px 7px;border-radius:4px;margin-bottom:8px;width:fit-content}.playbook-title{font-size:14.5px;font-weight:700;color:var(--text);margin:0 0 6px;line-height:1.38}.playbook-takeaway{font-size:12.5px;color:var(--text-secondary);margin:0 0 12px;line-height:1.48}.guide-takeaway{background:var(--bg-elev-2);border:1px solid var(--border-strong);border-left:3px solid var(--green);border-radius:8px;padding:14px 18px;margin:16px 0 20px;font-size:14px;color:var(--text);font-weight:500}.guide-step{background:var(--bg-elev-2);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:12px}.guide-step-title{font-size:15px;font-weight:700;color:var(--text);margin:0 0 6px}.guide-code{background:#111110;color:#EDEDEB;padding:12px 14px;border-radius:8px;font-family:var(--mono);font-size:12px;overflow-x:auto;margin:10px 0 0;line-height:1.5;border:1px solid var(--border)}.stack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px}.stack-card{background:var(--bg-elev-2);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;gap:10px}</style>
 </head>
 <body>
 <div class="nav-glass">
 <header class="masthead">
-<a class="brand-mark" href="../../en/index.html"><svg class="brand-logo-svg" viewBox="0 0 28 28" width="24" height="24" role="img" aria-label="TCO Benchmark Logo"><rect width="28" height="28" rx="7" fill="#1D1D1F"/><rect x="5" y="15" width="3.5" height="7.5" rx="1.2" fill="#60A5FA"/><rect x="10.5" y="11" width="3.5" height="11.5" rx="1.2" fill="#3B82F6"/><rect x="16" y="6.5" width="3.5" height="16" rx="1.2" fill="#34D399"/><path d="M4.5 10.5 H23.5" stroke="#FBBF24" stroke-width="1.7" stroke-linecap="round" stroke-dasharray="2 2"/><circle cx="16" cy="10.5" r="2.6" fill="#10B981" stroke="#1D1D1F" stroke-width="1"/></svg><span>TCO // BENCHMARK.26</span></a>
+<a class="brand-mark" href="../../en/index.html"><svg class="brand-logo-svg" viewBox="0 0 28 28" width="22" height="22" role="img" aria-label="TCO Benchmark Logo"><rect width="28" height="28" rx="5" fill="var(--text)"/><rect x="5" y="15" width="3.5" height="7.5" rx="1" fill="var(--bg)"/><rect x="10.5" y="11" width="3.5" height="11.5" rx="1" fill="var(--bg)"/><rect x="16" y="6.5" width="3.5" height="16" rx="1" fill="var(--bg)"/></svg><span>TCO // BENCHMARK.26</span></a>
 <nav class="nav-bar">
 <a class="nav-link" href="../../en/index.html">Calculator (170)</a>
 <a class="nav-link active" href="../../en/index.html#playbooks">Playbooks (5)</a>
+<button type="button" class="theme-btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">◐</button>
 <a class="nav-link " href="../../th/guides/thai-tokenizer-cost-benchmark.html">ภาษาไทย</a>
 <a class="nav-link active" href="#">English</a>
 </nav>
@@ -32,54 +33,43 @@
 <div class="shell">
 <section class="hero-block">
 <div class="kicker">THAI TOKEN BENCHMARK • SAVE 8–15X • 3 min read • Empirical Benchmark</div>
-<h1 style="max-width:32ch;">Thai Tokenizer Benchmark: Why Thai Text Costs up to 2.3x More Tokens (and How to Fix It)</h1>
-<div class="guide-takeaway">
-Bottom Line: For Thai document parsing, RAG, and chat triage, routing to Gemini 2.5 Flash or DeepSeek V3 via a unified API cuts effective Thai per-page cost by 12–40x compared to flagship models.
-</div>
-<div style="margin: 22px 0;">
-<svg viewBox="0 0 680 230" width="100%" height="auto" role="img" aria-label="Real Benchmark: 1 Page of Thai Text (2,500 chars) Token Consumption" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
-<text x="24" y="30" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">Real Benchmark: 1 Page of Thai Text (2,500 chars) Token Consumption</text>
-<text x="24" y="48" font-family="-apple-system, sans-serif" font-size="11" fill="#515154">Lower Thai token inflation + lower $/1M rate = up to 15x lower monthly bill</text>
+<h1>Thai Tokenizer Benchmark: Why Thai Text Costs up to 2.3x More Tokens (and How to Fix It)</h1>
+<div class="guide-takeaway">Bottom Line: For Thai document parsing, RAG, and chat triage, routing to Gemini 2.5 Flash or DeepSeek V3 via a unified API cuts effective Thai per-page cost by 12–40x compared to flagship models.</div>
+<div style="margin: 18px 0;"><svg viewBox="0 0 680 230" width="100%" height="auto" role="img" aria-label="Real Benchmark: 1 Page of Thai Text (2,500 chars) Token Consumption" style="display:block; background:var(--bg-elev-2); border:1px solid var(--border); border-radius:10px;">
+<text x="24" y="30" font-size="13" font-weight="700" fill="var(--text)">Real Benchmark: 1 Page of Thai Text (2,500 chars) Token Consumption</text>
+<text x="24" y="48" font-size="11" fill="var(--text-secondary)">Lower Thai token inflation + lower $/1M rate = up to 15x lower monthly bill</text>
 
-<!-- Row 1: Gemini 2.5 Flash -->
-<text x="24" y="82" font-family="SF Mono, monospace" font-size="11.5" font-weight="600" fill="#1D1D1F">Gemini 2.5 Flash</text>
-<rect x="185" y="69" width="110" height="18" rx="5" fill="#1D7D3F"/>
-<text x="305" y="82" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D7D3F">~920 tok  • ฿0.05 / 10 pages (Best Value)</text>
+<text x="24" y="82" class="mono" font-size="11.5" font-weight="600" fill="var(--text)">Gemini 2.5 Flash</text>
+<rect x="185" y="69" width="110" height="16" rx="3" fill="var(--green)"/>
+<text x="305" y="82" class="mono" font-size="11" font-weight="600" fill="var(--green)">~920 tok  • ฿0.05 / 10 pages (Best Value)</text>
 
-<!-- Row 2: Qwen 2.5 / DeepSeek V3 -->
-<text x="24" y="116" font-family="SF Mono, monospace" font-size="11.5" font-weight="600" fill="#1D1D1F">DeepSeek V3 / Qwen 2.5</text>
-<rect x="185" y="103" width="130" height="18" rx="5" fill="#0066CC"/>
-<text x="325" y="116" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#0066CC">~1,080 tok • ฿0.18 / 10 pages (Smart + Cheap)</text>
+<text x="24" y="116" class="mono" font-size="11.5" font-weight="600" fill="var(--text)">DeepSeek V3 / Qwen 2.5</text>
+<rect x="185" y="103" width="130" height="16" rx="3" fill="var(--text)"/>
+<text x="325" y="116" class="mono" font-size="11" font-weight="600" fill="var(--text)">~1,080 tok • ฿0.18 / 10 pages (Smart + Cheap)</text>
 
-<!-- Row 3: GPT-4o -->
-<text x="24" y="150" font-family="SF Mono, monospace" font-size="11.5" font-weight="600" fill="#1D1D1F">OpenAI GPT-4o (o200k)</text>
-<rect x="185" y="137" width="190" height="18" rx="5" fill="#6E6E73"/>
-<text x="385" y="150" font-family="SF Mono, monospace" font-size="11" fill="#515154">~1,580 tok • ฿1.36 / 10 pages</text>
+<text x="24" y="150" class="mono" font-size="11.5" font-weight="500" fill="var(--text-secondary)">OpenAI GPT-4o (o200k)</text>
+<rect x="185" y="137" width="190" height="16" rx="3" fill="var(--text-muted)"/>
+<text x="385" y="150" class="mono" font-size="11" fill="var(--text-secondary)">~1,580 tok • ฿1.36 / 10 pages</text>
 
-<!-- Row 4: Claude 3.7 Sonnet -->
-<text x="24" y="184" font-family="SF Mono, monospace" font-size="11.5" font-weight="600" fill="#1D1D1F">Claude 3.7 Sonnet</text>
-<rect x="185" y="171" width="250" height="18" rx="5" fill="#D97706"/>
-<text x="445" y="184" font-family="SF Mono, monospace" font-size="11" fill="#B45309">~2,120 tok • ฿2.19 / 10 pages</text>
+<text x="24" y="184" class="mono" font-size="11.5" font-weight="500" fill="var(--text-secondary)">Claude 3.7 Sonnet</text>
+<rect x="185" y="171" width="250" height="16" rx="3" fill="var(--border-strong)"/>
+<text x="445" y="184" class="mono" font-size="11" fill="var(--text-muted)">~2,120 tok • ฿2.19 / 10 pages</text>
 
-<line x1="24" y1="202" x2="656" y2="202" stroke="rgba(0,0,0,0.07)" stroke-width="1"/>
-<text x="24" y="218" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#515154">Key Tip: Parse bulk Thai docs with Gemini Flash / DeepSeek, then pass compact summaries to Claude 3.7</text>
-</svg>
-</div>
-<div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:18px;">
-<a class="btn-primary" href="../index.html?req=3000&steps=2&inTok=2200&outTok=500&cache=45&hours=12">
-Load This Scenario in Interactive Calculator →
-</a>
-<a class="action-link" href="../../en/index.html#playbooks" style="padding:10px 14px;">
-← All 5 Architecture Playbooks
-</a>
+<line x1="24" y1="202" x2="656" y2="202" stroke="var(--border)" stroke-width="1"/>
+<text x="24" y="218" font-size="10.5" font-weight="500" fill="var(--text-secondary)">Key Tip: Parse bulk Thai docs with Gemini Flash / DeepSeek, then pass compact summaries to Claude 3.7</text>
+</svg></div>
+<div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:14px;">
+<a class="btn-primary" href="../index.html?req=3000&steps=2&inTok=2200&outTok=500&cache=45&hours=12">Load This Scenario in Interactive Calculator →</a>
+<a class="action-link" href="../../en/index.html#playbooks">← All 5 Architecture Playbooks</a>
 </div>
 </section>
 
-<section class="table-block">
+<section class="standalone-section">
 <div class="section-tag">
 <span>EMPIRICAL BENCHMARK & COST MATRIX</span>
 <span>2026 VERIFIED DATA</span>
 </div>
+<div class="table-wrap">
 <table>
 <thead>
 <tr>
@@ -94,28 +84,29 @@ Load This Scenario in Interactive Calculator →
 <td><span class="mono-val">Gemini 2.5 Flash (1M Context)</span></td>
 <td class="num"><span class="mono-val">~920 tokens (1.4x)</span></td>
 <td class="num"><span class="savings-val">฿4.75 ($0.14)</span></td>
-<td style="padding-left:18px; color:var(--ink-secondary); font-size:0.84rem;">Best overall for bulk Thai PDF/OCR extraction and high-volume RAG.</td>
+<td style="padding-left:14px; color:var(--text-secondary); font-size:12.5px;">Best overall for bulk Thai PDF/OCR extraction and high-volume RAG.</td>
 </tr>
 <tr>
 <td><span class="mono-val">DeepSeek V3 / Qwen 2.5 (via Novita AI)</span></td>
 <td class="num"><span class="mono-val">~1,080 tokens (1.6x)</span></td>
 <td class="num"><span class="savings-val">฿20.50 ($0.59)</span></td>
-<td style="padding-left:18px; color:var(--ink-secondary); font-size:0.84rem;">Sweet spot for structured JSON extraction, Thai reasoning, and agent steps.</td>
+<td style="padding-left:14px; color:var(--text-secondary); font-size:12.5px;">Sweet spot for structured JSON extraction, Thai reasoning, and agent steps.</td>
 </tr>
 <tr>
 <td><span class="mono-val">OpenAI GPT-4o (o200k_base)</span></td>
 <td class="num"><span class="mono-val">~1,580 tokens (2.4x)</span></td>
 <td class="num"><span class="savings-val">฿136.30 ($3.95)</span></td>
-<td style="padding-left:18px; color:var(--ink-secondary); font-size:0.84rem;">Use when multimodal vision/audio or strict enterprise tone is required.</td>
+<td style="padding-left:14px; color:var(--text-secondary); font-size:12.5px;">Use when multimodal vision/audio or strict enterprise tone is required.</td>
 </tr>
 <tr>
 <td><span class="mono-val">Claude 3.7 Sonnet</span></td>
 <td class="num"><span class="mono-val">~2,120 tokens (3.2x)</span></td>
 <td class="num"><span class="savings-val">฿219.40 ($6.36)</span></td>
-<td style="padding-left:18px; color:var(--ink-secondary); font-size:0.84rem;">#1 for complex coding, but high Thai token multiplier—feed compressed context only.</td>
+<td style="padding-left:14px; color:var(--text-secondary); font-size:12.5px;">#1 for complex coding, but high Thai token multiplier—feed compressed context only.</td>
 </tr>
 </tbody>
 </table>
+</div>
 </section>
 
 <section class="standalone-section">
@@ -152,8 +143,8 @@ Always reply in natural, polite Thai.`;</code></pre>
 <div class="stack-card">
 <div>
 <div class="kicker" style="margin-bottom:4px;">Unified Low-Cost LLM API</div>
-<div class="mono-val" style="font-size:0.95rem; margin-bottom:6px;">Novita AI (DeepSeek V3 / Qwen 2.5 / Llama 3.3)</div>
-<div class="sub-val" style="color:var(--ledger-green); font-weight:600;">$0.15–$0.55 per 1M tokens</div>
+<div class="mono-val" style="font-size:14px; margin-bottom:4px;">Novita AI (DeepSeek V3 / Qwen 2.5 / Llama 3.3)</div>
+<div class="sub-val" style="color:var(--green); font-weight:600;">$0.15–$0.55 per 1M tokens</div>
 </div>
 <a class="btn-primary" style="text-align:center; width:100%;" href="https://novita.ai/?ref=zge5ztg&amp;utm_source=affiliate&amp;utm_campaign=thai-tokenizer-cost-benchmark-guide-thai-token-novita" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_aimlapi',{mode:'cors'}).catch(function(){});">
 Get Unified API Key →
@@ -162,8 +153,8 @@ Get Unified API Key →
 <div class="stack-card">
 <div>
 <div class="kicker" style="margin-bottom:4px;">Automated Token Compression Skill</div>
-<div class="mono-val" style="font-size:0.95rem; margin-bottom:6px;">Agensi.io — token-budget-architect</div>
-<div class="sub-val" style="color:var(--ledger-green); font-weight:600;">$14 one-time workflow skill</div>
+<div class="mono-val" style="font-size:14px; margin-bottom:4px;">Agensi.io — token-budget-architect</div>
+<div class="sub-val" style="color:var(--green); font-weight:600;">$14 one-time workflow skill</div>
 </div>
 <a class="btn-primary" style="text-align:center; width:100%;" href="https://www.agensi.io/r/BURAPA?utm_campaign=thai-tokenizer-cost-benchmark-guide-thai-token-budget-skill" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_agensi',{mode:'cors'}).catch(function(){});">
 View Skill on Agensi.io →
@@ -174,211 +165,21 @@ View Skill on Agensi.io →
 
 <section class="standalone-section">
 <div class="section-tag"><span>FREQUENTLY ASKED QUESTIONS</span><span>FAQ</span></div>
-<div style="margin-bottom:14px;">
-<div style="font-weight:600; font-size:0.94rem;">Why does Thai text consume more tokens than English?</div>
-<p style="margin:6px 0 0; color:var(--ink-secondary); font-size:0.88rem;">Thai script has no spaces between words and stacks vowels/tone marks vertically. Western-centric BPE tokenizers split Thai words into byte fragments (2–4 tokens per word), whereas Gemini 2.5 and Qwen 2.5 include dedicated multilingual vocabulary entries for whole Thai words.</p>
+<div style="margin-bottom:12px;">
+<div style="font-weight:600; font-size:13.5px;">Why does Thai text consume more tokens than English?</div>
+<p style="margin:4px 0 0; color:var(--text-secondary); font-size:12.5px;">Thai script has no spaces between words and stacks vowels/tone marks vertically. Western-centric BPE tokenizers split Thai words into byte fragments (2–4 tokens per word), whereas Gemini 2.5 and Qwen 2.5 include dedicated multilingual vocabulary entries for whole Thai words.</p>
 </div>
 </section>
 
-<section class="standalone-section" id="playbooks">
-<div class="section-tag">
-<span>PRACTICAL AI ARCHITECTURE & COST PLAYBOOKS</span>
-<span>ZERO FLUFF • VISUAL BLUEPRINTS</span>
-</div>
-<div class="playbook-grid">
-<a class="playbook-card" href="./line-oa-rag-chatbot-blueprint.html">
-<div>
-<span class="playbook-badge">PRODUCTION RAG BLUEPRINT • ~$34/MO</span>
-<div style="margin:6px 0 12px; border-radius:10px; overflow:hidden;">
-<svg viewBox="0 0 680 220" width="100%" height="auto" role="img" aria-label="LINE OA RAG Blueprint" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
-<text x="24" y="28" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">LINE OA + RAG Production Blueprint (~$34 / ฿1,180 per month)</text>
+<section class="standalone-section" id="playbooks"><div class="section-tag"><span>PRACTICAL AI PLAYBOOKS (5 GUIDES)</span><a href="../index.html#playbooks" class="provider-link">All 5 Guides →</a></div><div class="guide-list"><a class="guide-row" href="./line-oa-rag-chatbot-blueprint.html"><span class="guide-badge">PRODUCTION RAG BLUEPRINT • ~$34/MO</span><span class="guide-body"><span class="guide-title">LINE OA + Enterprise RAG Chatbot Blueprint Under $35/Month (฿1,200/mo)</span></span><span class="guide-arrow">→</span></a><a class="guide-row" href="./claude-code-cursor-cost-cut.html"><span class="guide-badge">DEVELOPER PLAYBOOK • CUT TOKEN SPEND 60%</span><span class="guide-body"><span class="guide-title">How to Cut Claude Code &amp; Cursor Token Bills by 60% Without Losing Code Quality</span></span><span class="guide-arrow">→</span></a><a class="guide-row" href="./api-to-runpod-vllm-migration.html"><span class="guide-badge">CLOUD GPU MIGRATION • FLAT MONTHLY CEILING</span><span class="guide-body"><span class="guide-title">When &amp; How to Migrate from Per-Token APIs to Dedicated RunPod GPUs (with vLLM Recipes)</span></span><span class="guide-arrow">→</span></a><a class="guide-row" href="./thai-vps-vs-global-cloud-ai-backend.html"><span class="guide-badge">INFRASTRUCTURE GUIDE • THAILAND VS GLOBAL</span><span class="guide-body"><span class="guide-title">Thailand VPS vs. Global Managed Cloud for AI Backends: Latency, PDPA, and TCO Guide</span></span><span class="guide-arrow">→</span></a></div></section>
 
-<!-- Box 1: LINE Users -->
-<rect x="24" y="54" width="130" height="96" rx="12" fill="#FFFFFF" stroke="#1D7D3F" stroke-width="1.5"/>
-<circle cx="89" cy="80" r="13" fill="#E8F5E9"/>
-<text x="89" y="84" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#1D7D3F">LINE</text>
-<text x="89" y="108" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#1D1D1F">Customer Chat</text>
-<text x="89" y="126" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" fill="#515154">2,500 msg/day</text>
-
-<!-- Arrow 1 -->
-<line x1="154" y1="102" x2="192" y2="102" stroke="#86868B" stroke-width="1.5" stroke-dasharray="3,3"/>
-<polygon points="192,98 200,102 192,106" fill="#86868B"/>
-<text x="177" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="9.5" fill="#1D7D3F">&lt;8ms</text>
-
-<!-- Box 2: Thai VPS -->
-<rect x="200" y="54" width="210" height="96" rx="12" fill="#FFFFFF" stroke="#0066CC" stroke-width="1.5"/>
-<text x="305" y="78" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#0066CC">1. Thailand VPS (Hostatom/Ruk-Com)</text>
-<text x="305" y="98" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#1D1D1F">Webhook API + Qdrant Vector DB</text>
-<rect x="235" y="110" width="140" height="24" rx="6" fill="#EFF6FF"/>
-<text x="305" y="126" text-anchor="middle" font-family="SF Mono, monospace" font-size="10.5" font-weight="600" fill="#0066CC">$24/mo (~฿828/mo)</text>
-
-<!-- Arrow 2 -->
-<line x1="410" y1="102" x2="452" y2="102" stroke="#86868B" stroke-width="1.5"/>
-<polygon points="452,98 460,102 452,106" fill="#86868B"/>
-<text x="435" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="9.5" fill="#0066CC">Cache 75%</text>
-
-<!-- Box 3: Unified LLM Router -->
-<rect x="460" y="54" width="196" height="96" rx="12" fill="#FFFFFF" stroke="#1D1D1F" stroke-width="1.5"/>
-<text x="558" y="78" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#1D1D1F">2. Novita AI Router</text>
-<text x="558" y="98" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">Gemini 2.5 Flash / DeepSeek V3</text>
-<rect x="488" y="110" width="140" height="24" rx="6" fill="#F0FDF4"/>
-<text x="558" y="126" text-anchor="middle" font-family="SF Mono, monospace" font-size="10.5" font-weight="600" fill="#1D7D3F">~$10/mo (~฿350/mo)</text>
-
-<!-- Bottom summary bar -->
-<rect x="24" y="168" width="632" height="34" rx="8" fill="#1D1D1F"/>
-<text x="340" y="189" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#FFFFFF">Total Stack Cost: ~$34/mo (฿1,178/mo) for 75,000 chats/mo ($0.00045 per chat)</text>
-</svg>
-</div>
-<h3 class="playbook-title">LINE OA + Enterprise RAG Chatbot Blueprint Under $35/Month (฿1,200/mo)</h3>
-<p class="playbook-takeaway">Bottom Line: Host your LINE Webhook and Qdrant vector DB on a Bangkok NVMe VPS ($24/mo) for &lt;8ms domestic latency, and pair it with cached Gemini 2.5 Flash / DeepSeek V3 calls (~$10/mo).</p>
-</div>
-<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-weight:600; color:var(--accent); border-top:1px solid var(--line); padding-top:10px;">
-<span>4 min read • Complete Stack Blueprint</span>
-<span>Read Blueprint →</span>
-</div>
-</a>
-<a class="playbook-card" href="./claude-code-cursor-cost-cut.html">
-<div>
-<span class="playbook-badge">DEVELOPER PLAYBOOK • CUT TOKEN SPEND 60%</span>
-<div style="margin:6px 0 12px; border-radius:10px; overflow:hidden;">
-<svg viewBox="0 0 680 225" width="100%" height="auto" role="img" aria-label="Coding Agent Token Savings Flow" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
-<text x="24" y="28" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">How to Cut Claude Code & Cursor Token Spend by 60%</text>
-
-<!-- Left: Raw Unoptimized -->
-<rect x="24" y="48" width="185" height="150" rx="12" fill="#FFF5F5" stroke="#FECACA" stroke-width="1.5"/>
-<text x="116" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#B91C1C">Before (Unoptimized)</text>
-<text x="116" y="96" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• Reads full files every turn</text>
-<text x="116" y="116" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• Spawns costly subagents</text>
-<text x="116" y="136" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• Flagship model on trivial edits</text>
-<rect x="46" y="154" width="140" height="28" rx="6" fill="#FEE2E2"/>
-<text x="116" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11.5" font-weight="700" fill="#B91C1C">$240/mo (฿8,280)</text>
-
-<!-- Middle Filter: Agensi Skills -->
-<line x1="209" y1="123" x2="243" y2="123" stroke="#1D1D1F" stroke-width="1.5"/>
-<polygon points="243,119 251,123 243,127" fill="#1D1D1F"/>
-
-<rect x="251" y="48" width="185" height="150" rx="12" fill="#FFFFFF" stroke="#0066CC" stroke-width="2"/>
-<text x="343" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#0066CC">Agensi.io Guardrails</text>
-<text x="343" y="96" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="600" fill="#1D1D1F">token-budget-architect</text>
-<text x="343" y="112" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#515154">Reads line-ranges only (-30%)</text>
-<text x="343" y="136" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="600" fill="#1D1D1F">devguard (verified-dev)</text>
-<text x="343" y="152" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#515154">Blocks wasted subagents (-35%)</text>
-<rect x="273" y="164" width="140" height="22" rx="5" fill="#EFF6FF"/>
-<text x="343" y="179" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="600" fill="#0066CC">$14–$19 One-Time</text>
-
-<!-- Right: Optimized Output -->
-<line x1="436" y1="123" x2="470" y2="123" stroke="#1D7D3F" stroke-width="1.5"/>
-<polygon points="470,119 478,123 470,127" fill="#1D7D3F"/>
-
-<rect x="478" y="48" width="178" height="150" rx="12" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.5"/>
-<text x="567" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#1D7D3F">After (62% Lower Bill)</text>
-<text x="567" y="96" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#1D1D1F">• 80% routine → DeepSeek/Haiku</text>
-<text x="567" y="116" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#1D1D1F">• 20% hard tasks → Claude 3.7</text>
-<text x="567" y="136" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#1D1D1F">• 2.5x longer coding sessions</text>
-<rect x="497" y="154" width="140" height="28" rx="6" fill="#1D7D3F"/>
-<text x="567" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11.5" font-weight="700" fill="#FFFFFF">$92/mo (฿3,174)</text>
-</svg>
-</div>
-<h3 class="playbook-title">How to Cut Claude Code &amp; Cursor Token Bills by 60% Without Losing Code Quality</h3>
-<p class="playbook-takeaway">Bottom Line: 60% of coding agent spend is wasted on full-file reads and 28k-token subagent bootstrap overhead on trivial single-file edits. Enforcing line-range reads and subagent gates cuts monthly bills in half.</p>
-</div>
-<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-weight:600; color:var(--accent); border-top:1px solid var(--line); padding-top:10px;">
-<span>3 min read • For Engineers &amp; Dev Teams</span>
-<span>Read Blueprint →</span>
-</div>
-</a>
-<a class="playbook-card" href="./api-to-runpod-vllm-migration.html">
-<div>
-<span class="playbook-badge">CLOUD GPU MIGRATION • FLAT MONTHLY CEILING</span>
-<div style="margin:6px 0 12px; border-radius:10px; overflow:hidden;">
-<svg viewBox="0 0 680 230" width="100%" height="auto" role="img" aria-label="API vs Cloud GPU Break-Even Chart" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
-<text x="24" y="28" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">Break-Even Curve: Pay-Per-Token API vs. Flat Hourly RunPod GPU</text>
-
-<!-- Axes -->
-<line x1="70" y1="190" x2="640" y2="190" stroke="#86868B" stroke-width="1.2"/>
-<line x1="70" y1="50" x2="70" y2="190" stroke="#86868B" stroke-width="1.2"/>
-<text x="65" y="193" text-anchor="end" font-family="SF Mono, monospace" font-size="9.5" fill="#86868B">$0</text>
-<text x="65" y="142" text-anchor="end" font-family="SF Mono, monospace" font-size="9.5" fill="#86868B">$160</text>
-<text x="65" y="92" text-anchor="end" font-family="SF Mono, monospace" font-size="9.5" fill="#86868B">$400</text>
-
-<!-- Flat GPU Line (RunPod RTX 4090 $158/mo @ 12h/day) -->
-<line x1="70" y1="142" x2="630" y2="142" stroke="#1D7D3F" stroke-width="2.5" stroke-dasharray="6,4"/>
-<rect x="430" y="116" width="205" height="22" rx="5" fill="#E8F5E9"/>
-<text x="532" y="131" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="700" fill="#1D7D3F">RunPod RTX 4090 ($158/mo flat)</text>
-
-<!-- Rising API Cost Line -->
-<polyline points="70,188 210,165 280,142 440,95 610,54" fill="none" stroke="#D97706" stroke-width="2.8"/>
-<text x="530" y="58" font-family="SF Mono, monospace" font-size="10" font-weight="700" fill="#B45309">Flagship API (Per-Token)</text>
-
-<!-- Break-Even Crossover Point -->
-<circle cx="280" cy="142" r="6" fill="#0066CC" stroke="#FFFFFF" stroke-width="2"/>
-<line x1="280" y1="142" x2="280" y2="190" stroke="#0066CC" stroke-width="1.2" stroke-dasharray="3,3"/>
-<rect x="195" y="78" width="175" height="44" rx="8" fill="#1D1D1F"/>
-<text x="282" y="96" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="700" fill="#FFFFFF">Break-Even Point</text>
-<text x="282" y="112" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" fill="#93C5FD">~1,450 tasks/day ($158/mo)</text>
-
-<!-- X-Axis labels -->
-<text x="150" y="210" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#515154">Low Volume → API Wins</text>
-<text x="480" y="210" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#1D7D3F">Heavy Volume → Flat GPU Wins</text>
-</svg>
-</div>
-<h3 class="playbook-title">When &amp; How to Migrate from Per-Token APIs to Dedicated RunPod GPUs (with vLLM Recipes)</h3>
-<p class="playbook-takeaway">Bottom Line: Once your monthly API bill crosses $160–$300/mo—or when strict data privacy forbids third-party token logging—switching to a dedicated RunPod RTX 4090 ($0.44/hr) or RTX A6000 48GB ($0.49/hr) caps your spend completely.</p>
-</div>
-<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-weight:600; color:var(--accent); border-top:1px solid var(--line); padding-top:10px;">
-<span>4 min read • Copy-Paste vLLM Commands</span>
-<span>Read Blueprint →</span>
-</div>
-</a>
-<a class="playbook-card" href="./thai-vps-vs-global-cloud-ai-backend.html">
-<div>
-<span class="playbook-badge">INFRASTRUCTURE GUIDE • THAILAND VS GLOBAL</span>
-<div style="margin:6px 0 12px; border-radius:10px; overflow:hidden;">
-<svg viewBox="0 0 680 220" width="100%" height="auto" role="img" aria-label="Thailand vs Global Cloud VPS Latency & Use Case Map" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
-<text x="24" y="28" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">Server Selection Matrix: Domestic Bangkok Nodes vs. Global Cloud</text>
-
-<!-- Option 1: Hostatom -->
-<rect x="24" y="48" width="200" height="150" rx="12" fill="#FFFFFF" stroke="#1D7D3F" stroke-width="1.5"/>
-<text x="124" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#1D7D3F">Hostatom VPS (TH)</text>
-<text x="124" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D1D1F">Ping: 4–8 ms (BKK)</text>
-<text x="124" y="114" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• Best THB/GB value in TH</text>
-<text x="124" y="132" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• Ideal for Docker / Qdrant / n8n</text>
-<rect x="49" y="154" width="150" height="28" rx="6" fill="#E8F5E9"/>
-<text x="124" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="700" fill="#1D7D3F">$24/mo (~฿828)</text>
-
-<!-- Option 2: Ruk-Com -->
-<rect x="240" y="48" width="200" height="150" rx="12" fill="#FFFFFF" stroke="#0066CC" stroke-width="1.5"/>
-<text x="340" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#0066CC">Ruk-Com Managed (TH)</text>
-<text x="340" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D1D1F">Ping: 5–9 ms (BKK)</text>
-<text x="340" y="114" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• Fully managed 24/7 Thai SLA</text>
-<text x="340" y="132" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• Enterprise WAF + DirectAdmin</text>
-<rect x="265" y="154" width="150" height="28" rx="6" fill="#EFF6FF"/>
-<text x="340" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="700" fill="#0066CC">$46/mo (~฿1,587)</text>
-
-<!-- Option 3: Cloudways -->
-<rect x="456" y="48" width="200" height="150" rx="12" fill="#FFFFFF" stroke="#1D1D1F" stroke-width="1.5"/>
-<text x="556" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#1D1D1F">Cloudways (SG/Global)</text>
-<text x="556" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D1D1F">Ping: ~32 ms (SG Edge)</text>
-<text x="556" y="114" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• Global SaaS (DO / Vultr HF)</text>
-<text x="556" y="132" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• 1-Click Staging & Auto-Healing</text>
-<rect x="481" y="154" width="150" height="28" rx="6" fill="#F5F5F7"/>
-<text x="556" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="700" fill="#1D1D1F">$54/mo (~฿1,863)</text>
-</svg>
-</div>
-<h3 class="playbook-title">Thailand VPS vs. Global Managed Cloud for AI Backends: Latency, PDPA, and TCO Guide</h3>
-<p class="playbook-takeaway">Bottom Line: If 90%+ of your users are in Thailand (LINE OA bots, clinics, local ERPs), Bangkok nodes on Hostatom or Ruk-Com deliver 4x lower latency (&lt;8ms) at half the price. For international SaaS traffic, choose Cloudways Managed Vultr HF.</p>
-</div>
-<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-weight:600; color:var(--accent); border-top:1px solid var(--line); padding-top:10px;">
-<span>3 min read • Decision Matrix by Workload</span>
-<span>Read Blueprint →</span>
-</div>
-</a>
-</div>
-</section>
-
-<footer id="affiliate-disclosure" style="padding:20px 0 40px; border-top:1px solid var(--line); color:var(--ink-muted); font-size:0.78rem; line-height:1.55; margin-top:24px;">
+<footer id="affiliate-disclosure" style="padding:18px 0 32px; border-top:1px solid var(--border); color:var(--text-muted); font-size:11.5px; line-height:1.55; margin-top:24px;">
 Affiliate Disclosure: Some links on this page (including Agensi.io, RunPod, Novita AI, and cloud hosting providers) are affiliate links. We may earn a commission at no extra cost to you if you sign up or make a purchase through them.
 </footer>
 </div>
+<script>
+function toggleTheme(){var r=document.documentElement,n=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('ai_cost_calc_theme',n);}catch(_){}}
+try{var st=localStorage.getItem('ai_cost_calc_theme');if(st){document.documentElement.setAttribute('data-theme',st);}}catch(_){}
+</script>
 </body>
 </html>

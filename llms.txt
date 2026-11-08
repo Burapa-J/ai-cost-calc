@@ -1,5 +1,5 @@
 # TCO // BENCHMARK.26 — Practical AI Cost & Architecture Planner (EN / TH)
-> Visual interactive calculator and 5 production AI architecture playbooks comparing single-bill LLM APIs, flat-rate hourly GPUs, managed servers, and token-saving Agent Skills (353 bilingual pages).
+> Visual interactive calculator, 9 client-side engineering tools (Workload TCO Planner, Thai Token Tax Inspector, Hybrid 80/20 Model Router, GPU VRAM & Idle Burn-Rate Checker, vLLM Launch Command Generator, RAG Vector DB & VPS RAM Sizer, 1-Click 6-Line Executive Spec Summary, Affiliate Skill ROI Calculator, and 5 Production AI Architecture Playbooks) across 353 bilingual pages.
 
 - English Planner: https://burapa-j.github.io/ai-cost-calc/en/index.html
 - Thai Planner: https://burapa-j.github.io/ai-cost-calc/th/index.html
@@ -8,4 +8,5 @@
 - Claude Code & Cursor 60% Cost Cut Guide: https://burapa-j.github.io/ai-cost-calc/th/guides/claude-code-cursor-cost-cut.html
 - API to RunPod vLLM Migration Guide: https://burapa-j.github.io/ai-cost-calc/th/guides/api-to-runpod-vllm-migration.html
 - Thai VPS vs Global Cloud Guide: https://burapa-j.github.io/ai-cost-calc/th/guides/thai-vps-vs-global-cloud-ai-backend.html
+- Validation & Onboarding Kit: https://burapa-j.github.io/ai-cost-calc/validation-kit.md
 - Sitemap (352 URLs): https://burapa-j.github.io/ai-cost-calc/sitemap.xml

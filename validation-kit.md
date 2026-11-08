@@ -1,8 +1,9 @@
 # Zero-Cost Demand Validation & Affiliate Onboarding Kit
 
-- Total Generated Static Pages (EN + TH): **353 pages**
+- Total Generated Static Pages (EN + TH): **353 pages** (352 sitemap URLs + root redirect)
 - Centralized Admin Command Center & Live Telemetry: `https://www.xamathi.com/admin/?project=affiliate`
 - Public Website: `https://burapa-j.github.io/ai-cost-calc/`
+- Built-in Interactive Buyer Decision Tools: **9 client-side tools** (Workload Planner, Thai Token Tax Inspector, Hybrid 80/20 Router Calculator, GPU VRAM & Burn-Rate Checker, Ready-to-Deploy vLLM Command Generator, RAG Vector DB & VPS RAM Sizer, 1-Click 6-Line Executive Summary Copy, Affiliate Skill ROI Estimator, and 5 Architecture Playbooks)
 
 ---
 
