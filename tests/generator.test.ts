@@ -10,7 +10,7 @@ import { startValidationServer } from '../src/server.ts';
 const configPath = path.resolve(import.meta.dirname, '../config/affiliates.json');
 const affiliateConfig = JSON.parse(fs.readFileSync(configPath, 'utf8')) as AffiliateConfigFile;
 
-test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 354 visual zero-fluff bilingual SEO & Playbook pages', () => {
+test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 353 visual zero-fluff bilingual SEO & Playbook pages with brand logo and no public Live Stats', () => {
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ai-cost-calc-test-'));
   const distPath = path.join(tmpRoot, 'dist');
 
@@ -18,15 +18,21 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
     const firstRun = generateStaticSite(distPath, affiliateConfig, 'https://burapa-j.github.io/ai-cost-calc');
     const secondRun = generateStaticSite(distPath, affiliateConfig, 'https://burapa-j.github.io/ai-cost-calc');
 
-    assert.equal(firstRun.totalHtmlPages, 354);
-    assert.equal(secondRun.totalHtmlPages, 354);
+    assert.equal(firstRun.totalHtmlPages, 353);
+    assert.equal(secondRun.totalHtmlPages, 353);
     assert.equal(firstRun.enComparisonPages, 170);
     assert.equal(firstRun.thComparisonPages, 170);
     assert.equal(firstRun.playbookPages, 10);
     assert.equal(firstRun.sitemapUrls, 352);
 
+    assert.equal(fs.existsSync(path.join(distPath, 'favicon.svg')), true);
+    assert.equal(fs.existsSync(path.join(distPath, 'validation-dashboard.html')), false);
+
     const thHome = fs.readFileSync(path.join(distPath, 'th', 'index.html'), 'utf8');
     assert.equal(thHome.includes('TCO // BENCHMARK.26'), true);
+    assert.equal(thHome.includes('class="brand-logo-svg"'), true);
+    assert.equal(thHome.includes('favicon.svg'), true);
+    assert.equal(thHome.includes('Live Stats'), false);
     assert.equal(thHome.includes('--paper: #FBFBFD'), true);
     assert.equal(thHome.includes('backdrop-filter: saturate(180%) blur(20px)'), true);
     assert.equal(thHome.includes('BURAPA'), true);

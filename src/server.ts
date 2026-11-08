@@ -74,11 +74,13 @@ export function startValidationServer(port = 4173, rootDir = path.resolve(import
     const mime =
       ext === '.html'
         ? 'text/html; charset=utf-8'
-        : ext === '.xml'
-          ? 'application/xml; charset=utf-8'
-          : ext === '.md' || ext === '.txt'
-            ? 'text/plain; charset=utf-8'
-            : 'application/octet-stream';
+        : ext === '.svg'
+          ? 'image/svg+xml'
+          : ext === '.xml'
+            ? 'application/xml; charset=utf-8'
+            : ext === '.md' || ext === '.txt'
+              ? 'text/plain; charset=utf-8'
+              : 'application/octet-stream';
 
     res.writeHead(200, { 'Content-Type': mime });
     res.end(fs.readFileSync(fullPath));

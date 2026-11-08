@@ -33,6 +33,21 @@ function escapeHtml(text: string): string {
     .replace(/'/g, '&#39;');
 }
 
+function renderFaviconSvg(): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="8" fill="#1D1D1F"/>
+  <rect x="6" y="18" width="4" height="8" rx="1.5" fill="#60A5FA"/>
+  <rect x="12" y="13" width="4" height="13" rx="1.5" fill="#0066CC"/>
+  <rect x="18" y="8" width="4" height="18" rx="1.5" fill="#34D399"/>
+  <path d="M5 12 H27" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" stroke-dasharray="2.5 2.5"/>
+  <circle cx="18" cy="12" r="3" fill="#10B981" stroke="#1D1D1F" stroke-width="1.2"/>
+</svg>`;
+}
+
+function renderBrandLogoMarkup(): string {
+  return `<svg class="brand-logo-svg" viewBox="0 0 28 28" width="24" height="24" role="img" aria-label="TCO Benchmark Logo"><rect width="28" height="28" rx="7" fill="#1D1D1F"/><rect x="5" y="15" width="3.5" height="7.5" rx="1.2" fill="#60A5FA"/><rect x="10.5" y="11" width="3.5" height="11.5" rx="1.2" fill="#3B82F6"/><rect x="16" y="6.5" width="3.5" height="16" rx="1.2" fill="#34D399"/><path d="M4.5 10.5 H23.5" stroke="#FBBF24" stroke-width="1.7" stroke-linecap="round" stroke-dasharray="2 2"/><circle cx="16" cy="10.5" r="2.6" fill="#10B981" stroke="#1D1D1F" stroke-width="1"/></svg><span>TCO // BENCHMARK.26</span>`;
+}
+
 function renderSharedStyles(isCompareSubpage = false): string {
   const extraStyles = isCompareSubpage
     ? ''
@@ -213,10 +228,17 @@ function renderSharedStyles(isCompareSubpage = false): string {
       font-size: 0.8rem;
     }
     .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
       font-weight: 600;
       color: var(--ink);
       letter-spacing: -0.01em;
       font-size: 0.9rem;
+    }
+    .brand-logo-svg {
+      flex-shrink: 0;
+      display: block;
     }
     .nav-bar {
       display: flex;
@@ -722,17 +744,17 @@ function renderPlaybookGuidePage(
   <meta property="og:title" content="${escapeHtml(guide.title[locale])}" />
   <meta property="og:description" content="${escapeHtml(guide.metaDescription[locale])}" />
   <meta property="og:url" content="${escapeHtml(canonicalUrl)}" />${gscMeta}
+  <link rel="icon" type="image/svg+xml" href="${rootPrefix}/favicon.svg" />
   <script type="application/ld+json">${jsonLd}</script>
   <style>${renderSharedStyles(false)}</style>
 </head>
 <body>
   <div class="nav-glass">
     <header class="masthead">
-      <a class="brand-mark" href="${rootPrefix}/${locale}/index.html">TCO // BENCHMARK.26</a>
+      <a class="brand-mark" href="${rootPrefix}/${locale}/index.html">${renderBrandLogoMarkup()}</a>
       <nav class="nav-bar">
         <a class="nav-link" href="${rootPrefix}/${locale}/index.html">${isTh ? 'เครื่องคำนวณงบ AI' : 'Calculator'} (${allPages.length})</a>
         <a class="nav-link active" href="${rootPrefix}/${locale}/index.html#playbooks">${isTh ? 'คู่มือจัดสเปก (5)' : 'Playbooks (5)'}</a>
-        <a class="nav-link" href="${rootPrefix}/validation-dashboard.html">Live Stats</a>
         <a class="nav-link ${locale === 'th' ? 'active' : ''}" href="${locale === 'th' ? '#' : alternatePath}">ภาษาไทย</a>
         <a class="nav-link ${locale === 'en' ? 'active' : ''}" href="${locale === 'en' ? '#' : alternatePath}">English</a>
       </nav>
@@ -1047,17 +1069,17 @@ function renderCalculatorPage(
   <meta property="og:title" content="${escapeHtml(title)}" />
   <meta property="og:description" content="${escapeHtml(metaDescription)}" />
   <meta property="og:url" content="${escapeHtml(canonicalUrl)}" />${gscMeta}
+  <link rel="icon" type="image/svg+xml" href="${rootPrefix}/favicon.svg" />
   <script type="application/ld+json">${jsonLd}</script>
   <style>${renderSharedStyles(isComparisonSubpage)}</style>
 </head>
 <body>
   <div class="nav-glass">
     <header class="masthead">
-      <a class="brand-mark" href="${rootPrefix}/${locale}/index.html">TCO // BENCHMARK.26</a>
+      <a class="brand-mark" href="${rootPrefix}/${locale}/index.html">${renderBrandLogoMarkup()}</a>
       <nav class="nav-bar">
         <a class="nav-link" href="${rootPrefix}/${locale}/index.html">${locale === 'th' ? 'คำนวณงบ' : 'Models'} (${allPages.length})</a>
         <a class="nav-link" href="#playbooks">${locale === 'th' ? 'คู่มือจัดสเปก (5)' : 'Playbooks (5)'}</a>
-        <a class="nav-link" href="${rootPrefix}/validation-dashboard.html">Live Stats</a>
         <a class="nav-link ${locale === 'th' ? 'active' : ''}" href="${locale === 'th' ? '#' : alternatePath}">ภาษาไทย</a>
         <a class="nav-link ${locale === 'en' ? 'active' : ''}" href="${locale === 'en' ? '#' : alternatePath}">English</a>
       </nav>
@@ -1596,226 +1618,12 @@ function renderCalculatorPage(
     .replace(/>\n+</g, '><');
 }
 
-function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): string {
-  const cfgJson = JSON.stringify(affiliateConfig);
-  return `<!DOCTYPE html>
-<html lang="th">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TCO // BENCHMARK.26 — Live Usage &amp; Conversion Telemetry</title>
-  <style>${renderSharedStyles()}</style>
-</head>
-<body>
-  <div class="nav-glass">
-    <header class="masthead">
-      <a class="brand-mark" href="./th/index.html">TCO // BENCHMARK.26</a>
-      <nav class="nav-bar">
-        <a class="nav-link" href="./th/index.html">ภาษาไทย</a>
-        <a class="nav-link" href="./en/index.html">English</a>
-        <a class="nav-link active" href="./validation-dashboard.html">Live Stats</a>
-      </nav>
-    </header>
-  </div>
-
-  <div class="shell">
-    <section class="hero-block">
-      <div class="kicker">CENTRALIZED LIVE TELEMETRY</div>
-      <h1>Real-User Demand &amp; Conversion Tracker</h1>
-      <p class="lead">หน้าสรุปจำนวนผู้เข้าชมจริง อัตราการเลื่อนคำนวณ และยอดคลิกลิงก์พาร์ทเนอร์จากทั่วโลก เพื่อวัดผลความสนใจของตลาดจริงแบบตรงไปตรงมา</p>
-    </section>
-
-    <section class="standalone-section">
-      <div class="section-tag">
-        <span>สถานะการพิสูจน์ตลาด (Validation Status)</span>
-        <span id="telemetry-source">SOURCE: GLOBAL LIVE COUNTER</span>
-      </div>
-      <div class="verdict-title" id="verdict-code">LOADING...</div>
-      <p class="verdict-copy" id="verdict-desc">กำลังดึงข้อมูลล่าสุด...</p>
-    </section>
-
-    <div class="ledger-frame">
-      <aside class="panel-left">
-        <div class="section-tag"><span>โหมดทดสอบ</span><span>SIMULATION</span></div>
-        <p style="font-size:0.84rem; color:var(--ink-secondary); margin-top:0;">แสดงผลจากตัวนับออนไลน์รวมศูนย์เป็นค่าเริ่มต้น หรือสามารถกดจำลองผู้เข้าชม 60 คนเพื่อดูการคำนวณเป้าหมายได้</p>
-        <button class="btn-primary" style="width:100%; margin-bottom:10px;" type="button" onclick="simulateSmokeTestBatch()">จำลองผู้เข้าชม 60 คน</button>
-        <button class="btn-outline" type="button" onclick="clearLocalTelemetry()">สลับกลับไปดูยอดจริงออนไลน์</button>
-      </aside>
-
-      <main class="panel-right">
-        <div class="table-block">
-          <div class="section-tag"><span>ตัวชี้วัดการใช้งานจริง</span><span>LIVE METRICS</span></div>
-          <table>
-            <tbody>
-              <tr><td>จำนวนผู้เข้าชมไม่ซ้ำ (Unique Sessions)</td><td class="num mono-val" id="m-sessions">0</td></tr>
-              <tr><td>จำนวนการเปิดหน้าเว็บทั้งหมด (Page Views)</td><td class="num mono-val" id="m-views">0</td></tr>
-              <tr><td>จำนวนครั้งที่ผู้ใช้ปรับตัวเลขคำนวณจริง</td><td class="num mono-val" id="m-calcs">0</td></tr>
-              <tr><td>สัดส่วนคนที่คำนวณจริง (เป้าหมาย &ge; 15.0%)</td><td class="num mono-val" id="m-ir">0.0%</td></tr>
-              <tr><td>จำนวนคลิกลิงก์พาร์ทเนอร์รวมทุกค่าย</td><td class="num mono-val" id="m-clicks">0</td></tr>
-              <tr><td>อัตราคลิกลิงก์พาร์ทเนอร์ (เป้าหมาย &ge; 2.5%)</td><td class="num mono-val" id="m-ctr">0.0%</td></tr>
-              <tr><td>ยอดคลิกแยกตามผู้ให้บริการ</td><td class="num mono-val" id="m-byprog">-</td></tr>
-              <tr><td>รายได้คาดการณ์จากยอดคลิกชุดนี้ (คิดที่ 8% ซื้อจริง)</td><td class="num mono-val" id="m-proj">$0 (฿0)</td></tr>
-              <tr><td>จำนวนผู้เข้าชมต่อเดือนที่ต้องใช้เพื่อแตะ 100,000 บาท/เดือน</td><td class="num mono-val" id="m-req-vis">12,500</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </main>
-    </div>
-  </div>
-
-  <script>
-    const AFF_CFG = ${cfgJson};
-    const STORAGE_KEY = 'ai_cost_calc_telemetry_v1';
-    const GLOBAL_NS = 'burapa_ai_cost_calc_live';
-
-    async function getGlobalKey(key) {
-      try {
-        const r = await fetch('https://abacus.jasoncameron.dev/get/' + GLOBAL_NS + '/' + key, { mode: 'cors' });
-        if (!r.ok) return 0;
-        const d = await r.json();
-        return Number(d.value || 0);
-      } catch (_) {
-        return 0;
-      }
-    }
-
-    async function loadEvents() {
-      const localSim = localStorage.getItem('ai_cost_calc_use_sim');
-      if (localSim === '1') {
-        document.getElementById('telemetry-source').textContent = 'SOURCE: LOCAL 60-VISITOR SIMULATION';
-        const localEvents = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        renderReport(computeFromCounts(
-          new Set(localEvents.map(function(e){return e.sessionId;})).size,
-          localEvents.filter(function(e){return e.eventType==='page_view';}).length,
-          localEvents.filter(function(e){return e.eventType==='calculation_run';}).length,
-          localEvents.filter(function(e){return e.eventType==='scenario_shared';}).length,
-          {
-            aimlapi: localEvents.filter(function(e){return e.affiliateId==='aimlapi';}).length,
-            runpod: localEvents.filter(function(e){return e.affiliateId==='runpod';}).length,
-            cloudways: localEvents.filter(function(e){return e.affiliateId==='cloudways';}).length,
-            vercel: localEvents.filter(function(e){return e.affiliateId==='vercel';}).length,
-            hostatom: localEvents.filter(function(e){return e.affiliateId==='hostatom';}).length,
-            rukcom: localEvents.filter(function(e){return e.affiliateId==='rukcom';}).length,
-            agensi: localEvents.filter(function(e){return e.affiliateId==='agensi';}).length
-          }
-        ));
-        return;
-      }
-
-      document.getElementById('telemetry-source').textContent = 'SOURCE: GLOBAL LIVE COUNTER';
-      const [u, views, calcs, shares, cAiml, cRunpod, cCw, cVercel, cHa, cRuk, cAgensi] = await Promise.all([
-        getGlobalKey('unique_sessions'),
-        getGlobalKey('page_views'),
-        getGlobalKey('calculation_runs'),
-        getGlobalKey('scenarios_shared'),
-        getGlobalKey('aff_aimlapi'),
-        getGlobalKey('aff_runpod'),
-        getGlobalKey('aff_cloudways'),
-        getGlobalKey('aff_vercel'),
-        getGlobalKey('aff_hostatom'),
-        getGlobalKey('aff_rukcom'),
-        getGlobalKey('aff_agensi')
-      ]);
-
-      renderReport(computeFromCounts(u, views, calcs, shares, {
-        aimlapi: cAiml,
-        runpod: cRunpod,
-        cloudways: cCw,
-        vercel: cVercel,
-        hostatom: cHa,
-        rukcom: cRuk,
-        agensi: cAgensi
-      }));
-    }
-
-    function computeFromCounts(u, views, calcs, shares, byProg) {
-      const clicks = Object.keys(byProg).reduce(function(acc, k) { return acc + (byProg[k] || 0); }, 0);
-      const denom = Math.max(1, u);
-      const ir = calcs / denom;
-      const ctr = clicks / denom;
-
-      let commissionUsd = 0;
-      Object.keys(byProg).forEach(function(k) {
-        const payout = (AFF_CFG.programs[k] && AFF_CFG.programs[k].estimatedPayoutUsd) || 40;
-        commissionUsd += byProg[k] * 0.08 * payout;
-      });
-      const projThb = Math.round(commissionUsd * (AFF_CFG.usdToThbDefault || 34.5));
-      const revPerVis = u > 0 ? projThb / u : 0;
-      const reqVis = revPerVis > 0 ? Math.ceil(100000 / revPerVis) : 12500;
-
-      let verdict = 'INSUFFICIENT_DATA';
-      let th = 'เก็บข้อมูลผู้เข้าชมจริงจากทั่วโลกได้ ' + u + '/50 คนแรก แนะนำให้นำลิงก์ไปแชร์ในกลุ่มผู้ใช้งานจริงเพื่อให้ครบ 50 คนแรก';
-      if (u >= 50 && ir >= 0.15 && ctr >= 0.025) {
-        verdict = 'PROVEN_GO_SCALE';
-        th = 'ผ่านเกณฑ์! อัตราการคำนวณ (' + (ir*100).toFixed(1) + '%) และอัตราคลิก (' + (ctr*100).toFixed(1) + '%) ยืนยันว่ามีคนใช้งานจริง คุ้มค่าที่จะขยายผลสู่ ' + reqVis.toLocaleString() + ' คน/เดือน';
-      } else if (u >= 50 && ir >= 0.15) {
-        verdict = 'ITERATE_CTA';
-        th = 'ผู้เข้าชมใช้งานเครื่องคำนวณสูง (' + (ir*100).toFixed(1) + '%) แต่อัตราคลิกลิงก์ยังต่ำกว่า 2.5%';
-      } else if (u >= 50) {
-        verdict = 'KILL_OR_PIVOT';
-        th = 'อัตราการคำนวณต่ำกว่า 15%';
-      }
-
-      return {
-        uniqueSessions: u,
-        totalPageViews: views,
-        calculatorInteractions: calcs,
-        scenariosShared: shares,
-        affiliateCtaClicks: clicks,
-        interactionRate: ir,
-        affiliateCtr: ctr,
-        clicksByProgram: byProg,
-        projectedMonthlyRevenueUsdAtCurrentCtr: Number(commissionUsd.toFixed(2)),
-        projectedMonthlyRevenueThbAtCurrentCtr: projThb,
-        requiredMonthlyVisitorsFor100kThb: reqVis,
-        verdict: verdict,
-        explanation: { th: th, en: th }
-      };
-    }
-
-    function renderReport(r) {
-      document.getElementById('verdict-code').textContent = r.verdict;
-      document.getElementById('verdict-desc').textContent = r.explanation.th;
-      document.getElementById('m-sessions').textContent = r.uniqueSessions.toLocaleString();
-      document.getElementById('m-views').textContent = r.totalPageViews.toLocaleString();
-      document.getElementById('m-calcs').textContent = r.calculatorInteractions.toLocaleString();
-      document.getElementById('m-ir').textContent = (r.interactionRate * 100).toFixed(1) + '%';
-      document.getElementById('m-clicks').textContent = r.affiliateCtaClicks.toLocaleString();
-      document.getElementById('m-ctr').textContent = (r.affiliateCtr * 100).toFixed(1) + '%';
-      document.getElementById('m-byprog').textContent = JSON.stringify(r.clicksByProgram);
-      document.getElementById('m-proj').textContent = '$' + r.projectedMonthlyRevenueUsdAtCurrentCtr + ' (฿' + r.projectedMonthlyRevenueThbAtCurrentCtr.toLocaleString() + ')';
-      document.getElementById('m-req-vis').textContent = r.requiredMonthlyVisitorsFor100kThb.toLocaleString();
-    }
-
-    function simulateSmokeTestBatch() {
-      const list = [];
-      for (let i = 1; i <= 60; i++) {
-        const sid = 'sim-sess-' + i;
-        list.push({ eventId: 'pv-' + i, sessionId: sid, eventType: 'page_view', locale: 'th', pageSlug: 'home' });
-        if (i <= 24) list.push({ eventId: 'calc-' + i, sessionId: sid, eventType: 'calculation_run', locale: 'th', pageSlug: 'home' });
-        if (i <= 4) list.push({ eventId: 'aff-' + i, sessionId: sid, eventType: 'affiliate_cta_click', locale: 'th', pageSlug: 'home', affiliateId: i % 2 === 0 ? 'agensi' : 'runpod' });
-      }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-      localStorage.setItem('ai_cost_calc_use_sim', '1');
-      loadEvents();
-    }
-
-    function clearLocalTelemetry() {
-      localStorage.removeItem('ai_cost_calc_use_sim');
-      loadEvents();
-    }
-
-    loadEvents();
-  </script>
-</body>
-</html>`;
-}
-
 function renderValidationKitMarkdown(baseUrl: string, pageCount: number): string {
   return `# Zero-Cost Demand Validation & Affiliate Onboarding Kit
 
 - Total Generated Static Pages (EN + TH): **${pageCount} pages**
-- Live Centralized Telemetry Ledger: \`${baseUrl}/validation-dashboard.html\`
+- Centralized Admin Command Center & Live Telemetry: \`https://www.xamathi.com/admin/?project=affiliate\`
+- Public Website: \`${baseUrl}/\`
 
 ---
 
@@ -1859,6 +1667,7 @@ export function generateStaticSite(
   fs.mkdirSync(path.join(stagingDir, 'en', 'guides'), { recursive: true });
   fs.mkdirSync(path.join(stagingDir, 'th', 'guides'), { recursive: true });
   fs.writeFileSync(path.join(stagingDir, '.nojekyll'), '', 'utf8');
+  fs.writeFileSync(path.join(stagingDir, 'favicon.svg'), renderFaviconSvg(), 'utf8');
 
   const catalog = buildProgrammaticPagesCatalog();
   const playbooks = buildPlaybooksCatalog();
@@ -1872,6 +1681,7 @@ export function generateStaticSite(
 <html lang="th">
 <head>
   <meta charset="UTF-8" />${rootGscMeta}
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
   <meta http-equiv="refresh" content="0; url=./th/index.html" />
   <title>TCO // BENCHMARK.26 — Practical AI Cost &amp; Quota Planner</title>
 </head>
@@ -1960,13 +1770,7 @@ export function generateStaticSite(
     }
   }
 
-  fs.writeFileSync(
-    path.join(stagingDir, 'validation-dashboard.html'),
-    renderValidationDashboardHtml(affiliateConfig),
-    'utf8'
-  );
-
-  const totalHtmlPages = 1 + 1 + locales.length * (1 + catalog.length + playbooks.length);
+  const totalHtmlPages = 1 + locales.length * (1 + catalog.length + playbooks.length);
 
   const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -1992,7 +1796,6 @@ ${sitemapUrls.map((u) => `  <url><loc>${escapeHtml(u)}</loc></url>`).join('\n')}
 - Claude Code & Cursor 60% Cost Cut Guide: ${publicBaseUrl}/th/guides/claude-code-cursor-cost-cut.html
 - API to RunPod vLLM Migration Guide: ${publicBaseUrl}/th/guides/api-to-runpod-vllm-migration.html
 - Thai VPS vs Global Cloud Guide: ${publicBaseUrl}/th/guides/thai-vps-vs-global-cloud-ai-backend.html
-- Live Stats: ${publicBaseUrl}/validation-dashboard.html
 - Sitemap (${sitemapUrls.length} URLs): ${publicBaseUrl}/sitemap.xml
 `;
   fs.writeFileSync(path.join(stagingDir, 'llms.txt'), llmsTxt, 'utf8');
