@@ -308,15 +308,15 @@
       </div>
 
       <div class="tabs">
-        <button class="tab-btn active" data-tab="api" onclick="switchTab('api')">API จ่ายตามจริง (9 โมเดล)</button>
-        <button class="tab-btn" data-tab="gpu" onclick="switchTab('gpu')">เช่า GPU รายชั่วโมง (4 รุ่น)</button>
-        <button class="tab-btn" data-tab="vps" onclick="switchTab('vps')">VPS รันระบบหลังบ้าน (3 แพ็กเกจ)</button>
-        <button class="tab-btn" data-tab="guides" onclick="switchTab('guides')">เทคนิคลดค่า Token & คู่มือ (5 บทความ)</button>
+        <button class="tab-btn active" data-tab="api" onclick="switchTab('api')">API จ่ายตามจริง (9)</button>
+        <button class="tab-btn" data-tab="gpu" onclick="switchTab('gpu')">เช่า GPU รายชั่วโมง (4)</button>
+        <button class="tab-btn" data-tab="vps" onclick="switchTab('vps')">VPS หลังบ้าน (3)</button>
+        <button class="tab-btn" data-tab="guides" onclick="switchTab('guides')">คู่มือจัดสเปก & ลด Token (5)</button>
       </div>
 
       <div class="tab-panel active" id="tab-api">
         <table>
-          <thead><tr><th>โมเดล</th><th class="num">ค่าใช้จ่าย/เดือน</th><th class="num">ต่อ 1,000 งาน</th><th class="num">ผู้ให้บริการ</th></tr></thead>
+          <thead><tr><th>โมเดล</th><th class="num">เรต In / Out (1M)</th><th class="num">ต่อ 1,000 งาน</th><th class="num">รวม/เดือน</th><th class="num">ช่องทางใช้งาน</th></tr></thead>
           <tbody id="api-tbody"></tbody>
         </table>
       </div>
@@ -367,15 +367,15 @@
     pageSlug: 'prototype-th',
     fx: 34.5,
     models: [
-      { id:'claude-3-7-sonnet', name:'Claude 3.7 Sonnet', provider:'Unified LLM API', inputUsdPer1M:3.0, cachedInputUsdPer1M:0.3, outputUsdPer1M:15.0, contextWindowK:200, affiliateId:'aimlapi' },
-      { id:'claude-3-5-haiku', name:'Claude 3.5 Haiku', provider:'Unified LLM API', inputUsdPer1M:0.8, cachedInputUsdPer1M:0.08, outputUsdPer1M:4.0, contextWindowK:200, affiliateId:'aimlapi' },
-      { id:'gpt-4o', name:'OpenAI GPT-4o', provider:'Unified LLM API', inputUsdPer1M:2.5, cachedInputUsdPer1M:1.25, outputUsdPer1M:10.0, contextWindowK:128, affiliateId:'aimlapi' },
-      { id:'gpt-4o-mini', name:'OpenAI GPT-4o mini', provider:'Unified LLM API', inputUsdPer1M:0.15, cachedInputUsdPer1M:0.075, outputUsdPer1M:0.6, contextWindowK:128, affiliateId:'aimlapi' },
-      { id:'o3-mini', name:'OpenAI o3-mini (Reasoning)', provider:'Unified LLM API', inputUsdPer1M:1.1, cachedInputUsdPer1M:0.55, outputUsdPer1M:4.4, contextWindowK:200, affiliateId:'aimlapi' },
-      { id:'gemini-2-5-pro', name:'Gemini 2.5 Pro', provider:'Unified LLM API', inputUsdPer1M:1.25, cachedInputUsdPer1M:0.31, outputUsdPer1M:10.0, contextWindowK:2000, affiliateId:'aimlapi' },
-      { id:'gemini-2-5-flash', name:'Gemini 2.5 Flash', provider:'Unified LLM API', inputUsdPer1M:0.15, cachedInputUsdPer1M:0.0375, outputUsdPer1M:0.6, contextWindowK:1000, affiliateId:'aimlapi' },
-      { id:'deepseek-v3-r1', name:'DeepSeek V3 / R1 (API)', provider:'Novita AI / Unified API', inputUsdPer1M:0.55, cachedInputUsdPer1M:0.14, outputUsdPer1M:2.19, contextWindowK:128, affiliateId:'aimlapi' },
-      { id:'llama-3-3-70b-api', name:'Llama 3.3 70B Instruct (API)', provider:'Meta / Unified Router', inputUsdPer1M:0.4, cachedInputUsdPer1M:0.2, outputUsdPer1M:0.6, contextWindowK:128, affiliateId:'aimlapi' }
+      { id:'claude-3-7-sonnet', name:'Claude 3.7 Sonnet', provider:'Anthropic', linkLabel:'Unified API', inputUsdPer1M:3.0, cachedInputUsdPer1M:0.3, outputUsdPer1M:15.0, contextWindowK:200, affiliateId:'aimlapi' },
+      { id:'claude-3-5-haiku', name:'Claude 3.5 Haiku', provider:'Anthropic', linkLabel:'Unified API', inputUsdPer1M:0.8, cachedInputUsdPer1M:0.08, outputUsdPer1M:4.0, contextWindowK:200, affiliateId:'aimlapi' },
+      { id:'gpt-4o', name:'OpenAI GPT-4o', provider:'OpenAI', linkLabel:'Unified API', inputUsdPer1M:2.5, cachedInputUsdPer1M:1.25, outputUsdPer1M:10.0, contextWindowK:128, affiliateId:'aimlapi' },
+      { id:'gpt-4o-mini', name:'OpenAI GPT-4o mini', provider:'OpenAI', linkLabel:'Unified API', inputUsdPer1M:0.15, cachedInputUsdPer1M:0.075, outputUsdPer1M:0.6, contextWindowK:128, affiliateId:'aimlapi' },
+      { id:'o3-mini', name:'OpenAI o3-mini', provider:'OpenAI (Reasoning)', linkLabel:'Unified API', inputUsdPer1M:1.1, cachedInputUsdPer1M:0.55, outputUsdPer1M:4.4, contextWindowK:200, affiliateId:'aimlapi' },
+      { id:'gemini-2-5-pro', name:'Gemini 2.5 Pro', provider:'Google DeepMind', linkLabel:'Unified API', inputUsdPer1M:1.25, cachedInputUsdPer1M:0.31, outputUsdPer1M:10.0, contextWindowK:2000, affiliateId:'aimlapi' },
+      { id:'gemini-2-5-flash', name:'Gemini 2.5 Flash', provider:'Google DeepMind', linkLabel:'Unified API', inputUsdPer1M:0.15, cachedInputUsdPer1M:0.0375, outputUsdPer1M:0.6, contextWindowK:1000, affiliateId:'aimlapi' },
+      { id:'deepseek-v3-r1', name:'DeepSeek V3 / R1', provider:'DeepSeek', linkLabel:'Novita AI', inputUsdPer1M:0.55, cachedInputUsdPer1M:0.14, outputUsdPer1M:2.19, contextWindowK:128, affiliateId:'aimlapi' },
+      { id:'llama-3-3-70b-api', name:'Llama 3.3 70B Instruct', provider:'Meta Open-Weights', linkLabel:'Novita AI', inputUsdPer1M:0.4, cachedInputUsdPer1M:0.2, outputUsdPer1M:0.6, contextWindowK:128, affiliateId:'aimlapi' }
     ],
     gpus: [
       { id:'runpod-rtx-4090', name:'RunPod NVIDIA RTX 4090 (24GB)', vramGb:24, hourlyUsd:0.44, throughputTokensPerSec:110, affiliateId:'runpod' },
@@ -561,9 +561,10 @@
       var url = buildAffiliateLink(m.affiliateId, m.id);
       return '<tr><td><span class="mono-val">' + m.name + '</span><span class="sub-val">' + m.provider + ' • Context ' + m.contextWindowK + 'K</span>' +
         '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></td>' +
-        '<td class="num"><span class="mono-val">$' + m.monthlyUsd.toLocaleString() + '</span><span class="sub-val">฿' + m.monthlyThb.toLocaleString() + '</span></td>' +
+        '<td class="num"><span class="mono-val">$' + m.inputUsdPer1M + ' / $' + m.outputUsdPer1M + '</span><span class="sub-val">Cache $' + m.cachedInputUsdPer1M + '</span></td>' +
         '<td class="num"><span class="mono-val">$' + m.per1k + '</span><span class="sub-val">ต่อ 1,000 งาน</span></td>' +
-        '<td class="num"><a class="provider-link" href="' + url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\'' + m.affiliateId + '\', ' + m.monthlyUsd + ')">' + BRAND_LABEL[m.affiliateId] + ' ↗</a></td></tr>';
+        '<td class="num"><span class="mono-val">$' + m.monthlyUsd.toLocaleString() + '</span><span class="sub-val">฿' + m.monthlyThb.toLocaleString() + '</span></td>' +
+        '<td class="num"><a class="provider-link" href="' + url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\'' + m.affiliateId + '\', ' + m.monthlyUsd + ')">' + (m.linkLabel || BRAND_LABEL[m.affiliateId]) + ' ↗</a></td></tr>';
     }).join('');
   }
 
