@@ -48,6 +48,27 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
       true
     );
     assert.equal(thHome.includes('⚡'), false);
+    assert.equal(thHome.includes('#6C79F0'), false);
+    assert.equal(thHome.includes('#8690FF'), false);
+    assert.equal(thHome.includes('#3DD68C'), false);
+    assert.equal(thHome.includes('#56A8FF'), false);
+    assert.equal(thHome.includes('#B98BFF'), false);
+    assert.equal(thHome.includes('#F2A33C'), false);
+    assert.equal(thHome.includes('linear-gradient'), false);
+    assert.equal(thHome.includes('✅'), false);
+    assert.equal(thHome.includes('⚠️'), false);
+    assert.equal(thHome.includes('🌙'), false);
+    assert.equal(thHome.includes('id="inp-prompt-sample"'), true);
+    assert.equal(thHome.includes('id="btn-apply-tokens"'), true);
+    assert.equal(thHome.includes('id="token-tax-readout"'), true);
+    assert.equal(thHome.includes('id="inp-hybrid-router"'), true);
+    assert.equal(thHome.includes('id="inp-router-pct"'), true);
+    assert.equal(thHome.includes('id="hybrid-router-summary"'), true);
+    assert.equal(thHome.includes('id="inp-rag-docs"'), true);
+    assert.equal(thHome.includes('id="inp-rag-stack"'), true);
+    assert.equal(thHome.includes('id="vps-ram-summary"'), true);
+    assert.equal(thHome.includes('id="vps-docker-command"'), true);
+    assert.equal(thHome.includes('id="btn-copy-summary"'), true);
 
     const keyFileContent = fs.readFileSync(
       path.join(distPath, 'a8f4c2e91b6d40789e3c5a12f08d6b4e.txt'),
@@ -65,6 +86,10 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
     assert.equal(enCompare.includes('Claude 3.7 Sonnet vs. RunPod NVIDIA A100 PCIe (80GB)'), true);
     assert.equal(enCompare.includes('class="matchup-spotlight"'), true);
     assert.equal(enCompare.includes('<svg'), true);
+    assert.equal(enCompare.includes('id="inp-prompt-sample"'), true);
+    assert.equal(enCompare.includes('id="inp-hybrid-router"'), true);
+    assert.equal(enCompare.includes('id="inp-rag-docs"'), true);
+    assert.equal(enCompare.includes('id="btn-copy-summary"'), true);
     assert.equal(Buffer.byteLength(enCompare, 'utf8') < 65_000, true);
 
     const workloadPage = fs.readFileSync(
@@ -73,6 +98,24 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
     );
     assert.equal(workloadPage.includes('ระบบ AI Agent เขียนและตรวจโค้ดอัตโนมัติหลายขั้นตอน ด้วย Claude 3.7 Sonnet'), true);
     assert.equal(workloadPage.includes('class="matchup-spotlight"'), true);
+    assert.equal(workloadPage.includes('data-theme="dark"'), true);
+    assert.equal(workloadPage.includes('id="theme-toggle"'), true);
+    assert.equal(workloadPage.includes('id="inp-selfmodel"'), true);
+    assert.equal(workloadPage.includes('id="inp-conc"'), true);
+    assert.equal(workloadPage.includes('id="inp-volume"'), true);
+    assert.equal(workloadPage.includes('id="vllm-command"'), true);
+    assert.equal(workloadPage.includes('id="buyrent-grid"'), true);
+    assert.equal(workloadPage.includes('id="inp-prompt-sample"'), true);
+    assert.equal(workloadPage.includes('id="inp-hybrid-router"'), true);
+    assert.equal(workloadPage.includes('id="inp-rag-docs"'), true);
+    assert.equal(workloadPage.includes('id="btn-copy-summary"'), true);
+    assert.equal(Buffer.byteLength(workloadPage, 'utf8') < 65_000, true);
+
+    const largestThCompare = fs.readFileSync(
+      path.join(distPath, 'th', 'compare', 'autonomous-coding-agent-with-llama-3-3-70b-api-cost-estimator.html'),
+      'utf8'
+    );
+    assert.equal(Buffer.byteLength(largestThCompare, 'utf8') < 65_000, true);
 
     const thGuidePath = path.join(
       distPath,

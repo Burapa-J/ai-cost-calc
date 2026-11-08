@@ -30,179 +30,157 @@ export function renderPlaybookSvg(svgType: PlaybookSvgType, locale: Locale): str
     const sub = isTh
       ? 'ยิ่งตัวคูณ Token ต่ำ + ค่า Input ถูก = ประหยัดงบงานภาษาไทยได้สูงสุด 8–15 เท่า'
       : 'Lower Thai token inflation + lower $/1M rate = up to 15x lower monthly bill';
-    return `<svg viewBox="0 0 680 230" width="100%" height="auto" role="img" aria-label="${esc(title)}" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
-      <text x="24" y="30" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">${esc(title)}</text>
-      <text x="24" y="48" font-family="-apple-system, sans-serif" font-size="11" fill="#515154">${esc(sub)}</text>
+    return `<svg viewBox="0 0 680 230" width="100%" height="auto" role="img" aria-label="${esc(title)}" style="display:block; background:var(--bg-elev-2); border:1px solid var(--border); border-radius:10px;">
+      <text x="24" y="30" font-size="13" font-weight="700" fill="var(--text)">${esc(title)}</text>
+      <text x="24" y="48" font-size="11" fill="var(--text-secondary)">${esc(sub)}</text>
 
-      <!-- Row 1: Gemini 2.5 Flash -->
-      <text x="24" y="82" font-family="SF Mono, monospace" font-size="11.5" font-weight="600" fill="#1D1D1F">Gemini 2.5 Flash</text>
-      <rect x="185" y="69" width="110" height="18" rx="5" fill="#1D7D3F"/>
-      <text x="305" y="82" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D7D3F">~920 tok  • ฿0.05 / 10 pages (${isTh ? 'คุ้มสุดสำหรับงานไทย' : 'Best Value'})</text>
+      <text x="24" y="82" class="mono" font-size="11.5" font-weight="600" fill="var(--text)">Gemini 2.5 Flash</text>
+      <rect x="185" y="69" width="110" height="16" rx="3" fill="var(--green)"/>
+      <text x="305" y="82" class="mono" font-size="11" font-weight="600" fill="var(--green)">~920 tok  • ฿0.05 / 10 pages (${isTh ? 'คุ้มสุดสำหรับงานไทย' : 'Best Value'})</text>
 
-      <!-- Row 2: Qwen 2.5 / DeepSeek V3 -->
-      <text x="24" y="116" font-family="SF Mono, monospace" font-size="11.5" font-weight="600" fill="#1D1D1F">DeepSeek V3 / Qwen 2.5</text>
-      <rect x="185" y="103" width="130" height="18" rx="5" fill="#0066CC"/>
-      <text x="325" y="116" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#0066CC">~1,080 tok • ฿0.18 / 10 pages (${isTh ? 'ฉลาด + ประหยัด' : 'Smart + Cheap'})</text>
+      <text x="24" y="116" class="mono" font-size="11.5" font-weight="600" fill="var(--text)">DeepSeek V3 / Qwen 2.5</text>
+      <rect x="185" y="103" width="130" height="16" rx="3" fill="var(--text)"/>
+      <text x="325" y="116" class="mono" font-size="11" font-weight="600" fill="var(--text)">~1,080 tok • ฿0.18 / 10 pages (${isTh ? 'ฉลาด + ประหยัด' : 'Smart + Cheap'})</text>
 
-      <!-- Row 3: GPT-4o -->
-      <text x="24" y="150" font-family="SF Mono, monospace" font-size="11.5" font-weight="600" fill="#1D1D1F">OpenAI GPT-4o (o200k)</text>
-      <rect x="185" y="137" width="190" height="18" rx="5" fill="#6E6E73"/>
-      <text x="385" y="150" font-family="SF Mono, monospace" font-size="11" fill="#515154">~1,580 tok • ฿1.36 / 10 pages</text>
+      <text x="24" y="150" class="mono" font-size="11.5" font-weight="500" fill="var(--text-secondary)">OpenAI GPT-4o (o200k)</text>
+      <rect x="185" y="137" width="190" height="16" rx="3" fill="var(--text-muted)"/>
+      <text x="385" y="150" class="mono" font-size="11" fill="var(--text-secondary)">~1,580 tok • ฿1.36 / 10 pages</text>
 
-      <!-- Row 4: Claude 3.7 Sonnet -->
-      <text x="24" y="184" font-family="SF Mono, monospace" font-size="11.5" font-weight="600" fill="#1D1D1F">Claude 3.7 Sonnet</text>
-      <rect x="185" y="171" width="250" height="18" rx="5" fill="#D97706"/>
-      <text x="445" y="184" font-family="SF Mono, monospace" font-size="11" fill="#B45309">~2,120 tok • ฿2.19 / 10 pages</text>
+      <text x="24" y="184" class="mono" font-size="11.5" font-weight="500" fill="var(--text-secondary)">Claude 3.7 Sonnet</text>
+      <rect x="185" y="171" width="250" height="16" rx="3" fill="var(--border-strong)"/>
+      <text x="445" y="184" class="mono" font-size="11" fill="var(--text-muted)">~2,120 tok • ฿2.19 / 10 pages</text>
 
-      <line x1="24" y1="202" x2="656" y2="202" stroke="rgba(0,0,0,0.07)" stroke-width="1"/>
-      <text x="24" y="218" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#515154">${isTh ? 'เทคนิคสำคัญ: ใช้ Gemini Flash / DeepSeek อ่านเอกสารไทยจำนวนมาก แล้วส่งเฉพาะสรุปสั้นๆ ให้ Claude 3.7 คิดต่อ' : 'Key Tip: Parse bulk Thai docs with Gemini Flash / DeepSeek, then pass compact summaries to Claude 3.7'}</text>
+      <line x1="24" y1="202" x2="656" y2="202" stroke="var(--border)" stroke-width="1"/>
+      <text x="24" y="218" font-size="10.5" font-weight="500" fill="var(--text-secondary)">${isTh ? 'เทคนิคสำคัญ: ใช้ Gemini Flash / DeepSeek อ่านเอกสารไทยจำนวนมาก แล้วส่งเฉพาะสรุปสั้นๆ ให้ Claude 3.7 คิดต่อ' : 'Key Tip: Parse bulk Thai docs with Gemini Flash / DeepSeek, then pass compact summaries to Claude 3.7'}</text>
     </svg>`;
   }
 
   if (svgType === 'line_rag_arch') {
-    return `<svg viewBox="0 0 680 220" width="100%" height="auto" role="img" aria-label="LINE OA RAG Blueprint" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
-      <text x="24" y="28" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">${isTh ? 'ผังการวางระบบ LINE OA + ค้นเอกสาร (RAG) งบรวม ~฿1,180/เดือน' : 'LINE OA + RAG Production Blueprint (~$34 / ฿1,180 per month)'}</text>
+    return `<svg viewBox="0 0 680 220" width="100%" height="auto" role="img" aria-label="LINE OA RAG Blueprint" style="display:block; background:var(--bg-elev-2); border:1px solid var(--border); border-radius:10px;">
+      <text x="24" y="28" font-size="13" font-weight="700" fill="var(--text)">${isTh ? 'ผังการวางระบบ LINE OA + ค้นเอกสาร (RAG) งบรวม ~฿1,180/เดือน' : 'LINE OA + RAG Production Blueprint (~$34 / ฿1,180 per month)'}</text>
       
-      <!-- Box 1: LINE Users -->
-      <rect x="24" y="54" width="130" height="96" rx="12" fill="#FFFFFF" stroke="#1D7D3F" stroke-width="1.5"/>
-      <circle cx="89" cy="80" r="13" fill="#E8F5E9"/>
-      <text x="89" y="84" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#1D7D3F">LINE</text>
-      <text x="89" y="108" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#1D1D1F">${isTh ? 'ลูกค้าทักแชท' : 'Customer Chat'}</text>
-      <text x="89" y="126" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" fill="#515154">2,500 msg/day</text>
+      <rect x="24" y="54" width="130" height="96" rx="8" fill="var(--bg-elev)" stroke="var(--border-strong)" stroke-width="1"/>
+      <text x="89" y="82" text-anchor="middle" class="mono" font-size="11" font-weight="700" fill="var(--text)">LINE OA</text>
+      <text x="89" y="106" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--text-secondary)">${isTh ? 'ลูกค้าทักแชท' : 'Customer Chat'}</text>
+      <text x="89" y="126" text-anchor="middle" class="mono" font-size="10" fill="var(--text-muted)">2,500 msg/day</text>
 
-      <!-- Arrow 1 -->
-      <line x1="154" y1="102" x2="192" y2="102" stroke="#86868B" stroke-width="1.5" stroke-dasharray="3,3"/>
-      <polygon points="192,98 200,102 192,106" fill="#86868B"/>
-      <text x="177" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="9.5" fill="#1D7D3F">&lt;8ms</text>
+      <line x1="154" y1="102" x2="192" y2="102" stroke="var(--text-muted)" stroke-width="1.2" stroke-dasharray="3,3"/>
+      <polygon points="192,98 200,102 192,106" fill="var(--text-muted)"/>
+      <text x="177" y="92" text-anchor="middle" class="mono" font-size="9.5" fill="var(--text-secondary)">&lt;8ms</text>
 
-      <!-- Box 2: Thai VPS -->
-      <rect x="200" y="54" width="210" height="96" rx="12" fill="#FFFFFF" stroke="#0066CC" stroke-width="1.5"/>
-      <text x="305" y="78" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#0066CC">${isTh ? '1. เซิร์ฟเวอร์ในไทย (Hostatom/Ruk-Com)' : '1. Thailand VPS (Hostatom/Ruk-Com)'}</text>
-      <text x="305" y="98" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#1D1D1F">Webhook API + Qdrant Vector DB</text>
-      <rect x="235" y="110" width="140" height="24" rx="6" fill="#EFF6FF"/>
-      <text x="305" y="126" text-anchor="middle" font-family="SF Mono, monospace" font-size="10.5" font-weight="600" fill="#0066CC">$24/mo (~฿828/${isTh ? 'เดือน' : 'mo'})</text>
+      <rect x="200" y="54" width="210" height="96" rx="8" fill="var(--bg-elev)" stroke="var(--text)" stroke-width="1.2"/>
+      <text x="305" y="78" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--text)">${isTh ? '1. เซิร์ฟเวอร์ในไทย (Hostatom/Ruk-Com)' : '1. Thailand VPS (Hostatom/Ruk-Com)'}</text>
+      <text x="305" y="98" text-anchor="middle" font-size="10.5" fill="var(--text-secondary)">Webhook API + Qdrant Vector DB</text>
+      <rect x="235" y="110" width="140" height="24" rx="4" fill="var(--bg-elev-2)" stroke="var(--border)"/>
+      <text x="305" y="126" text-anchor="middle" class="mono" font-size="10.5" font-weight="600" fill="var(--text)">$24/mo (~฿828/${isTh ? 'เดือน' : 'mo'})</text>
 
-      <!-- Arrow 2 -->
-      <line x1="410" y1="102" x2="452" y2="102" stroke="#86868B" stroke-width="1.5"/>
-      <polygon points="452,98 460,102 452,106" fill="#86868B"/>
-      <text x="435" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="9.5" fill="#0066CC">Cache 75%</text>
+      <line x1="410" y1="102" x2="452" y2="102" stroke="var(--text-muted)" stroke-width="1.2"/>
+      <polygon points="452,98 460,102 452,106" fill="var(--text-muted)"/>
+      <text x="435" y="92" text-anchor="middle" class="mono" font-size="9.5" fill="var(--text-secondary)">Cache 75%</text>
 
-      <!-- Box 3: Unified LLM Router -->
-      <rect x="460" y="54" width="196" height="96" rx="12" fill="#FFFFFF" stroke="#1D1D1F" stroke-width="1.5"/>
-      <text x="558" y="78" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#1D1D1F">${isTh ? '2. Novita AI (คีย์เดียวครบ)' : '2. Novita AI Router'}</text>
-      <text x="558" y="98" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">Gemini 2.5 Flash / DeepSeek V3</text>
-      <rect x="488" y="110" width="140" height="24" rx="6" fill="#F0FDF4"/>
-      <text x="558" y="126" text-anchor="middle" font-family="SF Mono, monospace" font-size="10.5" font-weight="600" fill="#1D7D3F">~$10/mo (~฿350/${isTh ? 'เดือน' : 'mo'})</text>
+      <rect x="460" y="54" width="196" height="96" rx="8" fill="var(--bg-elev)" stroke="var(--border-strong)" stroke-width="1"/>
+      <text x="558" y="78" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--text)">${isTh ? '2. Novita AI (คีย์เดียวครบ)' : '2. Novita AI Router'}</text>
+      <text x="558" y="98" text-anchor="middle" font-size="10.5" fill="var(--text-secondary)">Gemini 2.5 Flash / DeepSeek V3</text>
+      <rect x="488" y="110" width="140" height="24" rx="4" fill="var(--bg-elev-2)" stroke="var(--border)"/>
+      <text x="558" y="126" text-anchor="middle" class="mono" font-size="10.5" font-weight="600" fill="var(--green)">~$10/mo (~฿350/${isTh ? 'เดือน' : 'mo'})</text>
 
-      <!-- Bottom summary bar -->
-      <rect x="24" y="168" width="632" height="34" rx="8" fill="#1D1D1F"/>
-      <text x="340" y="189" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#FFFFFF">${isTh ? 'สรุปงบรวมทั้งระบบ: ~฿1,178/เดือน รองรับ 75,000 แชท/เดือน (เฉลี่ยแชทละ 0.015 บาท)' : 'Total Stack Cost: ~$34/mo (฿1,178/mo) for 75,000 chats/mo ($0.00045 per chat)'}</text>
+      <rect x="24" y="168" width="632" height="34" rx="6" fill="var(--bg-elev)" stroke="var(--border-strong)"/>
+      <text x="340" y="189" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--text)">${isTh ? 'สรุปงบรวมทั้งระบบ: ~฿1,178/เดือน รองรับ 75,000 แชท/เดือน (เฉลี่ยแชทละ 0.015 บาท)' : 'Total Stack Cost: ~$34/mo (฿1,178/mo) for 75,000 chats/mo ($0.00045 per chat)'}</text>
     </svg>`;
   }
 
   if (svgType === 'coding_tier_flow') {
-    return `<svg viewBox="0 0 680 225" width="100%" height="auto" role="img" aria-label="Coding Agent Token Savings Flow" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
-      <text x="24" y="28" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">${isTh ? 'โครงสร้างลดค่าไฟ Claude Code & Cursor 60% โดยงานไม่ดรอป' : 'How to Cut Claude Code & Cursor Token Spend by 60%'}</text>
+    return `<svg viewBox="0 0 680 225" width="100%" height="auto" role="img" aria-label="Coding Agent Token Savings Flow" style="display:block; background:var(--bg-elev-2); border:1px solid var(--border); border-radius:10px;">
+      <text x="24" y="28" font-size="13" font-weight="700" fill="var(--text)">${isTh ? 'โครงสร้างลดค่าไฟ Claude Code & Cursor 60% โดยงานไม่ดรอป' : 'How to Cut Claude Code & Cursor Token Spend by 60%'}</text>
 
-      <!-- Left: Raw Unoptimized -->
-      <rect x="24" y="48" width="185" height="150" rx="12" fill="#FFF5F5" stroke="#FECACA" stroke-width="1.5"/>
-      <text x="116" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#B91C1C">${isTh ? 'แบบเดิม (เปลืองโควต้า)' : 'Before (Unoptimized)'}</text>
-      <text x="116" y="96" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">${isTh ? '• อ่านไฟล์ทั้งโปรเจกต์ทุกเทิร์น' : '• Reads full files every turn'}</text>
-      <text x="116" y="116" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">${isTh ? '• แตก Subagent พร่ำเพรื่อ' : '• Spawns costly subagents'}</text>
-      <text x="116" y="136" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">${isTh ? '• ใช้โมเดลแพงสุดกับงานเล็ก' : '• Flagship model on trivial edits'}</text>
-      <rect x="46" y="154" width="140" height="28" rx="6" fill="#FEE2E2"/>
-      <text x="116" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11.5" font-weight="700" fill="#B91C1C">$240/mo (฿8,280)</text>
+      <rect x="24" y="48" width="185" height="150" rx="8" fill="var(--bg-elev)" stroke="var(--border)" stroke-width="1"/>
+      <text x="116" y="72" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--text-secondary)">${isTh ? 'แบบเดิม (เปลืองโควต้า)' : 'Before (Unoptimized)'}</text>
+      <text x="116" y="96" text-anchor="middle" font-size="10.5" fill="var(--text-muted)">${isTh ? '• อ่านไฟล์ทั้งโปรเจกต์ทุกเทิร์น' : '• Reads full files every turn'}</text>
+      <text x="116" y="116" text-anchor="middle" font-size="10.5" fill="var(--text-muted)">${isTh ? '• แตก Subagent พร่ำเพรื่อ' : '• Spawns costly subagents'}</text>
+      <text x="116" y="136" text-anchor="middle" font-size="10.5" fill="var(--text-muted)">${isTh ? '• ใช้โมเดลแพงสุดกับงานเล็ก' : '• Flagship model on trivial edits'}</text>
+      <rect x="46" y="154" width="140" height="28" rx="5" fill="var(--bg-elev-2)" stroke="var(--border)"/>
+      <text x="116" y="172" text-anchor="middle" class="mono" font-size="11.5" font-weight="700" fill="var(--text-secondary)">$240/mo (฿8,280)</text>
 
-      <!-- Middle Filter: Agensi Skills -->
-      <line x1="209" y1="123" x2="243" y2="123" stroke="#1D1D1F" stroke-width="1.5"/>
-      <polygon points="243,119 251,123 243,127" fill="#1D1D1F"/>
+      <line x1="209" y1="123" x2="243" y2="123" stroke="var(--text-muted)" stroke-width="1.2"/>
+      <polygon points="243,119 251,123 243,127" fill="var(--text-muted)"/>
 
-      <rect x="251" y="48" width="185" height="150" rx="12" fill="#FFFFFF" stroke="#0066CC" stroke-width="2"/>
-      <text x="343" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#0066CC">${isTh ? 'ด่านกรอง Agensi.io Skills' : 'Agensi.io Guardrails'}</text>
-      <text x="343" y="96" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="600" fill="#1D1D1F">token-budget-architect</text>
-      <text x="343" y="112" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#515154">${isTh ? 'อ่านเฉพาะบรรทัดที่แก้ (-30%)' : 'Reads line-ranges only (-30%)'}</text>
-      <text x="343" y="136" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="600" fill="#1D1D1F">devguard (verified-dev)</text>
-      <text x="343" y="152" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#515154">${isTh ? 'บล็อก Subagent เกินจำเป็น (-35%)' : 'Blocks wasted subagents (-35%)'}</text>
-      <rect x="273" y="164" width="140" height="22" rx="5" fill="#EFF6FF"/>
-      <text x="343" y="179" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="600" fill="#0066CC">${isTh ? 'จ่ายครั้งเดียว $14–$19' : '$14–$19 One-Time'}</text>
+      <rect x="251" y="48" width="185" height="150" rx="8" fill="var(--bg-elev)" stroke="var(--text)" stroke-width="1.2"/>
+      <text x="343" y="72" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--text)">${isTh ? 'ด่านกรอง Agensi.io Skills' : 'Agensi.io Guardrails'}</text>
+      <text x="343" y="96" text-anchor="middle" class="mono" font-size="10" font-weight="600" fill="var(--text)">token-budget-architect</text>
+      <text x="343" y="112" text-anchor="middle" font-size="10" fill="var(--text-secondary)">${isTh ? 'อ่านเฉพาะบรรทัดที่แก้ (-30%)' : 'Reads line-ranges only (-30%)'}</text>
+      <text x="343" y="136" text-anchor="middle" class="mono" font-size="10" font-weight="600" fill="var(--text)">devguard (verified-dev)</text>
+      <text x="343" y="152" text-anchor="middle" font-size="10" fill="var(--text-secondary)">${isTh ? 'บล็อก Subagent เกินจำเป็น (-35%)' : 'Blocks wasted subagents (-35%)'}</text>
+      <rect x="273" y="164" width="140" height="22" rx="4" fill="var(--bg-elev-2)" stroke="var(--border)"/>
+      <text x="343" y="179" text-anchor="middle" class="mono" font-size="10" font-weight="600" fill="var(--text)">${isTh ? 'จ่ายครั้งเดียว $14–$19' : '$14–$19 One-Time'}</text>
 
-      <!-- Right: Optimized Output -->
-      <line x1="436" y1="123" x2="470" y2="123" stroke="#1D7D3F" stroke-width="1.5"/>
-      <polygon points="470,119 478,123 470,127" fill="#1D7D3F"/>
+      <line x1="436" y1="123" x2="470" y2="123" stroke="var(--text-muted)" stroke-width="1.2"/>
+      <polygon points="470,119 478,123 470,127" fill="var(--text-muted)"/>
 
-      <rect x="478" y="48" width="178" height="150" rx="12" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.5"/>
-      <text x="567" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#1D7D3F">${isTh ? 'หลังปรับแต่ง (ประหยัด 62%)' : 'After (62% Lower Bill)'}</text>
-      <text x="567" y="96" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#1D1D1F">${isTh ? '• 80% งานค้น/แก้เล็ก → DeepSeek' : '• 80% routine → DeepSeek/Haiku'}</text>
-      <text x="567" y="116" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#1D1D1F">${isTh ? '• 20% งานยาก → Claude 3.7' : '• 20% hard tasks → Claude 3.7'}</text>
-      <text x="567" y="136" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#1D1D1F">${isTh ? '• โควต้ายาวขึ้น 2.5 เท่า' : '• 2.5x longer coding sessions'}</text>
-      <rect x="497" y="154" width="140" height="28" rx="6" fill="#1D7D3F"/>
-      <text x="567" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11.5" font-weight="700" fill="#FFFFFF">$92/mo (฿3,174)</text>
+      <rect x="478" y="48" width="178" height="150" rx="8" fill="var(--bg-elev)" stroke="var(--border-strong)" stroke-width="1"/>
+      <text x="567" y="72" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--green)">${isTh ? 'หลังปรับแต่ง (ประหยัด 62%)' : 'After (62% Lower Bill)'}</text>
+      <text x="567" y="96" text-anchor="middle" font-size="10.5" fill="var(--text-secondary)">${isTh ? '• 80% งานค้น/แก้เล็ก → DeepSeek' : '• 80% routine → DeepSeek/Haiku'}</text>
+      <text x="567" y="116" text-anchor="middle" font-size="10.5" fill="var(--text-secondary)">${isTh ? '• 20% งานยาก → Claude 3.7' : '• 20% hard tasks → Claude 3.7'}</text>
+      <text x="567" y="136" text-anchor="middle" font-size="10.5" fill="var(--text-secondary)">${isTh ? '• โควต้ายาวขึ้น 2.5 เท่า' : '• 2.5x longer coding sessions'}</text>
+      <rect x="497" y="154" width="140" height="28" rx="5" fill="var(--bg-elev-2)" stroke="var(--green)"/>
+      <text x="567" y="172" text-anchor="middle" class="mono" font-size="11.5" font-weight="700" fill="var(--green)">$92/mo (฿3,174)</text>
     </svg>`;
   }
 
   if (svgType === 'gpu_breakeven_curve') {
-    return `<svg viewBox="0 0 680 230" width="100%" height="auto" role="img" aria-label="API vs Cloud GPU Break-Even Chart" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
-      <text x="24" y="28" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">${isTh ? 'กราฟจุดตัดคุ้มทุน: จ่ายตาม Token (API) เทียบกับ เช่าเหมาชั่วโมง (RunPod GPU)' : 'Break-Even Curve: Pay-Per-Token API vs. Flat Hourly RunPod GPU'}</text>
+    return `<svg viewBox="0 0 680 230" width="100%" height="auto" role="img" aria-label="API vs Cloud GPU Break-Even Chart" style="display:block; background:var(--bg-elev-2); border:1px solid var(--border); border-radius:10px;">
+      <text x="24" y="28" font-size="13" font-weight="700" fill="var(--text)">${isTh ? 'กราฟจุดตัดคุ้มทุน: จ่ายตาม Token (API) เทียบกับ เช่าเหมาชั่วโมง (RunPod GPU)' : 'Break-Even Curve: Pay-Per-Token API vs. Flat Hourly RunPod GPU'}</text>
 
-      <!-- Axes -->
-      <line x1="70" y1="190" x2="640" y2="190" stroke="#86868B" stroke-width="1.2"/>
-      <line x1="70" y1="50" x2="70" y2="190" stroke="#86868B" stroke-width="1.2"/>
-      <text x="65" y="193" text-anchor="end" font-family="SF Mono, monospace" font-size="9.5" fill="#86868B">$0</text>
-      <text x="65" y="142" text-anchor="end" font-family="SF Mono, monospace" font-size="9.5" fill="#86868B">$160</text>
-      <text x="65" y="92" text-anchor="end" font-family="SF Mono, monospace" font-size="9.5" fill="#86868B">$400</text>
+      <line x1="70" y1="190" x2="640" y2="190" stroke="var(--border-strong)" stroke-width="1"/>
+      <line x1="70" y1="50" x2="70" y2="190" stroke="var(--border-strong)" stroke-width="1"/>
+      <text x="65" y="193" text-anchor="end" class="mono" font-size="9.5" fill="var(--text-muted)">$0</text>
+      <text x="65" y="142" text-anchor="end" class="mono" font-size="9.5" fill="var(--text-muted)">$160</text>
+      <text x="65" y="92" text-anchor="end" class="mono" font-size="9.5" fill="var(--text-muted)">$400</text>
 
-      <!-- Flat GPU Line (RunPod RTX 4090 $158/mo @ 12h/day) -->
-      <line x1="70" y1="142" x2="630" y2="142" stroke="#1D7D3F" stroke-width="2.5" stroke-dasharray="6,4"/>
-      <rect x="430" y="116" width="205" height="22" rx="5" fill="#E8F5E9"/>
-      <text x="532" y="131" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="700" fill="#1D7D3F">RunPod RTX 4090 ($158/mo flat)</text>
+      <line x1="70" y1="142" x2="630" y2="142" stroke="var(--green)" stroke-width="2" stroke-dasharray="5,4"/>
+      <rect x="430" y="116" width="205" height="22" rx="4" fill="var(--bg-elev)" stroke="var(--border)"/>
+      <text x="532" y="131" text-anchor="middle" class="mono" font-size="10" font-weight="600" fill="var(--green)">RunPod RTX 4090 ($158/mo flat)</text>
 
-      <!-- Rising API Cost Line -->
-      <polyline points="70,188 210,165 280,142 440,95 610,54" fill="none" stroke="#D97706" stroke-width="2.8"/>
-      <text x="530" y="58" font-family="SF Mono, monospace" font-size="10" font-weight="700" fill="#B45309">Flagship API (Per-Token)</text>
+      <polyline points="70,188 210,165 280,142 440,95 610,54" fill="none" stroke="var(--text-secondary)" stroke-width="2"/>
+      <text x="530" y="58" class="mono" font-size="10" font-weight="600" fill="var(--text-secondary)">Flagship API (Per-Token)</text>
 
-      <!-- Break-Even Crossover Point -->
-      <circle cx="280" cy="142" r="6" fill="#0066CC" stroke="#FFFFFF" stroke-width="2"/>
-      <line x1="280" y1="142" x2="280" y2="190" stroke="#0066CC" stroke-width="1.2" stroke-dasharray="3,3"/>
-      <rect x="195" y="78" width="175" height="44" rx="8" fill="#1D1D1F"/>
-      <text x="282" y="96" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="700" fill="#FFFFFF">${isTh ? 'จุดตัดคุ้มทุน (Break-Even)' : 'Break-Even Point'}</text>
-      <text x="282" y="112" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" fill="#93C5FD">~1,450 ${isTh ? 'งาน/วัน (฿5,450/ด.)' : 'tasks/day ($158/mo)'}</text>
+      <circle cx="280" cy="142" r="5" fill="var(--text)" stroke="var(--bg-elev)" stroke-width="2"/>
+      <line x1="280" y1="142" x2="280" y2="190" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="3,3"/>
+      <rect x="195" y="78" width="175" height="44" rx="6" fill="var(--bg-elev)" stroke="var(--border-strong)"/>
+      <text x="282" y="96" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--text)">${isTh ? 'จุดตัดคุ้มทุน (Break-Even)' : 'Break-Even Point'}</text>
+      <text x="282" y="112" text-anchor="middle" class="mono" font-size="10" fill="var(--text-secondary)">~1,450 ${isTh ? 'งาน/วัน (฿5,450/ด.)' : 'tasks/day ($158/mo)'}</text>
 
-      <!-- X-Axis labels -->
-      <text x="150" y="210" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#515154">${isTh ? 'งานน้อย (<1,400/วัน) → ใช้ API ถูกกว่า' : 'Low Volume → API Wins'}</text>
-      <text x="480" y="210" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#1D7D3F">${isTh ? 'งานหนัก (>1,450/วัน) → เช่า GPU ล็อกงบนิ่ง' : 'Heavy Volume → Flat GPU Wins'}</text>
+      <text x="150" y="210" text-anchor="middle" font-size="10.5" font-weight="500" fill="var(--text-secondary)">${isTh ? 'งานน้อย (<1,400/วัน) → ใช้ API ถูกกว่า' : 'Low Volume → API Wins'}</text>
+      <text x="480" y="210" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--green)">${isTh ? 'งานหนัก (>1,450/วัน) → เช่า GPU ล็อกงบนิ่ง' : 'Heavy Volume → Flat GPU Wins'}</text>
     </svg>`;
   }
 
   // vps_latency_map
-  return `<svg viewBox="0 0 680 220" width="100%" height="auto" role="img" aria-label="Thailand vs Global Cloud VPS Latency & Use Case Map" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
-    <text x="24" y="28" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">${isTh ? 'เทียบความเร็วตอบสนอง (Latency) และการเลือกเซิร์ฟเวอร์สำหรับผู้ใช้ในไทย' : 'Server Selection Matrix: Domestic Bangkok Nodes vs. Global Cloud'}</text>
+  return `<svg viewBox="0 0 680 220" width="100%" height="auto" role="img" aria-label="Thailand vs Global Cloud VPS Latency & Use Case Map" style="display:block; background:var(--bg-elev-2); border:1px solid var(--border); border-radius:10px;">
+    <text x="24" y="28" font-size="13" font-weight="700" fill="var(--text)">${isTh ? 'เทียบความเร็วตอบสนอง (Latency) และการเลือกเซิร์ฟเวอร์สำหรับผู้ใช้ในไทย' : 'Server Selection Matrix: Domestic Bangkok Nodes vs. Global Cloud'}</text>
 
-    <!-- Option 1: Hostatom -->
-    <rect x="24" y="48" width="200" height="150" rx="12" fill="#FFFFFF" stroke="#1D7D3F" stroke-width="1.5"/>
-    <text x="124" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#1D7D3F">Hostatom VPS (TH)</text>
-    <text x="124" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D1D1F">Ping: 4–8 ms (BKK)</text>
-    <text x="124" y="114" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">${isTh ? '• คุ้มราคาที่สุดในไทย' : '• Best THB/GB value in TH'}</text>
-    <text x="124" y="132" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">${isTh ? '• เหมาะรัน Docker / Qdrant / n8n' : '• Ideal for Docker / Qdrant / n8n'}</text>
-    <rect x="49" y="154" width="150" height="28" rx="6" fill="#E8F5E9"/>
-    <text x="124" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="700" fill="#1D7D3F">$24/mo (~฿828)</text>
+    <rect x="24" y="48" width="200" height="150" rx="8" fill="var(--bg-elev)" stroke="var(--text)" stroke-width="1.2"/>
+    <text x="124" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">Hostatom VPS (TH)</text>
+    <text x="124" y="92" text-anchor="middle" class="mono" font-size="11" font-weight="600" fill="var(--green)">Ping: 4–8 ms (BKK)</text>
+    <text x="124" y="114" text-anchor="middle" font-size="10.5" fill="var(--text-secondary)">${isTh ? '• คุ้มราคาที่สุดในไทย' : '• Best THB/GB value in TH'}</text>
+    <text x="124" y="132" text-anchor="middle" font-size="10.5" fill="var(--text-secondary)">${isTh ? '• เหมาะรัน Docker / Qdrant / n8n' : '• Ideal for Docker / Qdrant / n8n'}</text>
+    <rect x="49" y="154" width="150" height="28" rx="5" fill="var(--bg-elev-2)" stroke="var(--border)"/>
+    <text x="124" y="172" text-anchor="middle" class="mono" font-size="11" font-weight="700" fill="var(--text)">$24/mo (~฿828)</text>
 
-    <!-- Option 2: Ruk-Com -->
-    <rect x="240" y="48" width="200" height="150" rx="12" fill="#FFFFFF" stroke="#0066CC" stroke-width="1.5"/>
-    <text x="340" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#0066CC">Ruk-Com Managed (TH)</text>
-    <text x="340" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D1D1F">Ping: 5–9 ms (BKK)</text>
-    <text x="340" y="114" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">${isTh ? '• มีวิศวกรไทยดูแลให้ 24 ชม.' : '• Fully managed 24/7 Thai SLA'}</text>
-    <text x="340" y="132" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">${isTh ? '• แถม WAF กันยิง + DirectAdmin' : '• Enterprise WAF + DirectAdmin'}</text>
-    <rect x="265" y="154" width="150" height="28" rx="6" fill="#EFF6FF"/>
-    <text x="340" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="700" fill="#0066CC">$46/mo (~฿1,587)</text>
+    <rect x="240" y="48" width="200" height="150" rx="8" fill="var(--bg-elev)" stroke="var(--border-strong)" stroke-width="1"/>
+    <text x="340" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">Ruk-Com Managed (TH)</text>
+    <text x="340" y="92" text-anchor="middle" class="mono" font-size="11" font-weight="600" fill="var(--green)">Ping: 5–9 ms (BKK)</text>
+    <text x="340" y="114" text-anchor="middle" font-size="10.5" fill="var(--text-secondary)">${isTh ? '• มีวิศวกรไทยดูแลให้ 24 ชม.' : '• Fully managed 24/7 Thai SLA'}</text>
+    <text x="340" y="132" text-anchor="middle" font-size="10.5" fill="var(--text-secondary)">${isTh ? '• แถม WAF กันยิง + DirectAdmin' : '• Enterprise WAF + DirectAdmin'}</text>
+    <rect x="265" y="154" width="150" height="28" rx="5" fill="var(--bg-elev-2)" stroke="var(--border)"/>
+    <text x="340" y="172" text-anchor="middle" class="mono" font-size="11" font-weight="700" fill="var(--text)">$46/mo (~฿1,587)</text>
 
-    <!-- Option 3: Cloudways -->
-    <rect x="456" y="48" width="200" height="150" rx="12" fill="#FFFFFF" stroke="#1D1D1F" stroke-width="1.5"/>
-    <text x="556" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#1D1D1F">Cloudways (SG/Global)</text>
-    <text x="556" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D1D1F">Ping: ~32 ms (SG Edge)</text>
-    <text x="556" y="114" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">${isTh ? '• รองรับลูกค้าทั่วโลก (DO/Vultr)' : '• Global SaaS (DO / Vultr HF)'}</text>
-    <text x="556" y="132" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">${isTh ? '• ระบบ Staging + Auto-Backup' : '• 1-Click Staging & Auto-Healing'}</text>
-    <rect x="481" y="154" width="150" height="28" rx="6" fill="#F5F5F7"/>
-    <text x="556" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="700" fill="#1D1D1F">$54/mo (~฿1,863)</text>
+    <rect x="456" y="48" width="200" height="150" rx="8" fill="var(--bg-elev)" stroke="var(--border)" stroke-width="1"/>
+    <text x="556" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text-secondary)">Cloudways (SG/Global)</text>
+    <text x="556" y="92" text-anchor="middle" class="mono" font-size="11" font-weight="600" fill="var(--text-muted)">Ping: ~32 ms (SG Edge)</text>
+    <text x="556" y="114" text-anchor="middle" font-size="10.5" fill="var(--text-muted)">${isTh ? '• รองรับลูกค้าทั่วโลก (DO/Vultr)' : '• Global SaaS (DO / Vultr HF)'}</text>
+    <text x="556" y="132" text-anchor="middle" font-size="10.5" fill="var(--text-muted)">${isTh ? '• ระบบ Staging + Auto-Backup' : '• 1-Click Staging & Auto-Healing'}</text>
+    <rect x="481" y="154" width="150" height="28" rx="5" fill="var(--bg-elev-2)" stroke="var(--border)"/>
+    <text x="556" y="172" text-anchor="middle" class="mono" font-size="11" font-weight="700" fill="var(--text-secondary)">$54/mo (~฿1,863)</text>
   </svg>`;
 }
 
@@ -213,14 +191,14 @@ export function renderHomeVisualArchitectureStrip(locale: Locale): string {
       <div class="visual-svg-wrap">
         <svg viewBox="0 0 280 96" width="100%" height="84" role="img" aria-label="Single Key Model Routing">
           <rect x="8" y="28" width="76" height="40" rx="8" fill="#1D1D1F"/>
-          <text x="46" y="52" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="700" fill="#FFFFFF">1 API KEY</text>
+          <text x="46" y="52" text-anchor="middle" class="mono" font-size="10" font-weight="700" fill="#FFFFFF">1 API KEY</text>
           <path d="M84 48 L132 20 M84 48 L132 48 M84 48 L132 76" stroke="#0066CC" stroke-width="1.6" fill="none"/>
           <rect x="132" y="8" width="138" height="22" rx="5" fill="#EFF6FF" stroke="#BFDBFE"/>
-          <text x="201" y="23" text-anchor="middle" font-family="SF Mono, monospace" font-size="9.5" font-weight="600" fill="#0066CC">Gemini Flash ($0.15)</text>
+          <text x="201" y="23" text-anchor="middle" class="mono" font-size="9.5" font-weight="600" fill="#0066CC">Gemini Flash ($0.15)</text>
           <rect x="132" y="37" width="138" height="22" rx="5" fill="#F0FDF4" stroke="#BBF7D0"/>
-          <text x="201" y="52" text-anchor="middle" font-family="SF Mono, monospace" font-size="9.5" font-weight="600" fill="#1D7D3F">DeepSeek V3 ($0.55)</text>
+          <text x="201" y="52" text-anchor="middle" class="mono" font-size="9.5" font-weight="600" fill="#1D7D3F">DeepSeek V3 ($0.55)</text>
           <rect x="132" y="66" width="138" height="22" rx="5" fill="#FFFBEB" stroke="#FDE68A"/>
-          <text x="201" y="81" text-anchor="middle" font-family="SF Mono, monospace" font-size="9.5" font-weight="600" fill="#B45309">Claude 3.7 ($3.00)</text>
+          <text x="201" y="81" text-anchor="middle" class="mono" font-size="9.5" font-weight="600" fill="#B45309">Claude 3.7 ($3.00)</text>
         </svg>
       </div>
       <div class="benefit-title">${isTh ? '1. แยกโมเดลตามความยากในบิลเดียว' : '1. Route by Task Complexity'}</div>
@@ -230,11 +208,11 @@ export function renderHomeVisualArchitectureStrip(locale: Locale): string {
     <div class="visual-card">
       <div class="visual-svg-wrap">
         <svg viewBox="0 0 280 96" width="100%" height="84" role="img" aria-label="Prompt Cache and Diff Guard">
-          <text x="10" y="24" font-family="-apple-system, sans-serif" font-size="9.5" font-weight="600" fill="#86868B">${isTh ? 'ก่อนปรับ (อ่านซ้ำทั้งไฟล์)' : 'Before (Full File Rescan)'}</text>
+          <text x="10" y="24" font-size="9.5" font-weight="600" fill="#86868B">${isTh ? 'ก่อนปรับ (อ่านซ้ำทั้งไฟล์)' : 'Before (Full File Rescan)'}</text>
           <rect x="10" y="30" width="250" height="14" rx="4" fill="#FCA5A5"/>
-          <text x="10" y="62" font-family="-apple-system, sans-serif" font-size="9.5" font-weight="600" fill="#1D7D3F">${isTh ? 'เปิด Cache + อ่านเฉพาะจุดแก้ (-65%)' : 'With Cache + Diff-Only Skill (-65%)'}</text>
+          <text x="10" y="62" font-size="9.5" font-weight="600" fill="#1D7D3F">${isTh ? 'เปิด Cache + อ่านเฉพาะจุดแก้ (-65%)' : 'With Cache + Diff-Only Skill (-65%)'}</text>
           <rect x="10" y="68" width="88" height="14" rx="4" fill="#1D7D3F"/>
-          <text x="108" y="79" font-family="SF Mono, monospace" font-size="10" font-weight="700" fill="#1D7D3F">2.5x Longer Quota</text>
+          <text x="108" y="79" class="mono" font-size="10" font-weight="700" fill="#1D7D3F">2.5x Longer Quota</text>
         </svg>
       </div>
       <div class="benefit-title">${isTh ? '2. ยืดโควต้าใช้งานนานขึ้น 2.5 เท่า' : '2. Stretch Quota 2.5x Longer'}</div>
@@ -248,8 +226,8 @@ export function renderHomeVisualArchitectureStrip(locale: Locale): string {
           <line x1="16" y1="48" x2="264" y2="48" stroke="#1D7D3F" stroke-width="2" stroke-dasharray="4,3"/>
           <polyline points="16,78 95,62 140,48 245,14" fill="none" stroke="#D97706" stroke-width="2.2"/>
           <circle cx="140" cy="48" r="4.5" fill="#0066CC"/>
-          <text x="148" y="42" font-family="SF Mono, monospace" font-size="9.5" font-weight="700" fill="#0066CC">Break-Even</text>
-          <text x="175" y="62" font-family="SF Mono, monospace" font-size="9" font-weight="600" fill="#1D7D3F">$0.44/hr Flat GPU</text>
+          <text x="148" y="42" class="mono" font-size="9.5" font-weight="700" fill="#0066CC">Break-Even</text>
+          <text x="175" y="62" class="mono" font-size="9" font-weight="600" fill="#1D7D3F">$0.44/hr Flat GPU</text>
         </svg>
       </div>
       <div class="benefit-title">${isTh ? '3. รู้จุดตัดย้ายไปเช่า GPU รายชั่วโมง' : '3. Know Your Exact GPU Break-Even'}</div>
@@ -285,24 +263,24 @@ export function renderSpecificMatchupCard(
         <span>${isTh ? 'สรุปเทียบตัวต่อตัว (HEAD-TO-HEAD SCORECARD)' : 'HEAD-TO-HEAD VISUAL SCORECARD'}</span>
         <span>${esc(m1.name)} vs ${esc(m2.name)}</span>
       </div>
-      <svg viewBox="0 0 680 148" width="100%" height="auto" role="img" aria-label="${esc(m1.name)} vs ${esc(m2.name)}" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:12px; margin-bottom:14px;">
-        <text x="20" y="26" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#1D1D1F">${isTh ? 'เทียบราคาต่อ 1 ล้าน Token (แถบสั้น = ประหยัดกว่า)' : 'Price per 1M Tokens (Shorter bar = Lower cost)'}</text>
+      <svg viewBox="0 0 680 148" width="100%" height="auto" role="img" aria-label="${esc(m1.name)} vs ${esc(m2.name)}" style="display:block; background:var(--bg-elev-2); border:1px solid var(--border); border-radius:10px; margin-bottom:14px;">
+        <text x="20" y="26" font-size="11.5" font-weight="700" fill="var(--text)">${isTh ? 'เทียบราคาต่อ 1 ล้าน Token (แถบสั้น = ประหยัดกว่า)' : 'Price per 1M Tokens (Shorter bar = Lower cost)'}</text>
         
-        <text x="20" y="56" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D1D1F">${esc(m1.name)} (In)</text>
-        <rect x="210" y="44" width="${w1In}" height="15" rx="4" fill="#0066CC"/>
-        <text x="${218 + w1In}" y="56" font-family="SF Mono, monospace" font-size="10.5" font-weight="600" fill="#0066CC">$${m1.inputUsdPer1M}/1M (Cache $${m1.cachedInputUsdPer1M})</text>
+        <text x="20" y="56" class="mono" font-size="11" font-weight="600" fill="var(--text)">${esc(m1.name)} (In)</text>
+        <rect x="210" y="44" width="${w1In}" height="15" rx="3" fill="var(--text)"/>
+        <text x="${218 + w1In}" y="56" class="mono" font-size="10.5" font-weight="600" fill="var(--text)">$${m1.inputUsdPer1M}/1M (Cache $${m1.cachedInputUsdPer1M})</text>
 
-        <text x="20" y="82" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D1D1F">${esc(m2.name)} (In)</text>
-        <rect x="210" y="70" width="${w2In}" height="15" rx="4" fill="#1D7D3F"/>
-        <text x="${218 + w2In}" y="82" font-family="SF Mono, monospace" font-size="10.5" font-weight="600" fill="#1D7D3F">$${m2.inputUsdPer1M}/1M (Cache $${m2.cachedInputUsdPer1M})</text>
+        <text x="20" y="82" class="mono" font-size="11" font-weight="600" fill="var(--text)">${esc(m2.name)} (In)</text>
+        <rect x="210" y="70" width="${w2In}" height="15" rx="3" fill="var(--green)"/>
+        <text x="${218 + w2In}" y="82" class="mono" font-size="10.5" font-weight="600" fill="var(--green)">$${m2.inputUsdPer1M}/1M (Cache $${m2.cachedInputUsdPer1M})</text>
 
-        <text x="20" y="112" font-family="SF Mono, monospace" font-size="11" fill="#515154">${esc(m1.name)} (Out)</text>
-        <rect x="210" y="100" width="${w1Out}" height="13" rx="4" fill="#6E6E73"/>
-        <text x="${218 + w1Out}" y="111" font-family="SF Mono, monospace" font-size="10" fill="#515154">$${m1.outputUsdPer1M}/1M • Context ${m1.contextWindowK}K</text>
+        <text x="20" y="112" class="mono" font-size="11" fill="var(--text-secondary)">${esc(m1.name)} (Out)</text>
+        <rect x="210" y="100" width="${w1Out}" height="13" rx="3" fill="var(--text-muted)"/>
+        <text x="${218 + w1Out}" y="111" class="mono" font-size="10" fill="var(--text-secondary)">$${m1.outputUsdPer1M}/1M • Context ${m1.contextWindowK}K</text>
 
-        <text x="20" y="136" font-family="SF Mono, monospace" font-size="11" fill="#515154">${esc(m2.name)} (Out)</text>
-        <rect x="210" y="124" width="${w2Out}" height="13" rx="4" fill="#1D1D1F"/>
-        <text x="${218 + w2Out}" y="135" font-family="SF Mono, monospace" font-size="10" fill="#1D1D1F">$${m2.outputUsdPer1M}/1M • Context ${m2.contextWindowK}K</text>
+        <text x="20" y="136" class="mono" font-size="11" fill="var(--text-secondary)">${esc(m2.name)} (Out)</text>
+        <rect x="210" y="124" width="${w2Out}" height="13" rx="3" fill="var(--border-strong)"/>
+        <text x="${218 + w2Out}" y="135" class="mono" font-size="10" fill="var(--text-secondary)">$${m2.outputUsdPer1M}/1M • Context ${m2.contextWindowK}K</text>
       </svg>
       <div class="matchup-decision-grid">
         <div class="decision-box">
@@ -342,7 +320,7 @@ export function renderSpecificMatchupCard(
         <div class="decision-box">
           <div class="decision-badge">${isTh ? `2. ย้ายมาเช่า ${gpu.name} ($${gpu.hourlyUsd}/ชม.) เมื่อต้องการล็อกงบ` : `2. Switch to ${gpu.name} ($${gpu.hourlyUsd}/hr) for Flat TCO`}</div>
           <p class="benefit-desc">${isTh ? `ได้ VRAM ${gpu.vramGb}GB (~${gpu.throughputTokensPerSec} tok/s) เปิดวันละ 10 ชม. จ่ายคงที่ ~$${gpuMonthly10h}/เดือน (~฿${gpuThb10h.toLocaleString()}) เหมาะรัน: ${gpu.bestForModels}` : `${gpu.vramGb}GB VRAM (~${gpu.throughputTokensPerSec} tok/s) caps 10h/day usage at ~$${gpuMonthly10h}/mo. Ideal for: ${gpu.bestForModels}.`}</p>
-          <code style="display:block; margin-top:8px; padding:6px 10px; background:#1D1D1F; color:#E5E7EB; border-radius:6px; font-size:0.74rem; font-family:var(--mono); overflow-x:auto;">vllm serve Qwen/Qwen2.5-Coder-32B-Instruct --enable-prefix-caching --max-model-len 32768</code>
+          <code style="display:block; margin-top:8px; padding:6px 10px; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:5px; font-size:0.74rem; font-family:var(--mono); overflow-x:auto;">vllm serve Qwen/Qwen2.5-Coder-32B-Instruct --enable-prefix-caching --max-model-len 32768</code>
           <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(gpuUrl)}" target="_blank" rel="noopener sponsored">${isTh ? `เช่า ${gpu.name} บน RunPod →` : `Deploy ${gpu.name} on RunPod →`}</a>
         </div>
       </div>
