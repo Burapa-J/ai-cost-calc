@@ -10,13 +10,19 @@ import {
   type AffiliateConfigFile,
   AGENT_SKILLS_CATALOG,
   CLOUD_GPUS,
-  CLOUD_VPS_OPTIONS,
   LLM_MODELS,
   type Locale,
+  type PlaybookGuideSpec,
   type ProgrammaticComparisonPageSpec,
   type WorkloadInput
 } from './domain.ts';
 import { buildProgrammaticPagesCatalog } from './pages-catalog.ts';
+import {
+  buildPlaybooksCatalog,
+  renderHomeVisualArchitectureStrip,
+  renderPlaybookSvg,
+  renderSpecificMatchupCard
+} from './playbooks-catalog.ts';
 
 function escapeHtml(text: string): string {
   return text
@@ -27,7 +33,134 @@ function escapeHtml(text: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function renderSharedStyles(): string {
+function renderSharedStyles(isCompareSubpage = false): string {
+  const extraStyles = isCompareSubpage
+    ? ''
+    : `
+    .visual-trio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+    @media (max-width: 860px) {
+      .visual-trio-grid { grid-template-columns: 1fr; }
+    }
+    .visual-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+      transition: transform 0.3s var(--ease-out);
+    }
+    .visual-card:hover {
+      transform: translateY(-2px);
+    }
+    .visual-svg-wrap {
+      background: #F8FAFC;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 12px;
+      padding: 6px 8px;
+      margin-bottom: 12px;
+    }
+    .playbook-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+    }
+    .playbook-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px 22px;
+      color: var(--ink);
+      transition: transform 0.25s var(--ease-out), border-color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+    }
+    .playbook-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      box-shadow: 0 10px 28px rgba(0, 102, 204, 0.08);
+      opacity: 1;
+    }
+    .playbook-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: #EFF6FF;
+      padding: 3px 9px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+      width: fit-content;
+    }
+    .playbook-title {
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 0 0 8px;
+      line-height: 1.38;
+    }
+    .playbook-takeaway {
+      font-size: 0.83rem;
+      color: var(--ink-secondary);
+      margin: 0 0 14px;
+      line-height: 1.5;
+    }
+    .guide-takeaway {
+      background: #F0FDF4;
+      border: 1px solid #86EFAC;
+      border-radius: 16px;
+      padding: 18px 22px;
+      margin: 20px 0 24px;
+      font-size: 0.95rem;
+      color: #14532D;
+      font-weight: 500;
+    }
+    .guide-step {
+      background: var(--surface-alt);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 14px;
+    }
+    .guide-step-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 0 0 6px;
+    }
+    .guide-code {
+      background: #1D1D1F;
+      color: #F5F5F7;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      overflow-x: auto;
+      margin: 12px 0 0;
+      line-height: 1.5;
+    }
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .stack-card {
+      background: var(--surface-alt);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }`;
   return `
     :root {
       --paper: #FBFBFD;
@@ -87,8 +220,9 @@ function renderSharedStyles(): string {
     }
     .nav-bar {
       display: flex;
-      gap: 22px;
+      gap: 20px;
       align-items: center;
+      flex-wrap: wrap;
     }
     .nav-link {
       color: var(--ink-secondary);
@@ -107,7 +241,7 @@ function renderSharedStyles(): string {
       animation: settleIn 0.55s var(--ease-out) both;
     }
     .hero-block {
-      padding: 56px 0 36px;
+      padding: 44px 0 26px;
     }
     .kicker {
       font-size: 0.75rem;
@@ -118,39 +252,21 @@ function renderSharedStyles(): string {
       margin-bottom: 10px;
     }
     h1 {
-      font-size: clamp(2rem, 3.8vw, 3.1rem);
+      font-size: clamp(1.9rem, 3.5vw, 2.85rem);
       font-weight: 600;
       letter-spacing: -0.032em;
-      line-height: 1.1;
-      margin: 0 0 16px;
-      max-width: 24ch;
+      line-height: 1.12;
+      margin: 0 0 14px;
+      max-width: 28ch;
       color: var(--ink);
     }
     .lead {
       color: var(--ink-secondary);
-      font-size: 1.08rem;
-      line-height: 1.6;
-      max-width: 64ch;
+      font-size: 1.04rem;
+      line-height: 1.58;
+      max-width: 66ch;
       margin: 0;
       font-weight: 400;
-    }
-    .benefit-trio {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-top: 28px;
-    }
-    @media (max-width: 860px) {
-      .benefit-trio { grid-template-columns: 1fr; }
-    }
-    .benefit-tile {
-      background: var(--surface-alt);
-      border-radius: 18px;
-      padding: 22px 24px;
-      transition: transform 0.35s var(--ease-out), background 0.35s var(--ease-out);
-    }
-    .benefit-tile:hover {
-      transform: translateY(-2px);
     }
     .benefit-title {
       font-size: 0.94rem;
@@ -165,11 +281,38 @@ function renderSharedStyles(): string {
       margin: 0;
       line-height: 1.5;
     }
+    .matchup-spotlight {
+      margin-top: 22px;
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: 20px;
+      padding: 24px 26px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.03);
+    }
+    .matchup-decision-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 780px) {
+      .matchup-decision-grid { grid-template-columns: 1fr; }
+    }
+    .decision-box {
+      background: var(--surface-alt);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+    .decision-badge {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
     .ledger-frame {
       display: grid;
       grid-template-columns: 370px 1fr;
       gap: 24px;
-      margin-top: 28px;
+      margin-top: 24px;
       align-items: start;
     }
     @media (max-width: 940px) {
@@ -283,20 +426,25 @@ function renderSharedStyles(): string {
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
     }
     .verdict-cell {
-      padding: 28px 30px;
+      padding: 26px 28px;
       border-radius: 20px;
       background: var(--surface);
       border: 1px solid var(--line);
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
       display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .verdict-top {
+      display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 24px;
+      gap: 20px;
       flex-wrap: wrap;
     }
     .verdict-meta { max-width: 60ch; }
     .verdict-title {
-      font-size: 1.45rem;
+      font-size: 1.42rem;
       font-weight: 600;
       letter-spacing: -0.025em;
       margin: 4px 0 8px;
@@ -304,10 +452,16 @@ function renderSharedStyles(): string {
       color: var(--ink);
     }
     .verdict-copy {
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       color: var(--ink-secondary);
       margin: 0;
       line-height: 1.55;
+    }
+    .live-chart-box {
+      background: #F8FAFC;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 14px;
+      padding: 14px 16px;
     }
     .btn-primary {
       display: inline-block;
@@ -440,7 +594,11 @@ function renderSharedStyles(): string {
       transform: translateY(-1px);
       opacity: 1;
     }
-  `;
+    ${extraStyles}
+  `
+    .replace(/\s+/g, ' ')
+    .replace(/\s*([{};,])\s*/g, '$1')
+    .trim();
 }
 
 function selectRelatedSpecs(
@@ -464,6 +622,238 @@ function selectRelatedSpecs(
   return sameCategory.slice(0, 6);
 }
 
+function renderPlaybookCardsSection(
+  locale: Locale,
+  playbooks: PlaybookGuideSpec[],
+  guidesPrefix: string,
+  includeSvgPreview = true
+): string {
+  const isTh = locale === 'th';
+  if (!includeSvgPreview) {
+    return `<section class="standalone-section" id="playbooks"><div class="section-tag"><span>${isTh ? 'คู่มือจัดสเปกตามงานจริง (AI PLAYBOOKS)' : 'PRACTICAL AI PLAYBOOKS'}</span><a href="../index.html#playbooks">${isTh ? 'ดูครบ 5 คู่มือ →' : 'All 5 Guides →'}</a></div><div class="index-grid">${playbooks
+      .map(
+        (pb) =>
+          `<a class="index-cell" href="${guidesPrefix}/${pb.slug}.html"><span>${escapeHtml(pb.title[locale])}</span><span style="color:var(--accent);">→</span></a>`
+      )
+      .join('')}</div></section>`;
+  }
+  return `<section class="standalone-section" id="playbooks">
+    <div class="section-tag">
+      <span>${isTh ? 'คู่มือจัดสเปกและสูตรลดต้นทุนตามงานจริง (PRACTICAL AI PLAYBOOKS)' : 'PRACTICAL AI ARCHITECTURE & COST PLAYBOOKS'}</span>
+      <span>${isTh ? 'เนื้อล้วน • มีภาพผังระบบ & ตัวเลขจริง' : 'ZERO FLUFF • VISUAL BLUEPRINTS'}</span>
+    </div>
+    <div class="playbook-grid">
+      ${playbooks
+        .map(
+          (pb) => `<a class="playbook-card" href="${guidesPrefix}/${pb.slug}.html">
+            <div>
+              <span class="playbook-badge">${escapeHtml(pb.badge[locale])}</span>
+              <div style="margin:6px 0 12px; border-radius:10px; overflow:hidden;">
+                ${renderPlaybookSvg(pb.svgType, locale)}
+              </div>
+              <h3 class="playbook-title">${escapeHtml(pb.title[locale])}</h3>
+              <p class="playbook-takeaway">${escapeHtml(pb.keyTakeaway[locale])}</p>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-weight:600; color:var(--accent); border-top:1px solid var(--line); padding-top:10px;">
+              <span>${escapeHtml(pb.readTime[locale])}</span>
+              <span>${isTh ? 'อ่านคู่มือและดูสูตรจัดสเปก →' : 'Read Blueprint →'}</span>
+            </div>
+          </a>`
+        )
+        .join('\n')}
+    </div>
+  </section>`;
+}
+
+function renderPlaybookGuidePage(
+  locale: Locale,
+  guide: PlaybookGuideSpec,
+  allPlaybooks: PlaybookGuideSpec[],
+  allPages: ProgrammaticComparisonPageSpec[],
+  affiliateConfig: AffiliateConfigFile,
+  publicBaseUrl: string
+): string {
+  const isTh = locale === 'th';
+  const rootPrefix = '../..';
+  const alternateLang: Locale = locale === 'en' ? 'th' : 'en';
+  const alternatePath = `${rootPrefix}/${alternateLang}/guides/${guide.slug}.html`;
+  const canonicalUrl = `${publicBaseUrl}/${locale}/guides/${guide.slug}.html`;
+
+  const w = sanitizeWorkloadInput(guide.presetWorkload);
+  const calcQuery = `req=${w.requestsPerDay}&steps=${w.agentSteps}&inTok=${w.inputTokensPerReq}&outTok=${w.outputTokensPerReq}&cache=${Math.round(w.cacheHitRate * 100)}&hours=${w.activeHoursPerDay}`;
+  const calculatorLink = `../index.html?${calcQuery}`;
+
+  const gscMeta = affiliateConfig.googleSiteVerification
+    ? `\n  <meta name="google-site-verification" content="${escapeHtml(affiliateConfig.googleSiteVerification)}" />`
+    : '';
+
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'TechArticle',
+        headline: guide.h1[locale],
+        description: guide.metaDescription[locale],
+        url: canonicalUrl
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: guide.faq.map((item) => ({
+          '@type': 'Question',
+          name: item.q[locale],
+          acceptedAnswer: { '@type': 'Answer', text: item.a[locale] }
+        }))
+      }
+    ]
+  });
+
+  const otherPlaybooks = allPlaybooks.filter((p) => p.slug !== guide.slug);
+
+  return `<!DOCTYPE html>
+<html lang="${locale}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${escapeHtml(guide.title[locale])}</title>
+  <meta name="description" content="${escapeHtml(guide.metaDescription[locale])}" />
+  <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />
+  <link rel="alternate" hreflang="${alternateLang}" href="${alternatePath}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="${escapeHtml(guide.title[locale])}" />
+  <meta property="og:description" content="${escapeHtml(guide.metaDescription[locale])}" />
+  <meta property="og:url" content="${escapeHtml(canonicalUrl)}" />${gscMeta}
+  <script type="application/ld+json">${jsonLd}</script>
+  <style>${renderSharedStyles(false)}</style>
+</head>
+<body>
+  <div class="nav-glass">
+    <header class="masthead">
+      <a class="brand-mark" href="${rootPrefix}/${locale}/index.html">TCO // BENCHMARK.26</a>
+      <nav class="nav-bar">
+        <a class="nav-link" href="${rootPrefix}/${locale}/index.html">${isTh ? 'เครื่องคำนวณงบ AI' : 'Calculator'} (${allPages.length})</a>
+        <a class="nav-link active" href="${rootPrefix}/${locale}/index.html#playbooks">${isTh ? 'คู่มือจัดสเปก (5)' : 'Playbooks (5)'}</a>
+        <a class="nav-link" href="${rootPrefix}/validation-dashboard.html">Live Stats</a>
+        <a class="nav-link ${locale === 'th' ? 'active' : ''}" href="${locale === 'th' ? '#' : alternatePath}">ภาษาไทย</a>
+        <a class="nav-link ${locale === 'en' ? 'active' : ''}" href="${locale === 'en' ? '#' : alternatePath}">English</a>
+      </nav>
+    </header>
+  </div>
+
+  <div class="shell">
+    <section class="hero-block">
+      <div class="kicker">${escapeHtml(guide.badge[locale])} • ${escapeHtml(guide.readTime[locale])}</div>
+      <h1 style="max-width:32ch;">${escapeHtml(guide.h1[locale])}</h1>
+      <div class="guide-takeaway">
+        ${escapeHtml(guide.keyTakeaway[locale])}
+      </div>
+      <div style="margin: 22px 0;">
+        ${renderPlaybookSvg(guide.svgType, locale)}
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:18px;">
+        <a class="btn-primary" href="${calculatorLink}">
+          ${isTh ? 'โหลดสเปกนี้เข้าเครื่องคำนวณเพื่อปรับตัวเลขจริง →' : 'Load This Scenario in Interactive Calculator →'}
+        </a>
+        <a class="action-link" href="${rootPrefix}/${locale}/index.html#playbooks" style="padding:10px 14px;">
+          ${isTh ? '← ดูคู่มือจัดสเปกทั้งหมด 5 เรื่อง' : '← All 5 Architecture Playbooks'}
+        </a>
+      </div>
+    </section>
+
+    <section class="table-block">
+      <div class="section-tag">
+        <span>${isTh ? 'ตารางเปรียบเทียบตัวเลขจริง' : 'EMPIRICAL BENCHMARK & COST MATRIX'}</span>
+        <span>2026 VERIFIED DATA</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>${escapeHtml(guide.comparisonHeaders.colA[locale])}</th>
+            <th class="num">${escapeHtml(guide.comparisonHeaders.colB[locale])}</th>
+            <th class="num">${escapeHtml(guide.comparisonHeaders.colC[locale])}</th>
+            <th>${escapeHtml(guide.comparisonHeaders.colD[locale])}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${guide.comparisonRows
+            .map(
+              (r) => `<tr>
+                <td><span class="mono-val">${escapeHtml(r.item[locale])}</span></td>
+                <td class="num"><span class="mono-val">${escapeHtml(r.colB)}</span></td>
+                <td class="num"><span class="savings-val">${escapeHtml(r.colC)}</span></td>
+                <td style="padding-left:18px; color:var(--ink-secondary); font-size:0.84rem;">${escapeHtml(r.verdict[locale])}</td>
+              </tr>`
+            )
+            .join('\n')}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="standalone-section">
+      <div class="section-tag">
+        <span>${isTh ? 'ขั้นตอนการตั้งค่าใช้งานจริง (STEP-BY-STEP RECIPE)' : 'ACTIONABLE IMPLEMENTATION STEPS'}</span>
+        <span>COPY &amp; DEPLOY</span>
+      </div>
+      ${guide.steps
+        .map(
+          (st) => `<div class="guide-step">
+            <h2 class="guide-step-title">${escapeHtml(st.title[locale])}</h2>
+            <p class="benefit-desc">${escapeHtml(st.detail[locale])}</p>
+            ${st.codeSnippet ? `<pre class="guide-code"><code>${escapeHtml(st.codeSnippet)}</code></pre>` : ''}
+          </div>`
+        )
+        .join('\n')}
+    </section>
+
+    <section class="standalone-section">
+      <div class="section-tag">
+        <span>${isTh ? 'ชุดเครื่องมือและผู้ให้บริการที่แนะนำสำหรับสูตรนี้' : 'RECOMMENDED PRODUCTION STACK FOR THIS PLAYBOOK'}</span>
+        <span>VERIFIED PARTNERS</span>
+      </div>
+      <div class="stack-grid">
+        ${guide.recommendedStack
+          .map((item) => {
+            const affUrl = resolveAffiliateUrl(affiliateConfig, item.affiliateId, `${guide.slug}-${item.itemSlug}`);
+            return `<div class="stack-card">
+              <div>
+                <div class="kicker" style="margin-bottom:4px;">${escapeHtml(item.role[locale])}</div>
+                <div class="mono-val" style="font-size:0.95rem; margin-bottom:6px;">${escapeHtml(item.name)}</div>
+                <div class="sub-val" style="color:var(--ledger-green); font-weight:600;">${escapeHtml(item.priceNote[locale])}</div>
+              </div>
+              <a class="btn-primary" style="text-align:center; width:100%;" href="${escapeHtml(affUrl)}" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_${item.affiliateId}',{mode:'cors'}).catch(function(){});">
+                ${escapeHtml(item.ctaLabel[locale])}
+              </a>
+            </div>`;
+          })
+          .join('\n')}
+      </div>
+    </section>
+
+    <section class="standalone-section">
+      <div class="section-tag"><span>${isTh ? 'คำถามที่พบบ่อย' : 'FREQUENTLY ASKED QUESTIONS'}</span><span>FAQ</span></div>
+      ${guide.faq
+        .map(
+          (f) => `<div style="margin-bottom:14px;">
+            <div style="font-weight:600; font-size:0.94rem;">${escapeHtml(f.q[locale])}</div>
+            <p style="margin:6px 0 0; color:var(--ink-secondary); font-size:0.88rem;">${escapeHtml(f.a[locale])}</p>
+          </div>`
+        )
+        .join('\n')}
+    </section>
+
+    ${renderPlaybookCardsSection(locale, otherPlaybooks, '.')}
+
+    <footer id="affiliate-disclosure" style="padding:20px 0 40px; border-top:1px solid var(--line); color:var(--ink-muted); font-size:0.78rem; line-height:1.55; margin-top:24px;">
+      ${
+        isTh
+          ? 'การเปิดเผยข้อมูลพาร์ทเนอร์ (Affiliate Disclosure): เว็บไซต์นี้มีลิงก์แนะนำบริการคลาวด์, API และชุดคำสั่ง AI (รวมถึง Agensi.io, RunPod, Novita AI และผู้ให้บริการ VPS) ซึ่งผู้จัดทำอาจได้รับค่าคอมมิชชันเมื่อคุณสมัครหรือสั่งซื้อผ่านลิงก์ดังกล่าว โดยที่คุณไม่เสียค่าใช้จ่ายเพิ่มใดๆ'
+          : 'Affiliate Disclosure: Some links on this page (including Agensi.io, RunPod, Novita AI, and cloud hosting providers) are affiliate links. We may earn a commission at no extra cost to you if you sign up or make a purchase through them.'
+      }
+    </footer>
+  </div>
+</body>
+</html>`.replace(/\n[ \t]+/g, '\n');
+}
+
 function renderCalculatorPage(
   locale: Locale,
   pageSlug: string,
@@ -473,13 +863,16 @@ function renderCalculatorPage(
   presetInput: Partial<WorkloadInput>,
   faqList: Array<{ q: { en: string; th: string }; a: { en: string; th: string } }>,
   allPages: ProgrammaticComparisonPageSpec[],
+  allPlaybooks: PlaybookGuideSpec[],
   affiliateConfig: AffiliateConfigFile,
   isComparisonSubpage: boolean,
-  publicBaseUrl: string
+  publicBaseUrl: string,
+  currentSpec?: ProgrammaticComparisonPageSpec
 ): string {
   const initialWorkload = sanitizeWorkloadInput(presetInput);
   const initialCalc = calculateCostComparison(initialWorkload, affiliateConfig, pageSlug);
   const rootPrefix = isComparisonSubpage ? '../..' : '..';
+  const guidesPrefix = isComparisonSubpage ? '../guides' : './guides';
   const alternateLang: Locale = locale === 'en' ? 'th' : 'en';
   const alternatePath = isComparisonSubpage
     ? `${rootPrefix}/${alternateLang}/compare/${pageSlug}.html`
@@ -488,25 +881,28 @@ function renderCalculatorPage(
   const relatedPages = selectRelatedSpecs(pageSlug, allPages, !isComparisonSubpage);
   const maxInitialApiUsd = Math.max(...initialCalc.apiOptions.map((a) => a.monthlyUsd), 1);
 
+  const cheapestInitial = initialCalc.apiOptions[0];
   const flagshipInitial =
     initialCalc.apiOptions.find((a) => a.modelId === 'claude-3-7-sonnet') ??
     initialCalc.apiOptions[initialCalc.apiOptions.length - 1];
+  const bestGpuInitial = initialCalc.gpuOptions[0];
+  const chartMaxInitial = Math.max(
+    cheapestInitial.monthlyUsd,
+    flagshipInitial.monthlyUsd,
+    bestGpuInitial.monthlyUsd,
+    1
+  );
+  const wCheapInit = Math.max(12, Math.round((cheapestInitial.monthlyUsd / chartMaxInitial) * 240));
+  const wFlagInit = Math.max(12, Math.round((flagshipInitial.monthlyUsd / chartMaxInitial) * 240));
+  const wGpuInit = Math.max(12, Math.round((bestGpuInitial.monthlyUsd / chartMaxInitial) * 240));
 
   const labels =
     locale === 'th'
       ? {
-          kicker: 'TCO // BENCHMARK.26 — เครื่องมือช่วยวางแผนงบ AI ตามการใช้งานจริง',
+          kicker: 'TCO // BENCHMARK.26 — เครื่องมือคำนวณงบและจัดสเปก AI ตามงานจริง',
           subtitle:
-            'เทียบให้เห็นชัดๆ ว่างานของคุณควรจ่ายเป็นครั้งตามที่ใช้จริง หรือเช่าเหมาชั่วโมงถึงจะประหยัดที่สุด พร้อมวิธีตั้งค่าให้ใช้งานได้นานขึ้นโดยโควต้าไม่หมดไว และรวมบิลจ่ายที่เดียวจบ',
+            'เทียบให้เห็นด้วยภาพและตัวเลขจริงว่างานของคุณควรจ่ายตาม Token (รวมทุกโมเดลในบิลเดียว) หรือเช่า GPU เหมาชั่วโมง พร้อมคู่มือจัดสเปกเฉพาะทางที่คัดเฉพาะเนื้อๆ ไปใช้งานได้ทันที',
           b1Title: 'จ่ายที่เดียวจบ ไม่ต้องแยกหลายบิล',
-          b1Desc:
-            'เช่น แทนที่จะต้องผูกบัตรเติมเงินแยกทั้ง OpenAI, Claude และ Gemini คุณสามารถใช้คีย์เดียวสลับโมเดลตามความยากของงานได้เลย',
-          b2Title: 'ทำงานได้นานขึ้นในงบเท่าเดิม',
-          b2Desc:
-            'เช่น เวลาสั่งแก้โค้ดหรือสรุปเอกสาร หากเปิดใช้ระบบจำข้อความซ้ำ (Cache) และตั้งค่าให้อ่านเฉพาะจุดสำคัญ จะยืดโควต้าใช้งานได้เกือบเท่าตัว',
-          b3Title: 'รู้เพดานรายจ่าย ไม่มีบิลช็อกสิ้นเดือน',
-          b3Desc:
-            'เมื่อทีมเริ่มใช้งานหนักขึ้น ตารางจะบอกจุดตัดทันทีว่าต้องมีงานกี่ครั้งต่อวัน การเปลี่ยนไปเช่าเครื่องรายชั่วโมงถึงจะถูกกว่า',
           workloadTag: 'ปรับตามลักษณะงานจริงของคุณ',
           presetStartup: 'งานทั่วไป / ทีมเล็ก',
           presetAgent: 'สั่งงานต่อเนื่องหลายขั้นตอน',
@@ -518,10 +914,11 @@ function renderCalculatorPage(
           cacheLabel: 'สัดส่วนข้อมูลเดิมที่ใช้ซ้ำได้ (Prompt Cache %)',
           hoursLabel: 'จำนวนชั่วโมงที่ต้องเปิดระบบต่อวัน',
           shareBtn: 'คัดลอกลิงก์ผลคำนวณนี้ไว้ส่งต่อ',
-          winnerTag: 'ทางเลือกที่ประหยัดและสะดวกที่สุดสำหรับคุณ',
+          winnerTag: 'คำตอบฟันธงที่ประหยัดและคุ้มค่าที่สุดสำหรับคุณ',
+          liveChartTitle: 'กราฟเปรียบเทียบรายจ่ายต่อเดือนแบบเรียลไทม์ (ขยับปุ่มด้านซ้ายเพื่อดูจุดตัด)',
           apiTableTag: '1. แบบจ่ายตามที่ใช้จริง (รวมทุกโมเดลในบิลเดียว ไม่ต้องดูแลเครื่อง)',
-          gpuTableTag: '2. แบบเช่าเครื่องส่วนตัวรายชั่วโมง (เหมาะกับงานหนัก คุมงบรายเดือนนิ่ง)',
-          vpsTableTag: '3. เซิร์ฟเวอร์สำหรับรันหน้าเว็บและระบบหลังบ้าน (มีทีมดูแลให้ครบ)',
+          gpuTableTag: '2. แบบเช่าเครื่องส่วนตัวรายชั่วโมง (เหมาะกับงานหนัก ล็อกงบรายเดือนนิ่ง)',
+          vpsTableTag: '3. เซิร์ฟเวอร์สำหรับรันหน้าเว็บและระบบหลังบ้าน (ไทย & ต่างประเทศ)',
           skillsTableTag: '4. ชุดคำสั่งเสริมช่วยให้ AI ประหยัดโควต้าและทำงานจบไวขึ้น (Agensi.io)',
           colModel: 'ตัวเลือก / ประโยชน์ที่ได้รับจริง',
           colMonthly: 'ค่าใช้จ่าย / เดือน',
@@ -531,24 +928,16 @@ function renderCalculatorPage(
           ctaRentGpu: 'ดูสเปกเครื่องเช่า',
           ctaHostVps: 'ดูแพ็กเกจเซิร์ฟเวอร์',
           ctaSkill: 'ดูชุดคำสั่งลดโควต้า',
-          faqTag: 'คำถามจากการใช้งานจริง',
+          faqTag: 'คำถามและเทคนิคจากการใช้งานจริง',
           directoryTag: isComparisonSubpage
             ? 'เปรียบเทียบเคสอื่นๆ ที่ใกล้เคียงกัน'
             : `รวมหน้าคำนวณแยกตามรูปแบบงานจริง (${allPages.length} รูปแบบ)`
         }
       : {
-          kicker: 'TCO // BENCHMARK.26 — PRACTICAL AI COST & QUOTA PLANNER',
+          kicker: 'TCO // BENCHMARK.26 — VISUAL AI COST & ARCHITECTURE PLANNER',
           subtitle:
-            'See clearly whether pay-as-you-go API billing or hourly dedicated rental costs less for your daily workload—plus practical ways to stretch your quota further and consolidate billing in one place.',
+            'See visually whether pay-as-you-go APIs or flat hourly GPUs cost less for your workload—complete with zero-fluff architecture blueprints and token-saving recipes.',
           b1Title: 'One-Stop Billing, Zero Juggling',
-          b1Desc:
-            'Real example: Instead of maintaining separate credit balances across OpenAI, Anthropic, and Google, route routine tasks to low-cost models and hard tasks to flagship models from a single account.',
-          b2Title: 'Work Longer Without Hitting Limits',
-          b2Desc:
-            'Real example: Reusing cached context and guiding coding agents to read only changed lines stretches your daily token budget significantly further.',
-          b3Title: 'Predictable Monthly Ceiling',
-          b3Desc:
-            'See the exact daily volume where switching from per-token billing to a flat hourly GPU caps your monthly bill with zero surprise overages.',
           workloadTag: 'Match Your Daily Usage',
           presetStartup: 'Solo / Small Team',
           presetAgent: 'Multi-Step Workflows',
@@ -561,6 +950,7 @@ function renderCalculatorPage(
           hoursLabel: 'Active System Hours per Day',
           shareBtn: 'Copy Shareable Link for This Scenario',
           winnerTag: 'Most Cost-Effective Choice for Your Workload',
+          liveChartTitle: 'Real-Time Monthly Cost Comparison (Drag Sliders to See Crossover)',
           apiTableTag: '1. Pay-As-You-Go APIs (One-Stop Billing, Zero Maintenance)',
           gpuTableTag: '2. Dedicated Hourly GPUs (Fixed Ceiling for Heavy Workloads)',
           vpsTableTag: '3. Managed Cloud Servers for Web & Backend Systems',
@@ -573,7 +963,7 @@ function renderCalculatorPage(
           ctaRentGpu: 'View Hourly GPU',
           ctaHostVps: 'View Managed Server',
           ctaSkill: 'View Workflow Skill',
-          faqTag: 'Practical Questions & Examples',
+          faqTag: 'Practical Questions & Recipes',
           directoryTag: isComparisonSubpage
             ? 'Related Workload Comparisons'
             : `All Workload & Model Calculators (${allPages.length})`
@@ -639,6 +1029,11 @@ function renderCalculatorPage(
     initialWorkload
   });
 
+  const heroVisualContent =
+    isComparisonSubpage && currentSpec
+      ? renderSpecificMatchupCard(currentSpec, locale, affiliateConfig)
+      : renderHomeVisualArchitectureStrip(locale);
+
   return `<!DOCTYPE html>
 <html lang="${locale}">
 <head>
@@ -653,14 +1048,15 @@ function renderCalculatorPage(
   <meta property="og:description" content="${escapeHtml(metaDescription)}" />
   <meta property="og:url" content="${escapeHtml(canonicalUrl)}" />${gscMeta}
   <script type="application/ld+json">${jsonLd}</script>
-  <style>${renderSharedStyles()}</style>
+  <style>${renderSharedStyles(isComparisonSubpage)}</style>
 </head>
 <body>
   <div class="nav-glass">
     <header class="masthead">
       <a class="brand-mark" href="${rootPrefix}/${locale}/index.html">TCO // BENCHMARK.26</a>
       <nav class="nav-bar">
-        <a class="nav-link" href="${rootPrefix}/${locale}/index.html">Models (${allPages.length})</a>
+        <a class="nav-link" href="${rootPrefix}/${locale}/index.html">${locale === 'th' ? 'คำนวณงบ' : 'Models'} (${allPages.length})</a>
+        <a class="nav-link" href="#playbooks">${locale === 'th' ? 'คู่มือจัดสเปก (5)' : 'Playbooks (5)'}</a>
         <a class="nav-link" href="${rootPrefix}/validation-dashboard.html">Live Stats</a>
         <a class="nav-link ${locale === 'th' ? 'active' : ''}" href="${locale === 'th' ? '#' : alternatePath}">ภาษาไทย</a>
         <a class="nav-link ${locale === 'en' ? 'active' : ''}" href="${locale === 'en' ? '#' : alternatePath}">English</a>
@@ -670,24 +1066,10 @@ function renderCalculatorPage(
 
   <div class="shell">
     <section class="hero-block">
-      <div class="kicker">${escapeHtml(labels.kicker)}</div>
+      <div class="kicker">${escapeHtml(labels.kicker)} • ${escapeHtml(labels.b1Title)}</div>
       <h1>${escapeHtml(h1)}</h1>
       <p class="lead">${escapeHtml(labels.subtitle)}</p>
-
-      <div class="benefit-trio">
-        <div class="benefit-tile">
-          <div class="benefit-title">${escapeHtml(labels.b1Title)}</div>
-          <p class="benefit-desc">${escapeHtml(labels.b1Desc)}</p>
-        </div>
-        <div class="benefit-tile">
-          <div class="benefit-title">${escapeHtml(labels.b2Title)}</div>
-          <p class="benefit-desc">${escapeHtml(labels.b2Desc)}</p>
-        </div>
-        <div class="benefit-tile">
-          <div class="benefit-title">${escapeHtml(labels.b3Title)}</div>
-          <p class="benefit-desc">${escapeHtml(labels.b3Desc)}</p>
-        </div>
-      </div>
+      ${heroVisualContent}
     </section>
 
     <div class="ledger-frame">
@@ -756,14 +1138,33 @@ function renderCalculatorPage(
 
       <main class="panel-right">
         <div class="verdict-cell">
-          <div class="verdict-meta">
-            <div class="kicker" style="margin-bottom:4px;">${escapeHtml(labels.winnerTag)}</div>
-            <div class="verdict-title" id="winner-name">${escapeHtml(initialCalc.recommendedWinner.name)} — $${initialCalc.recommendedWinner.monthlyUsd.toLocaleString()}/mo (฿${initialCalc.recommendedWinner.monthlyThb.toLocaleString()})</div>
-            <p class="verdict-copy" id="winner-verdict">${escapeHtml(initialCalc.recommendedWinner.verdict[locale])}</p>
+          <div class="verdict-top">
+            <div class="verdict-meta">
+              <div class="kicker" style="margin-bottom:4px;">${escapeHtml(labels.winnerTag)}</div>
+              <div class="verdict-title" id="winner-name">${escapeHtml(initialCalc.recommendedWinner.name)} — $${initialCalc.recommendedWinner.monthlyUsd.toLocaleString()}/mo (฿${initialCalc.recommendedWinner.monthlyThb.toLocaleString()})</div>
+              <p class="verdict-copy" id="winner-verdict">${escapeHtml(initialCalc.recommendedWinner.verdict[locale])}</p>
+            </div>
+            <a id="winner-cta" class="btn-primary" href="${escapeHtml(initialCalc.recommendedWinner.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${initialCalc.recommendedWinner.affiliateId}', ${initialCalc.recommendedWinner.monthlyUsd})">
+              ${initialCalc.recommendedWinner.category === 'cloud_gpu' ? escapeHtml(labels.ctaRentGpu) : escapeHtml(labels.ctaTryApi)} →
+            </a>
           </div>
-          <a id="winner-cta" class="btn-primary" href="${escapeHtml(initialCalc.recommendedWinner.affiliateUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${initialCalc.recommendedWinner.affiliateId}', ${initialCalc.recommendedWinner.monthlyUsd})">
-            ${initialCalc.recommendedWinner.category === 'cloud_gpu' ? escapeHtml(labels.ctaRentGpu) : escapeHtml(labels.ctaTryApi)} →
-          </a>
+
+          <div class="live-chart-box">
+            <div style="font-size:0.74rem; font-weight:600; color:var(--ink-muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">${escapeHtml(labels.liveChartTitle)}</div>
+            <svg id="live-cost-curve-svg" viewBox="0 0 650 112" width="100%" height="auto" role="img" aria-label="Live Monthly Cost Visual Comparison">
+              <text id="svg-lbl-cheap" x="8" y="26" font-family="SF Mono, monospace" font-size="10.5" font-weight="600" fill="#1D7D3F">1. ${escapeHtml(cheapestInitial.name)}</text>
+              <rect id="svg-bar-cheap" x="225" y="13" width="${wCheapInit}" height="16" rx="4" fill="#1D7D3F"/>
+              <text id="svg-val-cheap" x="${233 + wCheapInit}" y="26" font-family="SF Mono, monospace" font-size="11" font-weight="700" fill="#1D7D3F">$${cheapestInitial.monthlyUsd.toLocaleString()} (฿${cheapestInitial.monthlyThb.toLocaleString()})</text>
+
+              <text id="svg-lbl-gpu" x="8" y="60" font-family="SF Mono, monospace" font-size="10.5" font-weight="600" fill="#0066CC">2. ${escapeHtml(bestGpuInitial.name.replace('RunPod NVIDIA ', 'RunPod '))}</text>
+              <rect id="svg-bar-gpu" x="225" y="47" width="${wGpuInit}" height="16" rx="4" fill="#0066CC"/>
+              <text id="svg-val-gpu" x="${233 + wGpuInit}" y="60" font-family="SF Mono, monospace" font-size="11" font-weight="700" fill="#0066CC">$${bestGpuInitial.monthlyUsd.toLocaleString()} (฿${bestGpuInitial.monthlyThb.toLocaleString()})</text>
+
+              <text id="svg-lbl-flag" x="8" y="94" font-family="SF Mono, monospace" font-size="10.5" font-weight="600" fill="#B45309">3. ${escapeHtml(flagshipInitial.name)} (API)</text>
+              <rect id="svg-bar-flag" x="225" y="81" width="${wFlagInit}" height="16" rx="4" fill="#D97706"/>
+              <text id="svg-val-flag" x="${233 + wFlagInit}" y="94" font-family="SF Mono, monospace" font-size="11" font-weight="700" fill="#B45309">$${flagshipInitial.monthlyUsd.toLocaleString()} (฿${flagshipInitial.monthlyThb.toLocaleString()})</text>
+            </svg>
+          </div>
         </div>
 
         <div class="table-block">
@@ -890,6 +1291,8 @@ function renderCalculatorPage(
       </main>
     </div>
 
+    ${renderPlaybookCardsSection(locale, allPlaybooks, guidesPrefix, !isComparisonSubpage)}
+
     ${
       faqList.length > 0
         ? `<section class="standalone-section">
@@ -924,7 +1327,7 @@ function renderCalculatorPage(
       </div>
     </section>
 
-    <footer id="affiliate-disclosure" style="padding:20px 0 40px; border-top:1px solid var(--hairline); color:var(--ink-muted); font-size:0.78rem; line-height:1.55;">
+    <footer id="affiliate-disclosure" style="padding:20px 0 40px; border-top:1px solid var(--line); color:var(--ink-muted); font-size:0.78rem; line-height:1.55;">
       ${
         locale === 'th'
           ? 'การเปิดเผยข้อมูลพาร์ทเนอร์ (Affiliate Disclosure): เว็บไซต์นี้มีลิงก์แนะนำบริการคลาวด์, API และชุดคำสั่ง AI (รวมถึง Agensi.io, RunPod, Novita AI และผู้ให้บริการ VPS) ซึ่งผู้จัดทำอาจได้รับค่าคอมมิชชันเมื่อคุณสมัครหรือสั่งซื้อผ่านลิงก์ดังกล่าว โดยที่คุณไม่เสียค่าใช้จ่ายเพิ่มใดๆ'
@@ -991,7 +1394,7 @@ function renderCalculatorPage(
       const prog = APP_DATA.affiliates.programs[affiliateId];
       const code = (prog.affiliateCode || 'ai-cost-calc').trim();
       if (affiliateId === 'agensi') {
-        const cleanHandle = code.replace(/^https?:\/\/(www\.)?agensi\.io\/r\//i, '').replace(/^agensi\.io\/r\//i, '').replace(/^\/?r\//i, '').replace(/[^a-zA-Z0-9_-]/g, '') || 'YOUR_AGENSI_ID';
+        const cleanHandle = code.replace(/^https?:\\/\\/(www\\.)?agensi\\.io\\/r\\//i, '').replace(/^agensi\\.io\\/r\\//i, '').replace(/^\\/?r\\//i, '').replace(/[^a-zA-Z0-9_-]/g, '') || 'YOUR_AGENSI_ID';
         const agUrl = new URL('https://www.agensi.io/r/' + cleanHandle);
         agUrl.searchParams.set('utm_campaign', APP_DATA.pageSlug + '-' + itemSlug);
         return agUrl.toString();
@@ -1035,6 +1438,7 @@ function renderCalculatorPage(
       }).sort(function(a, b) { return a.monthlyUsd - b.monthlyUsd; });
 
       const maxApiUsd = Math.max.apply(null, apiRows.map(function(r) { return r.monthlyUsd; }).concat([1]));
+      const cheapest = apiRows[0];
       const flagship = apiRows.find(function(r) { return r.id === 'claude-3-7-sonnet'; }) || apiRows[apiRows.length - 1];
       const reqTokPerSec = (req * steps * outTok) / Math.max(1, hours * 3600);
 
@@ -1078,6 +1482,37 @@ function renderCalculatorPage(
       }
 
       const bestGpu = gpuRows[0];
+      const chartMax = Math.max(cheapest.monthlyUsd, flagship.monthlyUsd, bestGpu.monthlyUsd, 1);
+      const wCheap = Math.max(12, Math.round((cheapest.monthlyUsd / chartMax) * 240));
+      const wGpu = Math.max(12, Math.round((bestGpu.monthlyUsd / chartMax) * 240));
+      const wFlag = Math.max(12, Math.round((flagship.monthlyUsd / chartMax) * 240));
+
+      const barCheap = document.getElementById('svg-bar-cheap');
+      const valCheap = document.getElementById('svg-val-cheap');
+      const barGpu = document.getElementById('svg-bar-gpu');
+      const valGpu = document.getElementById('svg-val-gpu');
+      const barFlag = document.getElementById('svg-bar-flag');
+      const valFlag = document.getElementById('svg-val-flag');
+
+      if (barCheap && valCheap) {
+        document.getElementById('svg-lbl-cheap').textContent = '1. ' + cheapest.name;
+        barCheap.setAttribute('width', String(wCheap));
+        valCheap.setAttribute('x', String(233 + wCheap));
+        valCheap.textContent = '$' + cheapest.monthlyUsd.toLocaleString() + ' (฿' + cheapest.monthlyThb.toLocaleString() + ')';
+      }
+      if (barGpu && valGpu) {
+        document.getElementById('svg-lbl-gpu').textContent = '2. ' + bestGpu.name.replace('RunPod NVIDIA ', 'RunPod ');
+        barGpu.setAttribute('width', String(wGpu));
+        valGpu.setAttribute('x', String(233 + wGpu));
+        valGpu.textContent = '$' + bestGpu.monthlyUsd.toLocaleString() + ' (฿' + bestGpu.monthlyThb.toLocaleString() + ')';
+      }
+      if (barFlag && valFlag) {
+        document.getElementById('svg-lbl-flag').textContent = '3. ' + flagship.name + ' (API)';
+        barFlag.setAttribute('width', String(wFlag));
+        valFlag.setAttribute('x', String(233 + wFlag));
+        valFlag.textContent = '$' + flagship.monthlyUsd.toLocaleString() + ' (฿' + flagship.monthlyThb.toLocaleString() + ')';
+      }
+
       const winnerNameEl = document.getElementById('winner-name');
       const winnerVerdictEl = document.getElementById('winner-verdict');
       const winnerCtaEl = document.getElementById('winner-cta');
@@ -1154,7 +1589,11 @@ function renderCalculatorPage(
     })();
   </script>
 </body>
-</html>`;
+</html>`
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/\n[ \t]+/g, '\n')
+    .replace(/\n{2,}/g, '\n')
+    .replace(/>\n+</g, '><');
 }
 
 function renderValidationDashboardHtml(affiliateConfig: AffiliateConfigFile): string {
@@ -1402,6 +1841,7 @@ export interface BuildOutputSummary {
   totalHtmlPages: number;
   enComparisonPages: number;
   thComparisonPages: number;
+  playbookPages: number;
   sitemapUrls: number;
 }
 
@@ -1416,9 +1856,12 @@ export function generateStaticSite(
 
   fs.mkdirSync(path.join(stagingDir, 'en', 'compare'), { recursive: true });
   fs.mkdirSync(path.join(stagingDir, 'th', 'compare'), { recursive: true });
+  fs.mkdirSync(path.join(stagingDir, 'en', 'guides'), { recursive: true });
+  fs.mkdirSync(path.join(stagingDir, 'th', 'guides'), { recursive: true });
   fs.writeFileSync(path.join(stagingDir, '.nojekyll'), '', 'utf8');
 
   const catalog = buildProgrammaticPagesCatalog();
+  const playbooks = buildPlaybooksCatalog();
   const sitemapUrls: string[] = [];
 
   const rootGscMeta = affiliateConfig.googleSiteVerification
@@ -1449,14 +1892,14 @@ export function generateStaticSite(
       locale,
       'home',
       locale === 'th'
-        ? 'วางแผนค่าใช้จ่าย AI ให้ประหยัดที่สุด — เทียบจ่ายตามจริง vs เหมาชั่วโมง (2026)'
-        : 'Practical AI Cost & Quota Planner — Pay-As-You-Go vs. Hourly GPU (2026)',
+        ? 'วางแผนค่าใช้จ่าย AI และสูตรจัดสเปกตามงานจริง — เทียบ API vs. GPU (2026)'
+        : 'Practical AI Cost & Architecture Planner — API vs. Hourly GPU (2026)',
       locale === 'th'
-        ? 'เทียบชัดๆ ว่างานของคุณควรจ่ายตามที่ใช้จริงรวมในบิลเดียว หรือเช่าเหมาชั่วโมงถึงจะประหยัดกว่า พร้อมวิธีตั้งค่าให้ใช้งานได้นานขึ้นโดยโควต้าไม่หมดไว'
-        : 'See clearly whether pay-as-you-go single-bill APIs or flat hourly GPUs cost less for your daily workload, plus practical ways to stretch your token quota.',
+        ? 'เทียบด้วยภาพและตัวเลขจริงว่างานของคุณควรจ่ายตามที่ใช้จริงในบิลเดียว หรือเช่า GPU เหมาชั่วโมง พร้อม 5 คู่มือจัดสเปก AI สำหรับธุรกิจไทยและนักพัฒนา'
+        : 'Visual benchmark and interactive calculator comparing single-bill LLM APIs vs. flat hourly GPUs, plus 5 actionable architecture playbooks.',
       locale === 'th'
-        ? 'จ่ายน้อยลง ทำงานได้นานขึ้น และรวมทุกค่ายจบในที่เดียว'
-        : 'Pay less. Work longer. Consolidate in one place.',
+        ? 'คำนวณงบ AI ตามงานจริง พร้อมผังจัดสเปกที่คัดแต่เนื้อๆ'
+        : 'Zero-Fluff AI Cost Calculator & Architecture Playbooks',
       {
         requestsPerDay: 1500,
         inputTokensPerReq: 2500,
@@ -1467,12 +1910,30 @@ export function generateStaticSite(
       },
       [],
       catalog,
+      playbooks,
       affiliateConfig,
       false,
       publicBaseUrl
     );
     fs.writeFileSync(path.join(stagingDir, locale, 'index.html'), homeHtml, 'utf8');
     sitemapUrls.push(`${publicBaseUrl}/${locale}/index.html`);
+
+    for (const guide of playbooks) {
+      const guideHtml = renderPlaybookGuidePage(
+        locale,
+        guide,
+        playbooks,
+        catalog,
+        affiliateConfig,
+        publicBaseUrl
+      );
+      fs.writeFileSync(
+        path.join(stagingDir, locale, 'guides', `${guide.slug}.html`),
+        guideHtml,
+        'utf8'
+      );
+      sitemapUrls.push(`${publicBaseUrl}/${locale}/guides/${guide.slug}.html`);
+    }
 
     for (const spec of catalog) {
       const subHtml = renderCalculatorPage(
@@ -1484,9 +1945,11 @@ export function generateStaticSite(
         spec.presetWorkload,
         spec.faq,
         catalog,
+        playbooks,
         affiliateConfig,
         true,
-        publicBaseUrl
+        publicBaseUrl,
+        spec
       );
       fs.writeFileSync(
         path.join(stagingDir, locale, 'compare', `${spec.slug}.html`),
@@ -1503,7 +1966,7 @@ export function generateStaticSite(
     'utf8'
   );
 
-  const totalHtmlPages = 1 + 1 + locales.length * (1 + catalog.length);
+  const totalHtmlPages = 1 + 1 + locales.length * (1 + catalog.length + playbooks.length);
 
   const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -1519,11 +1982,16 @@ ${sitemapUrls.map((u) => `  <url><loc>${escapeHtml(u)}</loc></url>`).join('\n')}
     'utf8'
   );
 
-  const llmsTxt = `# TCO // BENCHMARK.26 — Practical AI Cost & Quota Planner (EN / TH)
-> Compare single-bill pay-as-you-go LLM APIs, flat-rate hourly GPUs, managed servers, and token-saving Agent Skills (${totalHtmlPages} bilingual pages).
+  const llmsTxt = `# TCO // BENCHMARK.26 — Practical AI Cost & Architecture Planner (EN / TH)
+> Visual interactive calculator and 5 production AI architecture playbooks comparing single-bill LLM APIs, flat-rate hourly GPUs, managed servers, and token-saving Agent Skills (${totalHtmlPages} bilingual pages).
 
 - English Planner: ${publicBaseUrl}/en/index.html
 - Thai Planner: ${publicBaseUrl}/th/index.html
+- Thai Tokenizer Benchmark Guide: ${publicBaseUrl}/th/guides/thai-tokenizer-cost-benchmark.html
+- LINE OA + RAG Blueprint Guide: ${publicBaseUrl}/th/guides/line-oa-rag-chatbot-blueprint.html
+- Claude Code & Cursor 60% Cost Cut Guide: ${publicBaseUrl}/th/guides/claude-code-cursor-cost-cut.html
+- API to RunPod vLLM Migration Guide: ${publicBaseUrl}/th/guides/api-to-runpod-vllm-migration.html
+- Thai VPS vs Global Cloud Guide: ${publicBaseUrl}/th/guides/thai-vps-vs-global-cloud-ai-backend.html
 - Live Stats: ${publicBaseUrl}/validation-dashboard.html
 - Sitemap (${sitemapUrls.length} URLs): ${publicBaseUrl}/sitemap.xml
 `;
@@ -1548,6 +2016,7 @@ ${sitemapUrls.map((u) => `  <url><loc>${escapeHtml(u)}</loc></url>`).join('\n')}
     totalHtmlPages,
     enComparisonPages: catalog.length,
     thComparisonPages: catalog.length,
+    playbookPages: locales.length * playbooks.length,
     sitemapUrls: sitemapUrls.length
   };
 }

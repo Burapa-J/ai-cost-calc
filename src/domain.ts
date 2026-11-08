@@ -208,6 +208,51 @@ export interface ProgrammaticComparisonPageSpec {
   faq: Array<{ q: BilingualText; a: BilingualText }>;
 }
 
+export type PlaybookSvgType =
+  | 'thai_token_bars'
+  | 'line_rag_arch'
+  | 'coding_tier_flow'
+  | 'gpu_breakeven_curve'
+  | 'vps_latency_map';
+
+export interface PlaybookGuideSpec {
+  slug: string;
+  svgType: PlaybookSvgType;
+  badge: BilingualText;
+  title: BilingualText;
+  metaDescription: BilingualText;
+  h1: BilingualText;
+  readTime: BilingualText;
+  keyTakeaway: BilingualText;
+  presetWorkload: Partial<WorkloadInput>;
+  comparisonHeaders: {
+    colA: BilingualText;
+    colB: BilingualText;
+    colC: BilingualText;
+    colD: BilingualText;
+  };
+  comparisonRows: Array<{
+    item: BilingualText;
+    colB: string;
+    colC: string;
+    verdict: BilingualText;
+  }>;
+  steps: Array<{
+    title: BilingualText;
+    detail: BilingualText;
+    codeSnippet?: string;
+  }>;
+  recommendedStack: Array<{
+    affiliateId: AffiliateId;
+    itemSlug: string;
+    role: BilingualText;
+    name: string;
+    priceNote: BilingualText;
+    ctaLabel: BilingualText;
+  }>;
+  faq: Array<{ q: BilingualText; a: BilingualText }>;
+}
+
 export const LLM_MODELS: LlmModelSpec[] = [
   {
     id: 'claude-3-7-sonnet',

@@ -10,7 +10,7 @@ import { startValidationServer } from '../src/server.ts';
 const configPath = path.resolve(import.meta.dirname, '../config/affiliates.json');
 const affiliateConfig = JSON.parse(fs.readFileSync(configPath, 'utf8')) as AffiliateConfigFile;
 
-test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 344 minimal un-slop bilingual SEO pages + global counter', () => {
+test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 354 visual zero-fluff bilingual SEO & Playbook pages', () => {
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ai-cost-calc-test-'));
   const distPath = path.join(tmpRoot, 'dist');
 
@@ -18,11 +18,12 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
     const firstRun = generateStaticSite(distPath, affiliateConfig, 'https://burapa-j.github.io/ai-cost-calc');
     const secondRun = generateStaticSite(distPath, affiliateConfig, 'https://burapa-j.github.io/ai-cost-calc');
 
-    assert.equal(firstRun.totalHtmlPages, 344);
-    assert.equal(secondRun.totalHtmlPages, 344);
+    assert.equal(firstRun.totalHtmlPages, 354);
+    assert.equal(secondRun.totalHtmlPages, 354);
     assert.equal(firstRun.enComparisonPages, 170);
     assert.equal(firstRun.thComparisonPages, 170);
-    assert.equal(firstRun.sitemapUrls, 342);
+    assert.equal(firstRun.playbookPages, 10);
+    assert.equal(firstRun.sitemapUrls, 352);
 
     const thHome = fs.readFileSync(path.join(distPath, 'th', 'index.html'), 'utf8');
     assert.equal(thHome.includes('TCO // BENCHMARK.26'), true);
@@ -32,6 +33,8 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
     assert.equal(thHome.includes('https://www.agensi.io/r/BURAPA'), true);
     assert.equal(thHome.includes('id="affiliate-disclosure"'), true);
     assert.equal(thHome.includes('จ่ายที่เดียวจบ ไม่ต้องแยกหลายบิล'), true);
+    assert.equal(thHome.includes('id="live-cost-curve-svg"'), true);
+    assert.equal(thHome.includes('id="playbooks"'), true);
     assert.equal(thHome.includes('https://abacus.jasoncameron.dev/hit/'), true);
     assert.equal(thHome.includes('burapa_ai_cost_calc_live'), true);
     assert.equal(
@@ -54,6 +57,8 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
     );
     const enCompare = fs.readFileSync(enSubpagePath, 'utf8');
     assert.equal(enCompare.includes('Claude 3.7 Sonnet vs. RunPod NVIDIA A100 PCIe (80GB)'), true);
+    assert.equal(enCompare.includes('class="matchup-spotlight"'), true);
+    assert.equal(enCompare.includes('<svg'), true);
     assert.equal(Buffer.byteLength(enCompare, 'utf8') < 65_000, true);
 
     const workloadPage = fs.readFileSync(
@@ -61,6 +66,20 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
       'utf8'
     );
     assert.equal(workloadPage.includes('ระบบ AI Agent เขียนและตรวจโค้ดอัตโนมัติหลายขั้นตอน ด้วย Claude 3.7 Sonnet'), true);
+    assert.equal(workloadPage.includes('class="matchup-spotlight"'), true);
+
+    const thGuidePath = path.join(
+      distPath,
+      'th',
+      'guides',
+      'line-oa-rag-chatbot-blueprint.html'
+    );
+    const thGuide = fs.readFileSync(thGuidePath, 'utf8');
+    assert.equal(thGuide.includes('LINE OA'), true);
+    assert.equal(thGuide.includes('<svg'), true);
+    assert.equal(thGuide.includes('Hostatom'), true);
+    assert.equal(thGuide.includes('Ruk-Com'), true);
+    assert.equal(Buffer.byteLength(thGuide, 'utf8') < 65_000, true);
   } finally {
     fs.rmSync(tmpRoot, { recursive: true, force: true });
   }
