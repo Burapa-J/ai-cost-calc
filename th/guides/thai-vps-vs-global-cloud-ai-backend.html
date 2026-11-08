@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>คู่มือเลือกเซิร์ฟเวอร์วางระบบเว็บและ AI Backend (ไทย vs ต่างประเทศ) — เลือกค่ายไหนไม่ให้ระบบล่ม?</title>
+<meta name="description" content="เปรียบเทียบชัดๆ ระหว่างการวางระบบหลังบ้านบน VPS ในไทย (Hostatom, Ruk-Com) กับ Managed Cloud ระดับสากล (Cloudways DigitalOcean / Vultr) ตามประเภทธุรกิจจริง" />
+<link rel="canonical" href="https://burapa-j.github.io/ai-cost-calc/th/guides/thai-vps-vs-global-cloud-ai-backend.html" />
+<link rel="alternate" hreflang="en" href="../../en/guides/thai-vps-vs-global-cloud-ai-backend.html" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="คู่มือเลือกเซิร์ฟเวอร์วางระบบเว็บและ AI Backend (ไทย vs ต่างประเทศ) — เลือกค่ายไหนไม่ให้ระบบล่ม?" />
+<meta property="og:description" content="เปรียบเทียบชัดๆ ระหว่างการวางระบบหลังบ้านบน VPS ในไทย (Hostatom, Ruk-Com) กับ Managed Cloud ระดับสากล (Cloudways DigitalOcean / Vultr) ตามประเภทธุรกิจจริง" />
+<meta property="og:url" content="https://burapa-j.github.io/ai-cost-calc/th/guides/thai-vps-vs-global-cloud-ai-backend.html" />
+<meta name="google-site-verification" content="0BpLINOsguphSm_6-JsDTcU7dLvSmAUZ2S4jvY1FUPU" />
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"เลือกเซิร์ฟเวอร์วางระบบเว็บและ AI Backend: เมื่อไหร่ควรใช้ VPS ในไทย (Hostatom / Ruk-Com) vs ระดับโลก (Cloudways)?","description":"เปรียบเทียบชัดๆ ระหว่างการวางระบบหลังบ้านบน VPS ในไทย (Hostatom, Ruk-Com) กับ Managed Cloud ระดับสากล (Cloudways DigitalOcean / Vultr) ตามประเภทธุรกิจจริง","url":"https://burapa-j.github.io/ai-cost-calc/th/guides/thai-vps-vs-global-cloud-ai-backend.html"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"ถ้าเริ่มต้นทำระบบ AI ภายในบริษัท ควรเริ่มจาก RAM กี่ GB?","acceptedAnswer":{"@type":"Answer","text":"แนะนำเริ่มต้นที่ 4GB RAM (เช่น Hostatom VPS 4GB ราคา $24/เดือน) ซึ่งเพียงพอสำหรับรัน Node.js/Python API คู่กับ Qdrant Vector Database ที่เก็บข้อมูลเอกสารได้ราว 100,000–300,000 ย่อหน้า หากเอกสารมากกว่านั้นหรือต้องการระบบ Managed เต็มรูปแบบ แนะนำขยับเป็น 8GB RAM บน Ruk-Com ($46/เดือน)"}}]}]}</script>
+<style>:root{--paper: #FBFBFD;--surface: #FFFFFF;--surface-alt: #F5F5F7;--ink: #1D1D1F;--ink-secondary: #515154;--ink-muted: #86868B;--line: rgba(0,0,0,0.08);--line-strong: rgba(0,0,0,0.14);--accent: #0066CC;--ledger-green: #1D7D3F;--mono: "SF Mono","JetBrains Mono","Menlo",monospace;--sans: -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter","Noto Sans Thai",sans-serif;--ease-out: cubic-bezier(0.22,1,0.36,1);}*{box-sizing: border-box;}body{margin: 0;font-family: var(--sans);background: var(--paper);color: var(--ink);line-height: 1.55;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;}a{color: var(--accent);text-decoration: none;transition: opacity 0.2s var(--ease-out);}a:hover{opacity: 0.78;}@keyframes settleIn{from{opacity: 0;transform: translateY(10px);}to{opacity: 1;transform: translateY(0);}}.nav-glass{position: sticky;top: 0;z-index: 40;background: rgba(251,251,253,0.8);backdrop-filter: saturate(180%) blur(20px);-webkit-backdrop-filter: saturate(180%) blur(20px);border-bottom: 1px solid var(--line);}.masthead{max-width: 1160px;margin: 0 auto;padding: 0 24px;height: 52px;display: flex;justify-content: space-between;align-items: center;font-size: 0.8rem;}.brand-mark{display: inline-flex;align-items: center;gap: 9px;font-weight: 600;color: var(--ink);letter-spacing: -0.01em;font-size: 0.9rem;}.brand-logo-svg{flex-shrink: 0;display: block;}.nav-bar{display: flex;gap: 20px;align-items: center;flex-wrap: wrap;}.nav-link{color: var(--ink-secondary);font-size: 0.78rem;transition: color 0.2s var(--ease-out);}.nav-link:hover,.nav-link.active{color: var(--ink);font-weight: 500;opacity: 1;}.shell{max-width: 1160px;margin: 0 auto;padding: 0 24px 96px;animation: settleIn 0.55s var(--ease-out) both;}.hero-block{padding: 44px 0 26px;}.kicker{font-size: 0.75rem;font-weight: 600;text-transform: uppercase;letter-spacing: 0.06em;color: var(--ink-muted);margin-bottom: 10px;}h1{font-size: clamp(1.9rem,3.5vw,2.85rem);font-weight: 600;letter-spacing: -0.032em;line-height: 1.12;margin: 0 0 14px;max-width: 28ch;color: var(--ink);}.lead{color: var(--ink-secondary);font-size: 1.04rem;line-height: 1.58;max-width: 66ch;margin: 0;font-weight: 400;}.benefit-title{font-size: 0.94rem;font-weight: 600;color: var(--ink);margin: 0 0 6px;letter-spacing: -0.01em;}.benefit-desc{font-size: 0.84rem;color: var(--ink-secondary);margin: 0;line-height: 1.5;}.matchup-spotlight{margin-top: 22px;background: var(--surface);border: 1px solid var(--line-strong);border-radius: 20px;padding: 24px 26px;box-shadow: 0 8px 28px rgba(0,0,0,0.03);}.matchup-decision-grid{display: grid;grid-template-columns: repeat(2,1fr);gap: 14px;}@media (max-width: 780px){.matchup-decision-grid{grid-template-columns: 1fr;}}.decision-box{background: var(--surface-alt);border-radius: 14px;padding: 16px 18px;}.decision-badge{font-size: 0.86rem;font-weight: 600;color: var(--ink);margin-bottom: 6px;}.ledger-frame{display: grid;grid-template-columns: 370px 1fr;gap: 24px;margin-top: 24px;align-items: start;}@media (max-width: 940px){.ledger-frame{grid-template-columns: 1fr;}}.panel-left{position: sticky;top: 72px;background: var(--surface);border: 1px solid var(--line);border-radius: 20px;padding: 26px;box-shadow: 0 8px 30px rgba(0,0,0,0.03);}@media (max-width: 940px){.panel-left{position: static;}}.panel-right{display: flex;flex-direction: column;gap: 20px;}.section-tag{font-size: 0.72rem;font-weight: 600;text-transform: uppercase;letter-spacing: 0.06em;color: var(--ink-muted);padding-bottom: 12px;border-bottom: 1px solid var(--line);margin-bottom: 18px;display: flex;justify-content: space-between;align-items: center;}.preset-strip{display: grid;grid-template-columns: repeat(3,1fr);gap: 6px;background: var(--surface-alt);padding: 4px;border-radius: 12px;margin-bottom: 22px;}.preset-btn{background: transparent;border: none;border-radius: 9px;padding: 8px 6px;font-family: var(--sans);font-size: 0.74rem;font-weight: 500;color: var(--ink-secondary);cursor: pointer;transition: background 0.25s var(--ease-out),color 0.25s var(--ease-out),box-shadow 0.25s var(--ease-out);}.preset-btn:hover{background: var(--surface);color: var(--ink);box-shadow: 0 2px 8px rgba(0,0,0,0.06);}.field-row{margin-bottom: 18px;}.field-top{display: flex;justify-content: space-between;align-items: baseline;margin-bottom: 8px;gap: 8px;}.field-label{font-size: 0.84rem;font-weight: 500;color: var(--ink);}.field-readout{font-family: var(--mono);font-size: 0.84rem;font-weight: 600;color: var(--ink);font-variant-numeric: tabular-nums;background: var(--surface-alt);padding: 3px 9px;border-radius: 8px;}input[type="range"]{-webkit-appearance: none;appearance: none;width: 100%;height: 4px;background: #E5E5EA;border-radius: 999px;outline: none;cursor: pointer;}input[type="range"]::-webkit-slider-thumb{-webkit-appearance: none;appearance: none;width: 20px;height: 20px;border-radius: 50%;background: var(--surface);border: 1px solid rgba(0,0,0,0.12);box-shadow: 0 2px 6px rgba(0,0,0,0.15);cursor: pointer;transition: transform 0.2s var(--ease-out),box-shadow 0.2s var(--ease-out);}input[type="range"]::-webkit-slider-thumb:hover{transform: scale(1.08);box-shadow: 0 3px 10px rgba(0,0,0,0.2);}.verdict-cell{padding: 26px 28px;border-radius: 20px;background: var(--surface);border: 1px solid var(--line);box-shadow: 0 8px 30px rgba(0,0,0,0.03);display: flex;flex-direction: column;gap: 18px;}.verdict-top{display: flex;justify-content: space-between;align-items: center;gap: 20px;flex-wrap: wrap;}.verdict-meta{max-width: 60ch;}.verdict-title{font-size: 1.42rem;font-weight: 600;letter-spacing: -0.025em;margin: 4px 0 8px;font-variant-numeric: tabular-nums;color: var(--ink);}.verdict-copy{font-size: 0.9rem;color: var(--ink-secondary);margin: 0;line-height: 1.55;}.live-chart-box{background: #F8FAFC;border: 1px solid rgba(0,0,0,0.06);border-radius: 14px;padding: 14px 16px;}.btn-primary{display: inline-block;background: var(--ink);color: var(--surface);font-size: 0.84rem;font-weight: 500;padding: 12px 22px;border-radius: 999px;border: none;cursor: pointer;white-space: nowrap;transition: transform 0.25s var(--ease-out),background 0.25s var(--ease-out),opacity 0.25s var(--ease-out);}.btn-primary:hover{background: #333336;color: #fff;transform: scale(1.015);opacity: 1;}.btn-outline{width: 100%;background: var(--surface-alt);color: var(--ink);font-size: 0.82rem;font-weight: 500;padding: 11px 16px;border-radius: 12px;border: 1px solid transparent;cursor: pointer;transition: background 0.2s var(--ease-out);}.btn-outline:hover{background: #E8E8ED;}.table-block{padding: 26px 28px;border-radius: 20px;background: var(--surface);border: 1px solid var(--line);box-shadow: 0 4px 20px rgba(0,0,0,0.02);}table{width: 100%;border-collapse: collapse;font-size: 0.88rem;font-variant-numeric: tabular-nums;}th{font-size: 0.72rem;text-transform: uppercase;letter-spacing: 0.05em;color: var(--ink-muted);text-align: left;padding: 8px 10px 10px 0;border-bottom: 1px solid var(--line-strong);font-weight: 600;}th.num,td.num{text-align: right;}td{padding: 14px 10px 14px 0;border-bottom: 1px solid var(--line);vertical-align: middle;}tr:last-child td{border-bottom: none;}.mono-val{font-family: var(--mono);font-weight: 600;color: var(--ink);}.savings-val{font-family: var(--mono);font-weight: 600;color: var(--ledger-green);}.sub-val{font-size: 0.78rem;color: var(--ink-secondary);display: block;margin-top: 2px;}.bar-track{width: 100%;max-width: 140px;height: 4px;background: var(--surface-alt);border-radius: 999px;margin-top: 6px;overflow: hidden;}.bar-fill{height: 100%;background: var(--ink);border-radius: 999px;transition: width 0.45s var(--ease-out);}.action-link{font-size: 0.82rem;font-weight: 500;color: var(--accent);white-space: nowrap;}.standalone-section{margin-top: 24px;border-radius: 20px;border: 1px solid var(--line);background: var(--surface);padding: 26px 28px;}.index-grid{display: grid;grid-template-columns: repeat(auto-fill,minmax(270px,1fr));gap: 10px;margin-top: 14px;}.index-cell{padding: 12px 14px;border-radius: 12px;background: var(--surface-alt);font-size: 0.82rem;color: var(--ink);display: flex;justify-content: space-between;align-items: center;gap: 8px;transition: background 0.2s var(--ease-out),transform 0.2s var(--ease-out);}.index-cell:hover{background: #E8E8ED;transform: translateY(-1px);opacity: 1;}.visual-trio-grid{display: grid;grid-template-columns: repeat(3,1fr);gap: 16px;margin-top: 24px;}@media (max-width: 860px){.visual-trio-grid{grid-template-columns: 1fr;}}.visual-card{background: var(--surface);border: 1px solid var(--line);border-radius: 18px;padding: 18px 20px;box-shadow: 0 4px 16px rgba(0,0,0,0.02);transition: transform 0.3s var(--ease-out);}.visual-card:hover{transform: translateY(-2px);}.visual-svg-wrap{background: #F8FAFC;border: 1px solid rgba(0,0,0,0.06);border-radius: 12px;padding: 6px 8px;margin-bottom: 12px;}.playbook-grid{display: grid;grid-template-columns: repeat(auto-fit,minmax(310px,1fr));gap: 16px;margin-top: 14px;}.playbook-card{display: flex;flex-direction: column;justify-content: space-between;background: var(--surface);border: 1px solid var(--line);border-radius: 18px;padding: 20px 22px;color: var(--ink);transition: transform 0.25s var(--ease-out),border-color 0.25s var(--ease-out),box-shadow 0.25s var(--ease-out);}.playbook-card:hover{transform: translateY(-3px);border-color: var(--accent);box-shadow: 0 10px 28px rgba(0,102,204,0.08);opacity: 1;}.playbook-badge{display: inline-block;font-family: var(--mono);font-size: 0.68rem;font-weight: 600;color: var(--accent);background: #EFF6FF;padding: 3px 9px;border-radius: 999px;margin-bottom: 10px;width: fit-content;}.playbook-title{font-size: 1.02rem;font-weight: 600;color: var(--ink);margin: 0 0 8px;line-height: 1.38;}.playbook-takeaway{font-size: 0.83rem;color: var(--ink-secondary);margin: 0 0 14px;line-height: 1.5;}.guide-takeaway{background: #F0FDF4;border: 1px solid #86EFAC;border-radius: 16px;padding: 18px 22px;margin: 20px 0 24px;font-size: 0.95rem;color: #14532D;font-weight: 500;}.guide-step{background: var(--surface-alt);border-radius: 16px;padding: 20px 24px;margin-bottom: 14px;}.guide-step-title{font-size: 1rem;font-weight: 600;color: var(--ink);margin: 0 0 6px;}.guide-code{background: #1D1D1F;color: #F5F5F7;padding: 14px 16px;border-radius: 10px;font-family: var(--mono);font-size: 0.78rem;overflow-x: auto;margin: 12px 0 0;line-height: 1.5;}.stack-grid{display: grid;grid-template-columns: repeat(auto-fit,minmax(260px,1fr));gap: 14px;margin-top: 14px;}.stack-card{background: var(--surface-alt);border: 1px solid var(--line);border-radius: 16px;padding: 18px 20px;display: flex;flex-direction: column;justify-content: space-between;gap: 10px;}</style>
+</head>
+<body>
+<div class="nav-glass">
+<header class="masthead">
+<a class="brand-mark" href="../../th/index.html"><svg class="brand-logo-svg" viewBox="0 0 28 28" width="24" height="24" role="img" aria-label="TCO Benchmark Logo"><rect width="28" height="28" rx="7" fill="#1D1D1F"/><rect x="5" y="15" width="3.5" height="7.5" rx="1.2" fill="#60A5FA"/><rect x="10.5" y="11" width="3.5" height="11.5" rx="1.2" fill="#3B82F6"/><rect x="16" y="6.5" width="3.5" height="16" rx="1.2" fill="#34D399"/><path d="M4.5 10.5 H23.5" stroke="#FBBF24" stroke-width="1.7" stroke-linecap="round" stroke-dasharray="2 2"/><circle cx="16" cy="10.5" r="2.6" fill="#10B981" stroke="#1D1D1F" stroke-width="1"/></svg><span>TCO // BENCHMARK.26</span></a>
+<nav class="nav-bar">
+<a class="nav-link" href="../../th/index.html">เครื่องคำนวณงบ AI (170)</a>
+<a class="nav-link active" href="../../th/index.html#playbooks">คู่มือจัดสเปก (5)</a>
+<a class="nav-link active" href="#">ภาษาไทย</a>
+<a class="nav-link " href="../../en/guides/thai-vps-vs-global-cloud-ai-backend.html">English</a>
+</nav>
+</header>
+</div>
+
+<div class="shell">
+<section class="hero-block">
+<div class="kicker">INFRASTRUCTURE GUIDE • ไทย vs ต่างประเทศ • อ่านจบใน 3 นาที • ตารางฟันธงตามประเภทธุรกิจ</div>
+<h1 style="max-width:32ch;">เลือกเซิร์ฟเวอร์วางระบบเว็บและ AI Backend: เมื่อไหร่ควรใช้ VPS ในไทย (Hostatom / Ruk-Com) vs ระดับโลก (Cloudways)?</h1>
+<div class="guide-takeaway">
+ฟันธง: ถ้าลูกค้า 90% อยู่ในไทย (เช่น ระบบคลินิก ร้านค้า LINE OA หรือระบบองค์กรที่ต้องเก็บข้อมูลในไทยตาม PDPA) ให้เลือก Hostatom หรือ Ruk-Com จะได้ความเร็วตอบสนองไวกว่า 4 เท่า (&lt;8ms) ในราคาเริ่มต้นเพียง ฿828/เดือน แต่ถ้าทำเว็บ SaaS ขายทั่วโลก ให้เลือก Cloudways (Vultr HF / DigitalOcean)
+</div>
+<div style="margin: 22px 0;">
+<svg viewBox="0 0 680 220" width="100%" height="auto" role="img" aria-label="Thailand vs Global Cloud VPS Latency & Use Case Map" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
+<text x="24" y="28" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">เทียบความเร็วตอบสนอง (Latency) และการเลือกเซิร์ฟเวอร์สำหรับผู้ใช้ในไทย</text>
+
+<!-- Option 1: Hostatom -->
+<rect x="24" y="48" width="200" height="150" rx="12" fill="#FFFFFF" stroke="#1D7D3F" stroke-width="1.5"/>
+<text x="124" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#1D7D3F">Hostatom VPS (TH)</text>
+<text x="124" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D1D1F">Ping: 4–8 ms (BKK)</text>
+<text x="124" y="114" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• คุ้มราคาที่สุดในไทย</text>
+<text x="124" y="132" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• เหมาะรัน Docker / Qdrant / n8n</text>
+<rect x="49" y="154" width="150" height="28" rx="6" fill="#E8F5E9"/>
+<text x="124" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="700" fill="#1D7D3F">$24/mo (~฿828)</text>
+
+<!-- Option 2: Ruk-Com -->
+<rect x="240" y="48" width="200" height="150" rx="12" fill="#FFFFFF" stroke="#0066CC" stroke-width="1.5"/>
+<text x="340" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#0066CC">Ruk-Com Managed (TH)</text>
+<text x="340" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D1D1F">Ping: 5–9 ms (BKK)</text>
+<text x="340" y="114" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• มีวิศวกรไทยดูแลให้ 24 ชม.</text>
+<text x="340" y="132" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• แถม WAF กันยิง + DirectAdmin</text>
+<rect x="265" y="154" width="150" height="28" rx="6" fill="#EFF6FF"/>
+<text x="340" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="700" fill="#0066CC">$46/mo (~฿1,587)</text>
+
+<!-- Option 3: Cloudways -->
+<rect x="456" y="48" width="200" height="150" rx="12" fill="#FFFFFF" stroke="#1D1D1F" stroke-width="1.5"/>
+<text x="556" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#1D1D1F">Cloudways (SG/Global)</text>
+<text x="556" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D1D1F">Ping: ~32 ms (SG Edge)</text>
+<text x="556" y="114" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• รองรับลูกค้าทั่วโลก (DO/Vultr)</text>
+<text x="556" y="132" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• ระบบ Staging + Auto-Backup</text>
+<rect x="481" y="154" width="150" height="28" rx="6" fill="#F5F5F7"/>
+<text x="556" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11" font-weight="700" fill="#1D1D1F">$54/mo (~฿1,863)</text>
+</svg>
+</div>
+<div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:18px;">
+<a class="btn-primary" href="../index.html?req=1500&steps=2&inTok=2000&outTok=500&cache=40&hours=24">
+โหลดสเปกนี้เข้าเครื่องคำนวณเพื่อปรับตัวเลขจริง →
+</a>
+<a class="action-link" href="../../th/index.html#playbooks" style="padding:10px 14px;">
+← ดูคู่มือจัดสเปกทั้งหมด 5 เรื่อง
+</a>
+</div>
+</section>
+
+<section class="table-block">
+<div class="section-tag">
+<span>ตารางเปรียบเทียบตัวเลขจริง</span>
+<span>2026 VERIFIED DATA</span>
+</div>
+<table>
+<thead>
+<tr>
+<th>ผู้ให้บริการเซิร์ฟเวอร์</th>
+<th class="num">สเปกเริ่มต้น / ที่ตั้ง</th>
+<th class="num">ราคา / เดือน</th>
+<th>เหมาะกับใครที่สุด?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="mono-val">Hostatom Cloud VPS Thailand</span></td>
+<td class="num"><span class="mono-val">2 vCPU / 4GB RAM • กรุงเทพฯ</span></td>
+<td class="num"><span class="savings-val">$24/mo (~฿828)</span></td>
+<td style="padding-left:18px; color:var(--ink-secondary); font-size:0.84rem;">ทีมที่มีนักพัฒนาดูแล Docker เองได้ ต้องการความเร็วในไทยสูงสุดในงบประหยัด</td>
+</tr>
+<tr>
+<td><span class="mono-val">Ruk-Com Managed VPS Thailand</span></td>
+<td class="num"><span class="mono-val">4 vCPU / 8GB RAM • กรุงเทพฯ</span></td>
+<td class="num"><span class="savings-val">$46/mo (~฿1,587)</span></td>
+<td style="padding-left:18px; color:var(--ink-secondary); font-size:0.84rem;">ธุรกิจไทยที่ต้องการวิศวกรดูแลระบบ ความปลอดภัย WAF และสำรองข้อมูลให้ครบ 24 ชม.</td>
+</tr>
+<tr>
+<td><span class="mono-val">Cloudways Managed (DO / Vultr HF)</span></td>
+<td class="num"><span class="mono-val">2–4 vCPU / 4–8GB • สิงคโปร์/ทั่วโลก</span></td>
+<td class="num"><span class="savings-val">$54–$112/mo</span></td>
+<td style="padding-left:18px; color:var(--ink-secondary); font-size:0.84rem;">เว็บแอป SaaS หรือ E-Commerce ที่มีลูกค้าหลายประเทศ ต้องการ Auto-Healing และ Staging</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<section class="standalone-section">
+<div class="section-tag">
+<span>ขั้นตอนการตั้งค่าใช้งานจริง (STEP-BY-STEP RECIPE)</span>
+<span>COPY &amp; DEPLOY</span>
+</div>
+<div class="guide-step">
+<h2 class="guide-step-title">ขั้นตอนที่ 1: เช็กว่าฐานข้อมูลของคุณต้องเรียกคุยกับ API ฝั่งไหนบ่อยที่สุด</h2>
+<p class="benefit-desc">ในงาน AI สมัยใหม่ เวลารอส่วนใหญ่มาจาก 2 ส่วนคือ ตอนโหลดหน้าเว็บ/ฐานข้อมูล (ควรอยู่ใกล้ผู้ใช้) และตอนรอ AI คิดคำตอบ การวางหน้าเว็บและฐานข้อมูลไว้ในไทยช่วยให้หน้าเว็บเปิดขึ้นมาทันทีใน 50ms แม้ระหว่างที่กำลังสตรีมคำตอบจาก AI</p>
+
+</div>
+<div class="guide-step">
+<h2 class="guide-step-title">ขั้นตอนที่ 2: แยกเซิร์ฟเวอร์ระบบหลักออกจากเครื่องประมวลผลหนัก</h2>
+<p class="benefit-desc">อย่าเอาเว็บหลักไปรันปนบนเครื่อง GPU รายชั่วโมง เพราะเวลาคุณสั่งปิด GPU เพื่อประหยัดเงิน เว็บหลักจะดับไปด้วย ให้รันเว็บหลักและฐานข้อมูลบน VPS รายเดือนที่เสถียรตลอด 24 ชม. (Hostatom / Ruk-Com / Cloudways) แล้วค่อยยิง API ไปหา LLM</p>
+
+</div>
+</section>
+
+<section class="standalone-section">
+<div class="section-tag">
+<span>ชุดเครื่องมือและผู้ให้บริการที่แนะนำสำหรับสูตรนี้</span>
+<span>VERIFIED PARTNERS</span>
+</div>
+<div class="stack-grid">
+<div class="stack-card">
+<div>
+<div class="kicker" style="margin-bottom:4px;">VPS ในไทย คุ้มราคาที่สุด</div>
+<div class="mono-val" style="font-size:0.95rem; margin-bottom:6px;">Hostatom Cloud VPS Thailand ($24/mo)</div>
+<div class="sub-val" style="color:var(--ledger-green); font-weight:600;">เริ่มต้น ~฿828/เดือน (กรุงเทพฯ)</div>
+</div>
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://support.hostatom.com/aff.php?aff=4643&amp;utm_campaign=thai-vps-vs-global-cloud-ai-backend-guide-vps-hostatom" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_hostatom',{mode:'cors'}).catch(function(){});">
+ดูแพ็กเกจ Hostatom →
+</a>
+</div>
+<div class="stack-card">
+<div>
+<div class="kicker" style="margin-bottom:4px;">Managed VPS ในไทย ดูแลครบ 24 ชม.</div>
+<div class="mono-val" style="font-size:0.95rem; margin-bottom:6px;">Ruk-Com Managed Cloud VPS ($46/mo)</div>
+<div class="sub-val" style="color:var(--ledger-green); font-weight:600;">เริ่มต้น ~฿1,587/เดือน พร้อมทีมดูแล</div>
+</div>
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://portal.ruk-com.cloud/aff.php?aff=1874&amp;utm_campaign=thai-vps-vs-global-cloud-ai-backend-guide-vps-rukcom" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_rukcom',{mode:'cors'}).catch(function(){});">
+ดูแพ็กเกจ Ruk-Com →
+</a>
+</div>
+<div class="stack-card">
+<div>
+<div class="kicker" style="margin-bottom:4px;">Managed Cloud ระดับสากล</div>
+<div class="mono-val" style="font-size:0.95rem; margin-bottom:6px;">Cloudways Managed DigitalOcean / Vultr HF ($54/mo)</div>
+<div class="sub-val" style="color:var(--ledger-green); font-weight:600;">มีโหนดสิงคโปร์และทั่วโลกกว่า 65 แห่ง</div>
+</div>
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://www.cloudways.com/en/?id=2225344&amp;utm_campaign=thai-vps-vs-global-cloud-ai-backend-guide-vps-cloudways" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_cloudways',{mode:'cors'}).catch(function(){});">
+ดูแพ็กเกจ Cloudways →
+</a>
+</div>
+</div>
+</section>
+
+<section class="standalone-section">
+<div class="section-tag"><span>คำถามที่พบบ่อย</span><span>FAQ</span></div>
+<div style="margin-bottom:14px;">
+<div style="font-weight:600; font-size:0.94rem;">ถ้าเริ่มต้นทำระบบ AI ภายในบริษัท ควรเริ่มจาก RAM กี่ GB?</div>
+<p style="margin:6px 0 0; color:var(--ink-secondary); font-size:0.88rem;">แนะนำเริ่มต้นที่ 4GB RAM (เช่น Hostatom VPS 4GB ราคา $24/เดือน) ซึ่งเพียงพอสำหรับรัน Node.js/Python API คู่กับ Qdrant Vector Database ที่เก็บข้อมูลเอกสารได้ราว 100,000–300,000 ย่อหน้า หากเอกสารมากกว่านั้นหรือต้องการระบบ Managed เต็มรูปแบบ แนะนำขยับเป็น 8GB RAM บน Ruk-Com ($46/เดือน)</p>
+</div>
+</section>
+
+<section class="standalone-section" id="playbooks">
+<div class="section-tag">
+<span>คู่มือจัดสเปกและสูตรลดต้นทุนตามงานจริง (PRACTICAL AI PLAYBOOKS)</span>
+<span>เนื้อล้วน • มีภาพผังระบบ & ตัวเลขจริง</span>
+</div>
+<div class="playbook-grid">
+<a class="playbook-card" href="./thai-tokenizer-cost-benchmark.html">
+<div>
+<span class="playbook-badge">BENCHMARK ภาษาไทย • ประหยัดงบ 8–15 เท่า</span>
+<div style="margin:6px 0 12px; border-radius:10px; overflow:hidden;">
+<svg viewBox="0 0 680 230" width="100%" height="auto" role="img" aria-label="ทดสอบจริง: ข้อความภาษาไทย 1 หน้า A4 (2,500 ตัวอักษร) กินกี่ Token?" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
+<text x="24" y="30" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">ทดสอบจริง: ข้อความภาษาไทย 1 หน้า A4 (2,500 ตัวอักษร) กินกี่ Token?</text>
+<text x="24" y="48" font-family="-apple-system, sans-serif" font-size="11" fill="#515154">ยิ่งตัวคูณ Token ต่ำ + ค่า Input ถูก = ประหยัดงบงานภาษาไทยได้สูงสุด 8–15 เท่า</text>
+
+<!-- Row 1: Gemini 2.5 Flash -->
+<text x="24" y="82" font-family="SF Mono, monospace" font-size="11.5" font-weight="600" fill="#1D1D1F">Gemini 2.5 Flash</text>
+<rect x="185" y="69" width="110" height="18" rx="5" fill="#1D7D3F"/>
+<text x="305" y="82" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#1D7D3F">~920 tok  • ฿0.05 / 10 pages (คุ้มสุดสำหรับงานไทย)</text>
+
+<!-- Row 2: Qwen 2.5 / DeepSeek V3 -->
+<text x="24" y="116" font-family="SF Mono, monospace" font-size="11.5" font-weight="600" fill="#1D1D1F">DeepSeek V3 / Qwen 2.5</text>
+<rect x="185" y="103" width="130" height="18" rx="5" fill="#0066CC"/>
+<text x="325" y="116" font-family="SF Mono, monospace" font-size="11" font-weight="600" fill="#0066CC">~1,080 tok • ฿0.18 / 10 pages (ฉลาด + ประหยัด)</text>
+
+<!-- Row 3: GPT-4o -->
+<text x="24" y="150" font-family="SF Mono, monospace" font-size="11.5" font-weight="600" fill="#1D1D1F">OpenAI GPT-4o (o200k)</text>
+<rect x="185" y="137" width="190" height="18" rx="5" fill="#6E6E73"/>
+<text x="385" y="150" font-family="SF Mono, monospace" font-size="11" fill="#515154">~1,580 tok • ฿1.36 / 10 pages</text>
+
+<!-- Row 4: Claude 3.7 Sonnet -->
+<text x="24" y="184" font-family="SF Mono, monospace" font-size="11.5" font-weight="600" fill="#1D1D1F">Claude 3.7 Sonnet</text>
+<rect x="185" y="171" width="250" height="18" rx="5" fill="#D97706"/>
+<text x="445" y="184" font-family="SF Mono, monospace" font-size="11" fill="#B45309">~2,120 tok • ฿2.19 / 10 pages</text>
+
+<line x1="24" y1="202" x2="656" y2="202" stroke="rgba(0,0,0,0.07)" stroke-width="1"/>
+<text x="24" y="218" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#515154">เทคนิคสำคัญ: ใช้ Gemini Flash / DeepSeek อ่านเอกสารไทยจำนวนมาก แล้วส่งเฉพาะสรุปสั้นๆ ให้ Claude 3.7 คิดต่อ</text>
+</svg>
+</div>
+<h3 class="playbook-title">เจาะลึก &quot;ตัวคูณโทเค็นภาษาไทย&quot; (Thai Token Tax) — ข้อความไทย 1 หน้า A4 ใช้ค่ายไหนถูกสุด?</h3>
+<p class="playbook-takeaway">ฟันธง: งานอ่านเอกสารไทย สรุปแชท หรือคัดกรองข้อมูล ให้ใช้ Gemini 2.5 Flash หรือ DeepSeek V3 ผ่าน Novita AI จะประหยัดกว่าใช้โมเดลเรือธงตรงๆ ถึง 12–40 เท่า เพราะทั้งตัวคูณ Token ภาษาไทยต่ำกว่าและราคาต่อล้าน Token ถูกกว่า</p>
+</div>
+<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-weight:600; color:var(--accent); border-top:1px solid var(--line); padding-top:10px;">
+<span>อ่านจบใน 3 นาที • มีตารางเทียบจริง</span>
+<span>อ่านคู่มือและดูสูตรจัดสเปก →</span>
+</div>
+</a>
+<a class="playbook-card" href="./line-oa-rag-chatbot-blueprint.html">
+<div>
+<span class="playbook-badge">BLUEPRINT ธุรกิจไทย • งบ ~฿1,180/เดือน</span>
+<div style="margin:6px 0 12px; border-radius:10px; overflow:hidden;">
+<svg viewBox="0 0 680 220" width="100%" height="auto" role="img" aria-label="LINE OA RAG Blueprint" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
+<text x="24" y="28" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">ผังการวางระบบ LINE OA + ค้นเอกสาร (RAG) งบรวม ~฿1,180/เดือน</text>
+
+<!-- Box 1: LINE Users -->
+<rect x="24" y="54" width="130" height="96" rx="12" fill="#FFFFFF" stroke="#1D7D3F" stroke-width="1.5"/>
+<circle cx="89" cy="80" r="13" fill="#E8F5E9"/>
+<text x="89" y="84" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#1D7D3F">LINE</text>
+<text x="89" y="108" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#1D1D1F">ลูกค้าทักแชท</text>
+<text x="89" y="126" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" fill="#515154">2,500 msg/day</text>
+
+<!-- Arrow 1 -->
+<line x1="154" y1="102" x2="192" y2="102" stroke="#86868B" stroke-width="1.5" stroke-dasharray="3,3"/>
+<polygon points="192,98 200,102 192,106" fill="#86868B"/>
+<text x="177" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="9.5" fill="#1D7D3F">&lt;8ms</text>
+
+<!-- Box 2: Thai VPS -->
+<rect x="200" y="54" width="210" height="96" rx="12" fill="#FFFFFF" stroke="#0066CC" stroke-width="1.5"/>
+<text x="305" y="78" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#0066CC">1. เซิร์ฟเวอร์ในไทย (Hostatom/Ruk-Com)</text>
+<text x="305" y="98" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#1D1D1F">Webhook API + Qdrant Vector DB</text>
+<rect x="235" y="110" width="140" height="24" rx="6" fill="#EFF6FF"/>
+<text x="305" y="126" text-anchor="middle" font-family="SF Mono, monospace" font-size="10.5" font-weight="600" fill="#0066CC">$24/mo (~฿828/เดือน)</text>
+
+<!-- Arrow 2 -->
+<line x1="410" y1="102" x2="452" y2="102" stroke="#86868B" stroke-width="1.5"/>
+<polygon points="452,98 460,102 452,106" fill="#86868B"/>
+<text x="435" y="92" text-anchor="middle" font-family="SF Mono, monospace" font-size="9.5" fill="#0066CC">Cache 75%</text>
+
+<!-- Box 3: Unified LLM Router -->
+<rect x="460" y="54" width="196" height="96" rx="12" fill="#FFFFFF" stroke="#1D1D1F" stroke-width="1.5"/>
+<text x="558" y="78" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#1D1D1F">2. Novita AI (คีย์เดียวครบ)</text>
+<text x="558" y="98" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">Gemini 2.5 Flash / DeepSeek V3</text>
+<rect x="488" y="110" width="140" height="24" rx="6" fill="#F0FDF4"/>
+<text x="558" y="126" text-anchor="middle" font-family="SF Mono, monospace" font-size="10.5" font-weight="600" fill="#1D7D3F">~$10/mo (~฿350/เดือน)</text>
+
+<!-- Bottom summary bar -->
+<rect x="24" y="168" width="632" height="34" rx="8" fill="#1D1D1F"/>
+<text x="340" y="189" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#FFFFFF">สรุปงบรวมทั้งระบบ: ~฿1,178/เดือน รองรับ 75,000 แชท/เดือน (เฉลี่ยแชทละ 0.015 บาท)</text>
+</svg>
+</div>
+<h3 class="playbook-title">สูตรจัดสเปกทำระบบแชทบอท LINE OA + ค้นเอกสารองค์กร (RAG) ในงบไม่เกิน ฿1,200/เดือน</h3>
+<p class="playbook-takeaway">ฟันธง: หัวใจของบอท LINE OA ที่ตอบไวและไม่แพง คือการวาง Webhook + ฐานข้อมูล Vector (Qdrant) ไว้บน VPS ในกรุงเทพฯ (Hostatom $24/ด. หรือ Ruk-Com) เพื่อตัดปัญหา Timeout ของ LINE แล้วเรียก Gemini 2.5 Flash / DeepSeek V3 โดยเปิด Prompt Cache 75%</p>
+</div>
+<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-weight:600; color:var(--accent); border-top:1px solid var(--line); padding-top:10px;">
+<span>อ่านจบใน 4 นาที • พร้อมผังวางระบบจริง</span>
+<span>อ่านคู่มือและดูสูตรจัดสเปก →</span>
+</div>
+</a>
+<a class="playbook-card" href="./claude-code-cursor-cost-cut.html">
+<div>
+<span class="playbook-badge">สำหรับสายเขียนโค้ด • ลดค่าไฟ 50–70%</span>
+<div style="margin:6px 0 12px; border-radius:10px; overflow:hidden;">
+<svg viewBox="0 0 680 225" width="100%" height="auto" role="img" aria-label="Coding Agent Token Savings Flow" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
+<text x="24" y="28" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">โครงสร้างลดค่าไฟ Claude Code & Cursor 60% โดยงานไม่ดรอป</text>
+
+<!-- Left: Raw Unoptimized -->
+<rect x="24" y="48" width="185" height="150" rx="12" fill="#FFF5F5" stroke="#FECACA" stroke-width="1.5"/>
+<text x="116" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#B91C1C">แบบเดิม (เปลืองโควต้า)</text>
+<text x="116" y="96" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• อ่านไฟล์ทั้งโปรเจกต์ทุกเทิร์น</text>
+<text x="116" y="116" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• แตก Subagent พร่ำเพรื่อ</text>
+<text x="116" y="136" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#515154">• ใช้โมเดลแพงสุดกับงานเล็ก</text>
+<rect x="46" y="154" width="140" height="28" rx="6" fill="#FEE2E2"/>
+<text x="116" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11.5" font-weight="700" fill="#B91C1C">$240/mo (฿8,280)</text>
+
+<!-- Middle Filter: Agensi Skills -->
+<line x1="209" y1="123" x2="243" y2="123" stroke="#1D1D1F" stroke-width="1.5"/>
+<polygon points="243,119 251,123 243,127" fill="#1D1D1F"/>
+
+<rect x="251" y="48" width="185" height="150" rx="12" fill="#FFFFFF" stroke="#0066CC" stroke-width="2"/>
+<text x="343" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#0066CC">ด่านกรอง Agensi.io Skills</text>
+<text x="343" y="96" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="600" fill="#1D1D1F">token-budget-architect</text>
+<text x="343" y="112" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#515154">อ่านเฉพาะบรรทัดที่แก้ (-30%)</text>
+<text x="343" y="136" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="600" fill="#1D1D1F">devguard (verified-dev)</text>
+<text x="343" y="152" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#515154">บล็อก Subagent เกินจำเป็น (-35%)</text>
+<rect x="273" y="164" width="140" height="22" rx="5" fill="#EFF6FF"/>
+<text x="343" y="179" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="600" fill="#0066CC">จ่ายครั้งเดียว $14–$19</text>
+
+<!-- Right: Optimized Output -->
+<line x1="436" y1="123" x2="470" y2="123" stroke="#1D7D3F" stroke-width="1.5"/>
+<polygon points="470,119 478,123 470,127" fill="#1D7D3F"/>
+
+<rect x="478" y="48" width="178" height="150" rx="12" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.5"/>
+<text x="567" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#1D7D3F">หลังปรับแต่ง (ประหยัด 62%)</text>
+<text x="567" y="96" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#1D1D1F">• 80% งานค้น/แก้เล็ก → DeepSeek</text>
+<text x="567" y="116" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#1D1D1F">• 20% งานยาก → Claude 3.7</text>
+<text x="567" y="136" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" fill="#1D1D1F">• โควต้ายาวขึ้น 2.5 เท่า</text>
+<rect x="497" y="154" width="140" height="28" rx="6" fill="#1D7D3F"/>
+<text x="567" y="172" text-anchor="middle" font-family="SF Mono, monospace" font-size="11.5" font-weight="700" fill="#FFFFFF">$92/mo (฿3,174)</text>
+</svg>
+</div>
+<h3 class="playbook-title">คู่มือลดค่าไฟ Claude Code &amp; Cursor 50–70% — เลิกจ่ายค่าอ่านไฟล์ซ้ำและ Subagent ที่ไม่จำเป็น</h3>
+<p class="playbook-takeaway">ฟันธง: ต้นทุนที่แพงที่สุดของสายเขียนโค้ดไม่ได้มาจากตอน AI พิมพ์โค้ด แต่เกิดจาก (1) AI กวาดอ่านไฟล์ทั้งโปรเจกต์ซ้ำทุกเทิร์น และ (2) การแตก Subagent ที่เสียค่าเริ่มต้น ~28,000 Token ต่อครั้ง การลงสกิลควบคุม 2 ตัวช่วยตัดส่วนสูญเปล่านี้ทิ้งทันที 50–65%</p>
+</div>
+<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-weight:600; color:var(--accent); border-top:1px solid var(--line); padding-top:10px;">
+<span>อ่านจบใน 3 นาที • สำหรับนักพัฒนาและทีม Dev</span>
+<span>อ่านคู่มือและดูสูตรจัดสเปก →</span>
+</div>
+</a>
+<a class="playbook-card" href="./api-to-runpod-vllm-migration.html">
+<div>
+<span class="playbook-badge">CLOUD GPU PLAYBOOK • ล็อกงบรายเดือนนิ่ง</span>
+<div style="margin:6px 0 12px; border-radius:10px; overflow:hidden;">
+<svg viewBox="0 0 680 230" width="100%" height="auto" role="img" aria-label="API vs Cloud GPU Break-Even Chart" style="display:block; background:#F8FAFC; border:1px solid rgba(0,0,0,0.08); border-radius:14px;">
+<text x="24" y="28" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#1D1D1F">กราฟจุดตัดคุ้มทุน: จ่ายตาม Token (API) เทียบกับ เช่าเหมาชั่วโมง (RunPod GPU)</text>
+
+<!-- Axes -->
+<line x1="70" y1="190" x2="640" y2="190" stroke="#86868B" stroke-width="1.2"/>
+<line x1="70" y1="50" x2="70" y2="190" stroke="#86868B" stroke-width="1.2"/>
+<text x="65" y="193" text-anchor="end" font-family="SF Mono, monospace" font-size="9.5" fill="#86868B">$0</text>
+<text x="65" y="142" text-anchor="end" font-family="SF Mono, monospace" font-size="9.5" fill="#86868B">$160</text>
+<text x="65" y="92" text-anchor="end" font-family="SF Mono, monospace" font-size="9.5" fill="#86868B">$400</text>
+
+<!-- Flat GPU Line (RunPod RTX 4090 $158/mo @ 12h/day) -->
+<line x1="70" y1="142" x2="630" y2="142" stroke="#1D7D3F" stroke-width="2.5" stroke-dasharray="6,4"/>
+<rect x="430" y="116" width="205" height="22" rx="5" fill="#E8F5E9"/>
+<text x="532" y="131" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" font-weight="700" fill="#1D7D3F">RunPod RTX 4090 ($158/mo flat)</text>
+
+<!-- Rising API Cost Line -->
+<polyline points="70,188 210,165 280,142 440,95 610,54" fill="none" stroke="#D97706" stroke-width="2.8"/>
+<text x="530" y="58" font-family="SF Mono, monospace" font-size="10" font-weight="700" fill="#B45309">Flagship API (Per-Token)</text>
+
+<!-- Break-Even Crossover Point -->
+<circle cx="280" cy="142" r="6" fill="#0066CC" stroke="#FFFFFF" stroke-width="2"/>
+<line x1="280" y1="142" x2="280" y2="190" stroke="#0066CC" stroke-width="1.2" stroke-dasharray="3,3"/>
+<rect x="195" y="78" width="175" height="44" rx="8" fill="#1D1D1F"/>
+<text x="282" y="96" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="700" fill="#FFFFFF">จุดตัดคุ้มทุน (Break-Even)</text>
+<text x="282" y="112" text-anchor="middle" font-family="SF Mono, monospace" font-size="10" fill="#93C5FD">~1,450 งาน/วัน (฿5,450/ด.)</text>
+
+<!-- X-Axis labels -->
+<text x="150" y="210" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#515154">งานน้อย (<1,400/วัน) → ใช้ API ถูกกว่า</text>
+<text x="480" y="210" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#1D7D3F">งานหนัก (>1,450/วัน) → เช่า GPU ล็อกงบนิ่ง</text>
+</svg>
+</div>
+<h3 class="playbook-title">คู่มือย้ายจาก OpenAI/Claude API มารันโมเดลส่วนตัวบน RunPod GPU (พร้อมคำสั่ง vLLM ใช้งานจริง)</h3>
+<p class="playbook-takeaway">ฟันธง: ทันทีที่บิล API ของทีมเกิน ~$160–$300/เดือน (ประมาณ ฿5,500–฿10,000) หรือต้องประมวลผลเอกสารความลับบริษัทที่ห้ามส่งออกนอก การเช่า RunPod RTX 4090 ($0.44/ชม.) หรือ RTX A6000 48GB ($0.49/ชม.) จะช่วยล็อกเพดานรายจ่ายให้นิ่งสนิททันที</p>
+</div>
+<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-weight:600; color:var(--accent); border-top:1px solid var(--line); padding-top:10px;">
+<span>อ่านจบใน 4 นาที • มีคำสั่งรันจริง</span>
+<span>อ่านคู่มือและดูสูตรจัดสเปก →</span>
+</div>
+</a>
+</div>
+</section>
+
+<footer id="affiliate-disclosure" style="padding:20px 0 40px; border-top:1px solid var(--line); color:var(--ink-muted); font-size:0.78rem; line-height:1.55; margin-top:24px;">
+การเปิดเผยข้อมูลพาร์ทเนอร์ (Affiliate Disclosure): เว็บไซต์นี้มีลิงก์แนะนำบริการคลาวด์, API และชุดคำสั่ง AI (รวมถึง Agensi.io, RunPod, Novita AI และผู้ให้บริการ VPS) ซึ่งผู้จัดทำอาจได้รับค่าคอมมิชชันเมื่อคุณสมัครหรือสั่งซื้อผ่านลิงก์ดังกล่าว โดยที่คุณไม่เสียค่าใช้จ่ายเพิ่มใดๆ
+</footer>
+</div>
+</body>
+</html>
