@@ -71,8 +71,8 @@
   .shell{max-width:1180px; margin:0 auto; padding:24px 24px 64px;}
 
   /* Grid layout */
-  .layout{display:grid; grid-template-columns:300px 1fr; gap:22px; align-items:start;}
-  @media (max-width:900px){ .layout{grid-template-columns:1fr;} }
+  .layout{display:grid; grid-template-columns:300px minmax(0,1fr); gap:22px; align-items:start;}
+  @media (max-width:900px){ .layout{grid-template-columns:minmax(0,1fr);} }
 
   .panel{
     background:var(--bg-elev); border:1px solid var(--border); border-radius:14px;
@@ -311,16 +311,18 @@
   .answer-bar.hero-flash{animation:heroFlash 900ms ease-out;}
 
   @media (max-width:960px){
-    .hero-los{grid-template-columns:1fr; height:auto; padding:16px;}
-    .hero-los-visual{grid-template-columns:1fr; gap:10px;}
+    .hero-los{grid-template-columns:minmax(0,1fr); height:auto; padding:16px;}
+    .hero-los-visual{grid-template-columns:minmax(0,1fr); gap:10px;}
     .hero-los-lines{display:none;}
     .hero-source{width:100%;}
   }
   @media (max-width:480px){
     .shell{padding:14px 12px 48px;}
     .topbar{padding:10px 14px;}
-    .nav{gap:12px;}
+    .nav{gap:10px;}
     .hero-node-sub{white-space:normal;}
+    .guide-row{flex-wrap:wrap;}
+    .guide-read{display:none;}
   }
 </style>
 </head>
