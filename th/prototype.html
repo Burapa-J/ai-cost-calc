@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ai-cost.dev — คำนวณงบ AI ตามงานจริง เทียบ API vs เช่า GPU</title>
-<meta name="description" content="คำนวณงบ AI แบบเรียลไทม์ เทียบ API จ่ายตามจริง 9 โมเดล, เช่า GPU รายชั่วโมง 4 รุ่น, VPS หลังบ้าน 3 แพ็กเกจ พร้อมคู่มือจัดสเปกจากเคสจริง" />
+<meta name="description" content="คำนวณงบ AI แบบเรียลไทม์ เทียบ API จ่ายตามจริง 9 โมเดล, เช่า GPU รายชั่วโมง 6 รุ่น, VPS หลังบ้าน 5 แพ็กเกจ พร้อมตัวเช็ก VRAM & เทียบเช่า vs ซื้อเครื่องเอง" />
 <style>
   :root[data-theme="dark"]{
     --bg:#0A0A0D; --bg-elev:#131318; --bg-elev-2:#1C1C24; --bg-hover:#20202A;
@@ -14,6 +14,7 @@
     --green:#3DD68C; --green-soft:rgba(61,214,140,0.12);
     --amber:#F2A33C; --amber-soft:rgba(242,163,60,0.12);
     --blue:#56A8FF; --blue-soft:rgba(86,168,255,0.12);
+    --violet:#B98BFF; --violet-soft:rgba(185,139,255,0.14);
     --shadow:0 8px 28px rgba(0,0,0,0.45);
   }
   :root[data-theme="light"]{
@@ -24,6 +25,7 @@
     --green:#1A9A5B; --green-soft:rgba(26,154,91,0.09);
     --amber:#B5690A; --amber-soft:rgba(181,105,10,0.09);
     --blue:#1C6FD9; --blue-soft:rgba(28,111,217,0.09);
+    --violet:#7C3AED; --violet-soft:rgba(124,58,237,0.09);
     --shadow:0 8px 24px rgba(15,15,20,0.08);
   }
   *{box-sizing:border-box;}
@@ -74,7 +76,7 @@
 
   .panel{
     background:var(--bg-elev); border:1px solid var(--border); border-radius:14px;
-    padding:18px;
+    padding:18px; min-width:0;
   }
   .panel-left{position:sticky; top:84px;}
   @media (max-width:900px){ .panel-left{position:static;} }
@@ -193,6 +195,128 @@
   .case-cta{font-size:11.5px; font-weight:700; color:var(--accent-strong); margin-top:8px; display:inline-block;}
 
   footer{margin-top:48px; padding-top:20px; border-top:1px solid var(--border); color:var(--text-muted); font-size:11.5px; line-height:1.6;}
+
+  select{
+    width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--border-strong);
+    background:var(--bg-elev-2); color:var(--text); font-size:12.5px; cursor:pointer;
+  }
+  .sub-section-label{
+    font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--text-muted); margin:18px 0 10px; padding-top:14px; border-top:1px solid var(--border);
+  }
+
+  .vram-bar{
+    background:linear-gradient(135deg, var(--blue-soft), transparent);
+    border:1px solid var(--border-strong); border-radius:12px; padding:14px 16px; margin-bottom:14px;
+  }
+
+  .checkbox-row{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-secondary); margin-bottom:14px; cursor:pointer;}
+  .checkbox-row input{accent-color:var(--accent); width:15px; height:15px; cursor:pointer; flex-shrink:0;}
+
+  .table-wrap{overflow-x:auto;}
+
+  .badge-pill{display:inline-block; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px; white-space:nowrap; line-height:1.5;}
+  .badge-green{background:var(--green-soft); color:var(--green);}
+  .badge-amber{background:var(--amber-soft); color:var(--amber);}
+
+  .code-box{display:flex; align-items:center; gap:10px; background:var(--bg-elev-2); border:1px solid var(--border); border-radius:9px; padding:10px 12px;}
+  .code-box code{flex:1; font-size:12px; overflow-x:auto; white-space:nowrap; color:var(--text);}
+  .btn-copy{flex-shrink:0; font-size:11.5px; font-weight:700; padding:6px 10px; border-radius:7px; border:1px solid var(--border-strong); background:transparent; color:var(--text); cursor:pointer;}
+  .btn-copy:hover{background:var(--bg-hover);}
+
+  .buyrent-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  @media (max-width:900px){ .buyrent-grid{grid-template-columns:1fr;} }
+  .buyrent-card{border:1px solid var(--border); border-radius:12px; padding:14px; background:var(--bg-elev);}
+  .buyrent-title{font-size:12.5px; font-weight:700; margin-bottom:8px; line-height:1.4;}
+  .buyrent-stat{font-size:11.5px; color:var(--text-secondary); margin-bottom:4px;}
+  .buyrent-stat .mono{font-weight:700; color:var(--text);}
+  .buyrent-payback{font-size:15px; font-weight:800; color:var(--green); margin-top:8px;}
+  .buyrent-warn{font-size:11px; color:var(--amber); margin-top:6px; font-weight:600; line-height:1.4;}
+
+  /* Hero line-of-sight banner */
+  .hero-los{
+    position:relative; overflow:hidden; display:flex; align-items:stretch; gap:22px;
+    height:178px; padding:18px 22px; margin-bottom:20px;
+    border:1px solid var(--border); border-radius:14px; background:var(--bg-elev);
+    background-image:radial-gradient(var(--border-strong) 1px, transparent 1px);
+    background-size:18px 18px; background-position:-4px -4px;
+  }
+  .hero-los-copy{position:relative; z-index:2; flex:0 0 228px; display:flex; flex-direction:column; justify-content:center;}
+  .hero-los-eyebrow{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--accent-strong); margin-bottom:8px;}
+  .hero-los-title{font-size:19px; font-weight:800; line-height:1.28; letter-spacing:-0.01em; margin:0 0 8px; color:var(--text);}
+  .hero-los-sub{font-size:12px; line-height:1.45; color:var(--text-secondary); margin:0;}
+
+  .hero-los-visual{position:relative; z-index:2; flex:1; min-width:0;}
+  .hero-los-lines{position:absolute; left:155px; top:0; width:calc(51% - 155px); height:100%; display:block; overflow:visible;}
+  .hero-path{fill:none; stroke-width:1.8; stroke-linecap:round;}
+  .hero-path-green{stroke:var(--green); opacity:.65;}
+  .hero-path-blue{stroke:var(--blue); opacity:.65;}
+  .hero-path-violet{stroke:var(--violet); opacity:.65;}
+  .hero-flow-green{fill:var(--green); filter:drop-shadow(0 0 4px var(--green));}
+  .hero-flow-blue{fill:var(--blue); filter:drop-shadow(0 0 4px var(--blue));}
+  .hero-flow-violet{fill:var(--violet); filter:drop-shadow(0 0 4px var(--violet));}
+
+  .hero-source{
+    position:absolute; left:0; top:50%; transform:translateY(-50%); width:155px;
+    padding:9px 11px; border-radius:10px; background:var(--bg-elev-2);
+    border:1px solid var(--accent); box-shadow:0 0 0 3px var(--accent-soft);
+  }
+  .hero-source-tag{font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent-strong); display:block; margin-bottom:3px;}
+  .hero-source-val{font-family:"SF Mono",monospace; font-size:11px; font-weight:700; color:var(--text); display:block; line-height:1.35;}
+  .hero-source-sub{font-size:10px; color:var(--text-muted); display:block; margin-top:2px;}
+
+  .hero-node{
+    position:absolute; left:51%; right:4px; transform:translateY(-50%);
+    display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:10px;
+    background:var(--bg-elev-2); border:1px solid var(--border); cursor:pointer;
+    text-align:left; font:inherit; color:inherit;
+    transition:border-color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .hero-node:hover{transform:translateY(-50%) translateX(-2px);}
+  .hero-node-green.active, .hero-node-green:hover{border-color:var(--green); background:var(--green-soft);}
+  .hero-node-blue.active, .hero-node-blue:hover{border-color:var(--blue); background:var(--blue-soft);}
+  .hero-node-violet.active, .hero-node-violet:hover{border-color:var(--violet); background:var(--violet-soft);}
+
+  .hero-node-icon{
+    width:30px; height:30px; border-radius:8px; background:var(--bg-elev); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative;
+  }
+  .hero-node-copy{display:flex; flex-direction:column; min-width:0;}
+  .hero-node-title{font-size:11px; font-weight:700; color:var(--text); line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .hero-node-sub{font-size:9.5px; color:var(--text-muted); line-height:1.3; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+  .hero-bars{display:flex; align-items:flex-end; gap:2px; height:16px;}
+  .hero-bars span{display:block; width:3px; border-radius:1px; background:var(--green);}
+
+  .hero-gauge{width:20px; height:9px; border:1.4px solid var(--blue); border-radius:3px; overflow:hidden; background:var(--bg-elev-2);}
+  .hero-gauge-fill{display:block; height:100%; background:var(--blue);}
+
+  .hero-rack{display:flex; flex-direction:column; gap:2px; position:relative;}
+  .hero-rack span{display:block; width:18px; height:3px; border-radius:1px; background:var(--violet);}
+  .hero-rack span:nth-child(2){opacity:.75;}
+  .hero-rack span:nth-child(3){opacity:.5;}
+  .hero-rack span.hero-ping{
+    width:6px; height:6px; border-radius:50%; background:var(--violet); position:absolute; top:-3px; right:-3px;
+    animation:heroPing 1.8s ease-out infinite;
+  }
+  @keyframes heroPing{
+    0%{box-shadow:0 0 0 0 var(--violet-soft);}
+    70%{box-shadow:0 0 0 6px rgba(0,0,0,0);}
+    100%{box-shadow:0 0 0 0 rgba(0,0,0,0);}
+  }
+
+  @keyframes heroFlash{ 0%{box-shadow:0 0 0 2px var(--accent);} 100%{box-shadow:0 0 0 0 rgba(0,0,0,0);} }
+  .answer-bar.hero-flash{animation:heroFlash 900ms ease-out;}
+
+  @media (max-width:900px){
+    .hero-los{flex-direction:column; height:auto; padding:18px;}
+    .hero-los-copy{flex:none;}
+    .hero-los-visual{width:100%; height:190px;}
+  }
+  @media (max-width:480px){
+    .hero-node-sub{display:none;}
+    .hero-los-visual{height:170px;}
+  }
 </style>
 </head>
 <body>
@@ -215,6 +339,63 @@
 </div>
 
 <div class="shell" id="calculator">
+  <div class="hero-los" id="hero-los">
+    <div class="hero-los-copy">
+      <div class="hero-los-eyebrow">เริ่มต้นที่นี่ · ai-cost.dev</div>
+      <h1 class="hero-los-title">วางสเปกและคำนวณงบ AI<br/>จากภาระงานจริงใน 10 วินาที</h1>
+      <p class="hero-los-sub">ไม่ต้องเดาเองว่าจะจ่ายรายคำ เช่าการ์ดจอ หรือตั้งเครื่องเอง — เลือกเส้นทางด้านขวาแล้วดูตัวเลขจริงทันที</p>
+    </div>
+    <div class="hero-los-visual">
+      <div class="hero-source">
+        <span class="hero-source-tag">โจทย์งานของคุณ (Live)</span>
+        <span class="hero-source-val" id="hero-source-val">2,000 งาน/วัน · 14h</span>
+        <span class="hero-source-sub" id="hero-source-sub">32B Q4 · พร้อมกัน 5 คน</span>
+      </div>
+
+      <svg class="hero-los-lines" viewBox="0 0 260 140" aria-hidden="true">
+        <path d="M2,70 C110,70 120,22 258,22" class="hero-path hero-path-green" stroke-dasharray="4 3"></path>
+        <path d="M2,70 L258,70" class="hero-path hero-path-blue"></path>
+        <path d="M2,70 C110,70 120,118 258,118" class="hero-path hero-path-violet" stroke-dasharray="4 3"></path>
+        <circle cx="2" cy="70" r="4" fill="var(--accent)"></circle>
+        <circle r="3.5" class="hero-flow-green"><animateMotion dur="2.8s" repeatCount="indefinite" path="M2,70 C110,70 120,22 258,22"></animateMotion></circle>
+        <circle r="3.5" class="hero-flow-blue"><animateMotion dur="2.4s" repeatCount="indefinite" path="M2,70 L258,70"></animateMotion></circle>
+        <circle r="3.5" class="hero-flow-violet"><animateMotion dur="3.1s" repeatCount="indefinite" path="M2,70 C110,70 120,118 258,118"></animateMotion></circle>
+      </svg>
+
+      <button type="button" class="hero-node hero-node-green active" data-tab="api" style="top:16%;" onclick="activateHeroPath(0,'api')" aria-label="เปิดแท็บ API จ่ายตามจริง และโหลดพรีเซ็ตแชทบอททั่วไป">
+        <span class="hero-node-icon">
+          <span class="hero-bars">
+            <span style="height:14px;"></span><span style="height:11px;opacity:.8;"></span><span style="height:7px;opacity:.6;"></span><span style="height:4px;opacity:.4;"></span>
+          </span>
+        </span>
+        <span class="hero-node-copy">
+          <span class="hero-node-title">1. จ่ายตาม Token (API)</span>
+          <span class="hero-node-sub">9 โมเดล · Cache ลดสูงสุด 40x · เริ่ม ~฿850/ด.</span>
+        </span>
+      </button>
+
+      <button type="button" class="hero-node hero-node-blue" data-tab="gpu" style="top:50%;" onclick="activateHeroPath(3,'gpu')" aria-label="เปิดแท็บเช่า GPU และโหลดพรีเซ็ตประมวลผลหนัก 24 ชม.">
+        <span class="hero-node-icon">
+          <span class="hero-gauge"><span class="hero-gauge-fill" style="width:65%;"></span></span>
+        </span>
+        <span class="hero-node-copy">
+          <span class="hero-node-title">2. เช่า GPU / ซื้อเครื่องตั้งเอง</span>
+          <span class="hero-node-sub">เช็ก VRAM 24–160GB · จุดคุ้มทุน RunPod vs PC/Mac</span>
+        </span>
+      </button>
+
+      <button type="button" class="hero-node hero-node-violet" data-tab="vps" style="top:84%;" onclick="activateHeroPath(1,'vps')" aria-label="เปิดแท็บ VPS หลังบ้าน และโหลดพรีเซ็ต LINE OA + RAG">
+        <span class="hero-node-icon">
+          <span class="hero-rack"><span></span><span></span><span></span><span class="hero-ping"></span></span>
+        </span>
+        <span class="hero-node-copy">
+          <span class="hero-node-title">3. เซิร์ฟเวอร์ LINE OA / n8n / RAG</span>
+          <span class="hero-node-sub">VPS ไทย Ping ~5ms · ใบกำกับภาษี VAT 7% เริ่ม ฿828/ด.</span>
+        </span>
+      </button>
+    </div>
+  </div>
+
   <div class="layout">
 
     <!-- LEFT: Controls -->
@@ -275,6 +456,28 @@
         <input id="inp-hours" type="range" min="1" max="24" step="1" value="14" />
       </div>
 
+      <div class="sub-section-label">ถ้าจะรันโมเดลเอง (GPU)</div>
+
+      <div class="field-row">
+        <div class="field-top">
+          <label class="field-label" for="inp-selfmodel">ขนาดโมเดลที่จะรันเอง</label>
+        </div>
+        <select id="inp-selfmodel">
+          <option value="8b-q4">8B–14B Q4 (Typhoon2 / Qwen 14B)</option>
+          <option value="32b-q4" selected>32B Q4 (Qwen 2.5 Coder 32B / R1 32B)</option>
+          <option value="70b-q4">70B Q4/AWQ (Llama 3.3 70B / Qwen 72B)</option>
+          <option value="70b-fp16">70B FP16 เต็มความละเอียด (Unquantized)</option>
+        </select>
+      </div>
+
+      <div class="field-row">
+        <div class="field-top">
+          <label class="field-label" for="inp-conc">คนใช้งานพร้อมกันช่วงพีค (คน)</label>
+          <span class="field-val" id="val-conc">5</span>
+        </div>
+        <input id="inp-conc" type="range" min="1" max="50" step="1" value="5" />
+      </div>
+
       <button type="button" class="btn-outline" id="btn-share" onclick="copyScenarioLink()">คัดลอกลิงก์พารามิเตอร์นี้</button>
     </aside>
 
@@ -309,8 +512,8 @@
 
       <div class="tabs">
         <button class="tab-btn active" data-tab="api" onclick="switchTab('api')">API จ่ายตามจริง (9)</button>
-        <button class="tab-btn" data-tab="gpu" onclick="switchTab('gpu')">เช่า GPU รายชั่วโมง (4)</button>
-        <button class="tab-btn" data-tab="vps" onclick="switchTab('vps')">VPS หลังบ้าน (3)</button>
+        <button class="tab-btn" data-tab="gpu" onclick="switchTab('gpu')">เช่า GPU รายชั่วโมง (6)</button>
+        <button class="tab-btn" data-tab="vps" onclick="switchTab('vps')">VPS หลังบ้าน (5)</button>
         <button class="tab-btn" data-tab="guides" onclick="switchTab('guides')">คู่มือจัดสเปก & ลด Token (5)</button>
       </div>
 
@@ -322,17 +525,46 @@
       </div>
 
       <div class="tab-panel" id="tab-gpu">
+        <div class="vram-bar" id="vram-summary">
+          <div class="answer-tag">สรุป VRAM ที่ต้องใช้จริงตามโมเดลที่เลือก</div>
+          <div class="answer-text" id="vram-summary-text">กำลังคำนวณ…</div>
+        </div>
+
+        <label class="checkbox-row" for="inp-volume">
+          <input type="checkbox" id="inp-volume" checked />
+          <span>รวมค่าฝากไฟล์โมเดลตอนปิดเครื่อง (Persistent Volume 80GB = +$5.60/เดือน)</span>
+        </label>
+
+        <div class="table-wrap">
         <table>
-          <thead><tr><th>การ์ดจอ (RunPod)</th><th class="num">ค่าใช้จ่าย/เดือน</th><th class="num">จุดคุ้มทุน</th><th class="num">ผู้ให้บริการ</th></tr></thead>
+          <thead><tr><th>การ์ดจอ (RunPod)</th><th class="num">สถานะ VRAM</th><th class="num">รองรับพร้อมกัน</th><th class="num">รวม/เดือน (จุดคุ้มทุน)</th><th class="num">ผู้ให้บริการ</th></tr></thead>
           <tbody id="gpu-tbody"></tbody>
         </table>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div class="field-label" style="margin-bottom:6px;">คำสั่งรัน vLLM (เปลี่ยนโมเดล & --tensor-parallel-size อัตโนมัติ)</div>
+          <div class="code-box">
+            <code class="mono" id="vllm-command"></code>
+            <button type="button" class="btn-copy" id="btn-copy-vllm" onclick="copyVllmCommand()">คัดลอก</button>
+          </div>
+        </div>
+
+        <div class="standalone" style="margin-top:28px;">
+          <div class="standalone-head">
+            <div class="standalone-title">เช่า Cloud GPU (RunPod) vs ซื้อเครื่องตั้งเองที่ไทย (Rent vs Buy Payback)</div>
+          </div>
+          <div class="buyrent-grid" id="buyrent-grid"></div>
+        </div>
       </div>
 
       <div class="tab-panel" id="tab-vps">
+        <div class="table-wrap">
         <table>
-          <thead><tr><th>แพ็กเกจเซิร์ฟเวอร์</th><th class="num">ค่าใช้จ่าย/เดือน</th><th class="num">สเปก</th><th class="num">ผู้ให้บริการ</th></tr></thead>
+          <thead><tr><th>แพ็กเกจ & สเปก</th><th>เหมาะรันระบบอะไร</th><th>ภาษีไทย & Latency</th><th class="num">รวม/เดือน</th><th class="num">ผู้ให้บริการ</th></tr></thead>
           <tbody id="vps-tbody"></tbody>
         </table>
+        </div>
       </div>
 
       <div class="tab-panel" id="tab-guides">
@@ -381,12 +613,28 @@
       { id:'runpod-rtx-4090', name:'RunPod NVIDIA RTX 4090 (24GB)', vramGb:24, hourlyUsd:0.44, throughputTokensPerSec:110, affiliateId:'runpod' },
       { id:'runpod-rtx-a6000-48gb', name:'RunPod NVIDIA RTX A6000 (48GB)', vramGb:48, hourlyUsd:0.49, throughputTokensPerSec:135, affiliateId:'runpod' },
       { id:'runpod-l40s-48gb', name:'RunPod NVIDIA L40S (48GB Ada)', vramGb:48, hourlyUsd:0.86, throughputTokensPerSec:195, affiliateId:'runpod' },
-      { id:'runpod-a100-80gb', name:'RunPod NVIDIA A100 PCIe (80GB)', vramGb:80, hourlyUsd:1.39, throughputTokensPerSec:220, affiliateId:'runpod' }
+      { id:'runpod-a100-80gb', name:'RunPod NVIDIA A100 PCIe (80GB)', vramGb:80, hourlyUsd:1.39, throughputTokensPerSec:220, affiliateId:'runpod' },
+      { id:'runpod-h100-80gb', name:'RunPod NVIDIA H100 SXM (80GB)', vramGb:80, hourlyUsd:2.69, throughputTokensPerSec:520, affiliateId:'runpod' },
+      { id:'runpod-2x-a100-160gb', name:'RunPod 2x NVIDIA A100 (160GB)', vramGb:160, hourlyUsd:2.78, throughputTokensPerSec:410, affiliateId:'runpod' }
+    ],
+    selfModels: [
+      { id:'8b-q4', label:'8B–14B Q4 (Typhoon2 / Qwen 14B)', baseVramGb:9, kvGbPer1kTok:0.12, vllmModel:'scb10x/typhoon2-qwen2.5-7b-instruct', tp:1 },
+      { id:'32b-q4', label:'32B Q4 (Qwen 2.5 Coder 32B / R1 32B)', baseVramGb:19, kvGbPer1kTok:0.22, vllmModel:'Qwen/Qwen2.5-Coder-32B-Instruct-AWQ', tp:1 },
+      { id:'70b-q4', label:'70B Q4/AWQ (Llama 3.3 70B / Qwen 72B)', baseVramGb:41, kvGbPer1kTok:0.35, vllmModel:'casperhansen/llama-3.3-70b-instruct-awq', tp:2 },
+      { id:'70b-fp16', label:'70B FP16 เต็มความละเอียด (Unquantized)', baseVramGb:140, kvGbPer1kTok:0.70, vllmModel:'meta-llama/Llama-3.3-70B-Instruct', tp:4 }
+    ],
+    persistentVolumeUsdPerMonth: 5.60,
+    buyHardware: [
+      { id:'diy-rtx-4090', name:'ประกอบ PC RTX 4090 (24GB VRAM)', priceThb:95000, hourlyPowerThb:1.90, vramGb:24, warnIfInsufficient:true },
+      { id:'mac-mini-m4-pro', name:'Mac mini M4 Pro (64GB Unified Memory)', priceThb:64900, hourlyPowerThb:0.28, vramGb:64, warnIfInsufficient:false },
+      { id:'mac-studio-ultra', name:'Mac Studio M2/M3 Ultra (192GB Unified Memory)', priceThb:159900, hourlyPowerThb:0.50, vramGb:192, warnIfInsufficient:false }
     ],
     vps: [
-      { id:'hostatom-vps-4gb', name:'Hostatom Cloud VPS Thailand (4GB/2vCPU)', region:'thailand', vcpu:2, ramGb:4, monthlyUsd:24, affiliateId:'hostatom', brandLabel:'Hostatom' },
-      { id:'rukcom-managed-vps', name:'Ruk-Com Managed Cloud VPS (8GB/4vCPU)', region:'thailand', vcpu:4, ramGb:8, monthlyUsd:46, affiliateId:'rukcom', brandLabel:'Ruk-Com' },
-      { id:'cloudways-vultr-8gb', name:'Cloudways Managed Vultr HF (8GB/4vCPU)', region:'global', vcpu:4, ramGb:8, monthlyUsd:112, affiliateId:'cloudways', brandLabel:'Vultr' }
+      { id:'hostatom-vps-4gb', name:'Hostatom Cloud VPS Thailand (4GB/2vCPU)', region:'thailand', vcpu:2, ramGb:4, monthlyUsd:24, affiliateId:'hostatom', brandLabel:'Hostatom', managed:true, suitableFor:'n8n + Webhook LINE OA + PostgreSQL ขนาดเล็ก' },
+      { id:'rukcom-managed-vps', name:'Ruk-Com Managed Cloud VPS (8GB/4vCPU)', region:'thailand', vcpu:4, ramGb:8, monthlyUsd:46, affiliateId:'rukcom', brandLabel:'Ruk-Com', managed:true, suitableFor:'Docker + FastAPI + Qdrant Vector DB 100k หน้า + Redis' },
+      { id:'hostatom-dedicated-16gb', name:'Hostatom Dedicated Cloud (16GB/8vCPU)', region:'thailand', vcpu:8, ramGb:16, monthlyUsd:96, affiliateId:'hostatom', brandLabel:'Hostatom', managed:true, suitableFor:'Production Multi-Agent Queue + PostgreSQL + Redis โหลดสูง' },
+      { id:'cloudways-do-4gb', name:'Cloudways DigitalOcean (4GB/2vCPU)', region:'global', vcpu:2, ramGb:4, monthlyUsd:54, affiliateId:'cloudways', brandLabel:'DigitalOcean', managed:false, suitableFor:'Docker + FastAPI เริ่มต้น + Staging Environment' },
+      { id:'cloudways-vultr-8gb', name:'Cloudways Managed Vultr HF (8GB/4vCPU)', region:'global', vcpu:4, ramGb:8, monthlyUsd:112, affiliateId:'cloudways', brandLabel:'Vultr', managed:false, suitableFor:'Docker + FastAPI + Qdrant Vector DB + Redis โหลดสูง' }
     ],
     affiliates: {
       aimlapi: { baseUrl:'https://novita.ai/', paramKey:'ref', affiliateCode:'zge5ztg' },
@@ -425,17 +673,48 @@
     return { monthlyUsd: monthlyUsd, monthlyThb: monthlyThb, per1k: per1k };
   }
 
-  function calcGpuMonthly(gpu, req, steps, outTok, hours, flagshipCostPerTask) {
+  function computeReqVramGb(selfModel, inTok, outTok, concurrency) {
+    return selfModel.baseVramGb + (((inTok + outTok) / 1000) * selfModel.kvGbPer1kTok * concurrency) + 2.0;
+  }
+
+  function calcGpuMonthly(gpu, req, steps, outTok, hours, flagshipCostPerTask, reqVramGb, concurrency, includeVolume) {
     var reqTokPerSec = (req * steps * outTok) / Math.max(1, hours * 3600);
-    var instances = Math.max(1, Math.ceil(reqTokPerSec / gpu.throughputTokensPerSec));
-    var monthlyUsd = Number((instances * gpu.hourlyUsd * hours * 30).toFixed(2));
+    var throughputInstances = Math.max(1, Math.ceil(reqTokPerSec / gpu.throughputTokensPerSec));
+    var vramInstances = Math.max(1, Math.ceil(reqVramGb / gpu.vramGb));
+    var instances = Math.max(throughputInstances, vramInstances);
+    var volumeUsd = includeVolume ? APP_DATA.persistentVolumeUsdPerMonth : 0;
+    var monthlyUsd = Number((instances * gpu.hourlyUsd * hours * 30 + volumeUsd).toFixed(2));
     var monthlyThb = Math.round(monthlyUsd * APP_DATA.fx);
     var singleGpuMo = gpu.hourlyUsd * hours * 30;
     var breakEven = Math.max(1, Math.ceil(singleGpuMo / Math.max(0.000001, flagshipCostPerTask * 30)));
-    return { monthlyUsd: monthlyUsd, monthlyThb: monthlyThb, instances: instances, breakEven: breakEven };
+
+    var fitsSingle = reqVramGb <= gpu.vramGb;
+    var vramBadge = fitsSingle
+      ? '✅ รันใน 1 เครื่องได้ (เหลือ ' + (gpu.vramGb - reqVramGb).toFixed(1) + ' GB)'
+      : '⚠️ ต้องต่อ ' + vramInstances + ' เครื่อง (VRAM รวม ' + (vramInstances * gpu.vramGb) + 'GB)';
+
+    var maxConcurrency = Math.max(1, Math.floor((instances * gpu.throughputTokensPerSec) / 18));
+    var perUserTokPerSec = ((instances * gpu.throughputTokensPerSec) / concurrency).toFixed(0);
+
+    return {
+      monthlyUsd: monthlyUsd, monthlyThb: monthlyThb, instances: instances, breakEven: breakEven,
+      fitsSingle: fitsSingle, vramBadge: vramBadge, maxConcurrency: maxConcurrency, perUserTokPerSec: perUserTokPerSec
+    };
   }
 
-  function computeAll(req, steps, inTok, outTok, cachePct, hours) {
+  function findSelfModel(id) { return APP_DATA.selfModels.filter(function (x) { return x.id === id; })[0]; }
+
+  function pickBestFitGpu(reqVramGb) {
+    var fitting = APP_DATA.gpus.filter(function (g) { return g.vramGb >= reqVramGb; });
+    var pool = fitting.length ? fitting : APP_DATA.gpus.slice().sort(function (a, b) { return b.vramGb - a.vramGb; }).slice(0, 1);
+    return pool.slice().sort(function (a, b) { return a.hourlyUsd - b.hourlyUsd; })[0];
+  }
+
+  function buildVllmCommand(selfModel) {
+    return 'docker run --gpus all -p 8000:8000 vllm/vllm-openai:latest --model ' + selfModel.vllmModel + ' --tensor-parallel-size ' + selfModel.tp + ' --max-model-len 8192';
+  }
+
+  function computeAll(req, steps, inTok, outTok, cachePct, hours, selfModel, concurrency, includeVolume) {
     var apiRows = APP_DATA.models.map(function (m) {
       var c = calcApiMonthly(m, req, steps, inTok, outTok, cachePct);
       return Object.assign({}, m, c);
@@ -445,12 +724,16 @@
     var flagship = apiRows.filter(function (r) { return r.id === FLAGSHIP_ID; })[0] || apiRows[apiRows.length - 1];
     var flagshipCostPerTask = flagship.monthlyUsd / (req * 30);
 
+    var reqVramGb = computeReqVramGb(selfModel, inTok, outTok, concurrency);
+
     var gpuRows = APP_DATA.gpus.map(function (g) {
-      var c = calcGpuMonthly(g, req, steps, outTok, hours, flagshipCostPerTask);
+      var c = calcGpuMonthly(g, req, steps, outTok, hours, flagshipCostPerTask, reqVramGb, concurrency, includeVolume);
       return Object.assign({}, g, c);
     }).sort(function (a, b) { return a.monthlyUsd - b.monthlyUsd; });
 
-    return { apiRows: apiRows, gpuRows: gpuRows, cheapest: cheapest, flagship: flagship, bestGpu: gpuRows[0] };
+    var gpuRowsByVram = gpuRows.slice().sort(function (a, b) { return a.vramGb - b.vramGb; });
+
+    return { apiRows: apiRows, gpuRows: gpuRows, gpuRowsByVram: gpuRowsByVram, cheapest: cheapest, flagship: flagship, bestGpu: gpuRows[0], reqVramGb: reqVramGb };
   }
 
   /* ---------- Affiliate link builder (mirrors resolveAffiliateUrl in src/calculator.ts) ---------- */
@@ -529,7 +812,10 @@
       inTok: Number(document.getElementById('inp-intok').value),
       outTok: Number(document.getElementById('inp-outtok').value),
       cache: Number(document.getElementById('inp-cache').value),
-      hours: Number(document.getElementById('inp-hours').value)
+      hours: Number(document.getElementById('inp-hours').value),
+      selfModelId: document.getElementById('inp-selfmodel').value,
+      conc: Number(document.getElementById('inp-conc').value),
+      includeVolume: document.getElementById('inp-volume').checked
     };
   }
 
@@ -541,12 +827,22 @@
     document.getElementById('val-outtok').textContent = s.outTok.toLocaleString('th-TH');
     document.getElementById('val-cache').textContent = s.cache + '%';
     document.getElementById('val-hours').textContent = s.hours + 'h';
+    document.getElementById('val-conc').textContent = s.conc;
 
-    var r = computeAll(s.req, s.steps, s.inTok, s.outTok, s.cache, s.hours);
+    var selfModel = findSelfModel(s.selfModelId);
+    var r = computeAll(s.req, s.steps, s.inTok, s.outTok, s.cache, s.hours, selfModel, s.conc, s.includeVolume);
+
+    var heroValEl = document.getElementById('hero-source-val');
+    var heroSubEl = document.getElementById('hero-source-sub');
+    if (heroValEl) heroValEl.textContent = s.req.toLocaleString('th-TH') + ' งาน/วัน · ' + s.hours + 'h';
+    if (heroSubEl) heroSubEl.textContent = selfModel.id.toUpperCase() + ' · พร้อมกัน ' + s.conc + ' คน';
 
     renderApiTable(r);
     renderGpuTable(r);
     renderAnswerBar(r, s);
+    renderVramSummary(selfModel, r.reqVramGb, s);
+    renderBuyVsRent(r.reqVramGb, s.hours);
+    renderVllmCommand(selfModel);
 
     if (fromUserInput && !hasLoggedCalcInteraction) {
       hasLoggedCalcInteraction = true;
@@ -569,12 +865,56 @@
   }
 
   function renderGpuTable(r) {
-    document.getElementById('gpu-tbody').innerHTML = r.gpuRows.map(function (g) {
+    document.getElementById('gpu-tbody').innerHTML = r.gpuRowsByVram.map(function (g) {
       var url = buildAffiliateLink(g.affiliateId, g.id);
-      return '<tr><td><span class="mono-val">' + g.name + '</span><span class="sub-val">' + g.instances + 'x เครื่อง • VRAM ' + g.vramGb + 'GB • ' + g.throughputTokensPerSec + ' tok/s</span></td>' +
-        '<td class="num"><span class="mono-val">$' + g.monthlyUsd.toLocaleString() + '</span><span class="sub-val">฿' + g.monthlyThb.toLocaleString() + '</span></td>' +
-        '<td class="num"><span class="mono-val">' + g.breakEven.toLocaleString() + '</span><span class="sub-val">งาน/วัน จุดคุ้มทุน</span></td>' +
+      var badgeClass = g.fitsSingle ? 'badge-green' : 'badge-amber';
+      return '<tr><td><span class="mono-val">' + g.name.replace('RunPod NVIDIA ', '') + '</span><span class="sub-val">' + g.instances + 'x เครื่อง • VRAM ' + g.vramGb + 'GB • ' + g.throughputTokensPerSec + ' tok/s</span></td>' +
+        '<td class="num"><span class="badge-pill ' + badgeClass + '">' + g.vramBadge + '</span></td>' +
+        '<td class="num"><span class="mono-val">' + g.maxConcurrency.toLocaleString() + ' คน</span><span class="sub-val">' + g.perUserTokPerSec + ' tok/s ต่อคน</span></td>' +
+        '<td class="num"><span class="mono-val">$' + g.monthlyUsd.toLocaleString() + ' (฿' + g.monthlyThb.toLocaleString() + ')</span><span class="sub-val">คุ้มทุนที่ ' + g.breakEven.toLocaleString() + ' งาน/วัน</span></td>' +
         '<td class="num"><a class="provider-link" href="' + url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\'' + g.affiliateId + '\', ' + g.monthlyUsd + ')">' + BRAND_LABEL[g.affiliateId] + ' ↗</a></td></tr>';
+    }).join('');
+  }
+
+  function renderVramSummary(selfModel, reqVramGb, s) {
+    var kvGb = (((s.inTok + s.outTok) / 1000) * selfModel.kvGbPer1kTok * s.conc);
+    var html = 'โมเดลที่เลือก: <span class="mono">' + selfModel.label + '</span> • VRAM ที่ต้องใช้จริง: <span class="mono">' + reqVramGb.toFixed(1) + ' GB</span>' +
+      '<br><span style="color:var(--text-muted); font-size:12px; font-weight:400;">Base ' + selfModel.baseVramGb + 'GB + KV Cache ' + kvGb.toFixed(1) + 'GB (@ ' + s.conc + ' คนพร้อมกัน) + CUDA overhead 2.0GB</span>';
+    document.getElementById('vram-summary-text').innerHTML = html;
+  }
+
+  function renderVllmCommand(selfModel) {
+    document.getElementById('vllm-command').textContent = buildVllmCommand(selfModel);
+  }
+
+  function copyVllmCommand() {
+    var cmd = document.getElementById('vllm-command').textContent;
+    if (navigator.clipboard) navigator.clipboard.writeText(cmd).catch(function () {});
+    var btn = document.getElementById('btn-copy-vllm');
+    btn.textContent = 'คัดลอกแล้ว';
+    setTimeout(function () { btn.textContent = 'คัดลอก'; }, 2000);
+  }
+
+  function renderBuyVsRent(reqVramGb, hours) {
+    var bestFit = pickBestFitGpu(reqVramGb);
+    var cloudMonthlyThb = Math.round(bestFit.hourlyUsd * hours * 30 * APP_DATA.fx);
+    document.getElementById('buyrent-grid').innerHTML = APP_DATA.buyHardware.map(function (hw) {
+      var monthlyPowerThb = Math.round(hw.hourlyPowerThb * hours * 30);
+      var monthlySavingThb = cloudMonthlyThb - monthlyPowerThb;
+      var paybackText = monthlySavingThb > 0
+        ? Math.ceil(hw.priceThb / monthlySavingThb).toLocaleString() + ' เดือน'
+        : 'ไม่คุ้มทุน (ค่าไฟ+เครื่อง > ค่าเช่า)';
+      var warnHtml = (hw.warnIfInsufficient && reqVramGb > hw.vramGb)
+        ? '<div class="buyrent-warn">⚠️ VRAM ' + hw.vramGb + 'GB ไม่พอรันโมเดลที่เลือก (ต้องการ ' + reqVramGb.toFixed(1) + 'GB) ในเครื่องเดียว</div>'
+        : '';
+      return '<div class="buyrent-card">' +
+        '<div class="buyrent-title">' + hw.name + '</div>' +
+        '<div class="buyrent-stat">ราคาเครื่อง: <span class="mono">฿' + hw.priceThb.toLocaleString() + '</span></div>' +
+        '<div class="buyrent-stat">ค่าไฟ/เดือน (' + hours + 'h/วัน): <span class="mono">฿' + monthlyPowerThb.toLocaleString() + '</span></div>' +
+        '<div class="buyrent-stat">เทียบเช่า ' + bestFit.name.replace('RunPod NVIDIA ', 'RunPod ') + ': <span class="mono">฿' + cloudMonthlyThb.toLocaleString() + '/เดือน</span></div>' +
+        '<div class="buyrent-payback">คืนทุนใน ' + paybackText + '</div>' +
+        warnHtml +
+        '</div>';
     }).join('');
   }
 
@@ -582,9 +922,14 @@
     document.getElementById('vps-tbody').innerHTML = APP_DATA.vps.map(function (v) {
       var url = buildAffiliateLink(v.affiliateId, v.id);
       var monthlyThb = Math.round(v.monthlyUsd * APP_DATA.fx);
-      return '<tr><td><span class="mono-val">' + v.name + '</span><span class="sub-val">' + (v.region === 'thailand' ? 'ประเทศไทย' : 'ทั่วโลก') + '</span></td>' +
-        '<td class="num"><span class="mono-val">$' + v.monthlyUsd + '</span><span class="sub-val">฿' + monthlyThb.toLocaleString() + '</span></td>' +
-        '<td class="num"><span class="mono-val">' + v.vcpu + ' vCPU / ' + v.ramGb + 'GB</span></td>' +
+      var latencyTag = v.region === 'thailand'
+        ? '<span class="badge-pill badge-green">✅ ใบกำกับภาษี VAT 7% • Ping ~5ms</span>'
+        : '<span class="badge-pill badge-amber">อินวอยซ์ตปท. • Ping ~32ms (SG)</span>';
+      var managedTag = v.managed ? 'Managed (แอดมินดูแล)' : 'Self-Managed';
+      return '<tr><td><span class="mono-val">' + v.name + '</span><span class="sub-val">' + v.vcpu + ' vCPU / ' + v.ramGb + 'GB RAM • ' + managedTag + '</span></td>' +
+        '<td><span class="sub-val" style="color:var(--text-secondary); font-size:12px; line-height:1.45;">' + v.suitableFor + '</span></td>' +
+        '<td>' + latencyTag + '</td>' +
+        '<td class="num"><span class="mono-val">$' + v.monthlyUsd + '</span><span class="sub-val">฿' + monthlyThb.toLocaleString() + '/เดือน</span></td>' +
         '<td class="num"><a class="provider-link" href="' + url + '" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick(\'' + v.affiliateId + '\', ' + v.monthlyUsd + ')">' + v.brandLabel + ' ↗</a></td></tr>';
     }).join('');
   }
@@ -654,7 +999,9 @@
       var cA = calcApiMonthly(m, gpuPreset.req, gpuPreset.steps, gpuPreset.inTok, gpuPreset.outTok, gpuPreset.cache);
       var flagship = calcApiMonthly(findModel(FLAGSHIP_ID), gpuPreset.req, gpuPreset.steps, gpuPreset.inTok, gpuPreset.outTok, gpuPreset.cache);
       var flagshipCostPerTask = flagship.monthlyUsd / (gpuPreset.req * 30);
-      var cG = calcGpuMonthly(g, gpuPreset.req, gpuPreset.steps, gpuPreset.outTok, gpuPreset.hours, flagshipCostPerTask);
+      var defaultSelfModel = findSelfModel('32b-q4');
+      var defaultReqVramGb = computeReqVramGb(defaultSelfModel, gpuPreset.inTok, gpuPreset.outTok, 5);
+      var cG = calcGpuMonthly(g, gpuPreset.req, gpuPreset.steps, gpuPreset.outTok, gpuPreset.hours, flagshipCostPerTask, defaultReqVramGb, 5, true);
       return '<a class="case-card" style="display:block;" href="compare/' + slug + '.html"><div class="case-title">' + title + '</div>' +
         '<div class="case-stat">' + m.name + ' (API): <span class="mono">$' + cA.monthlyUsd.toLocaleString() + '/mo</span></div>' +
         '<div class="case-stat">' + g.name + ': <span class="mono">$' + cG.monthlyUsd.toLocaleString() + '/mo</span> (คุ้มทุน ' + cG.breakEven.toLocaleString() + ' งาน/วัน)</div>' +
@@ -699,6 +1046,15 @@
     for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('active', btns[i].getAttribute('data-tab') === name);
     var panels = document.querySelectorAll('.tab-panel');
     for (var j = 0; j < panels.length; j++) panels[j].classList.toggle('active', panels[j].id === 'tab-' + name);
+    var nodes = document.querySelectorAll('.hero-node');
+    for (var k = 0; k < nodes.length; k++) nodes[k].classList.toggle('active', nodes[k].getAttribute('data-tab') === name);
+  }
+
+  function activateHeroPath(presetIdx, tabName) {
+    applyPreset(presetIdx);
+    switchTab(tabName);
+    var bar = document.querySelector('.answer-bar');
+    if (bar) { bar.classList.remove('hero-flash'); void bar.offsetWidth; bar.classList.add('hero-flash'); }
   }
 
   function copyScenarioLink() {
@@ -706,6 +1062,7 @@
     var params = new URLSearchParams();
     params.set('req', s.req); params.set('steps', s.steps); params.set('inTok', s.inTok);
     params.set('outTok', s.outTok); params.set('cache', s.cache); params.set('hours', s.hours);
+    params.set('selfModel', s.selfModelId); params.set('conc', s.conc); params.set('volume', s.includeVolume ? '1' : '0');
     var shareUrl = window.location.origin + window.location.pathname + '?' + params.toString();
     if (navigator.clipboard) navigator.clipboard.writeText(shareUrl).catch(function () {});
     sendTelemetry('scenario_shared', {});
@@ -738,9 +1095,16 @@
     if (q.has('outTok')) document.getElementById('inp-outtok').value = q.get('outTok');
     if (q.has('cache')) document.getElementById('inp-cache').value = q.get('cache');
     if (q.has('hours')) document.getElementById('inp-hours').value = q.get('hours');
+    if (q.has('selfModel')) document.getElementById('inp-selfmodel').value = q.get('selfModel');
+    if (q.has('conc')) document.getElementById('inp-conc').value = q.get('conc');
+    if (q.has('volume')) document.getElementById('inp-volume').checked = q.get('volume') === '1';
+    if (q.has('tab')) switchTab(q.get('tab'));
 
-    ['inp-req', 'inp-steps', 'inp-intok', 'inp-outtok', 'inp-cache', 'inp-hours'].forEach(function (id) {
+    ['inp-req', 'inp-steps', 'inp-intok', 'inp-outtok', 'inp-cache', 'inp-hours', 'inp-conc'].forEach(function (id) {
       document.getElementById(id).addEventListener('input', function () { recalcAll(true); });
+    });
+    ['inp-selfmodel', 'inp-volume'].forEach(function (id) {
+      document.getElementById(id).addEventListener('change', function () { recalcAll(true); });
     });
 
     renderVpsTable();
