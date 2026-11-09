@@ -143,7 +143,7 @@ qdrant/qdrant:latest</code></pre>
 <div class="mono-val" style="font-size:14px; margin-bottom:4px;">Hostatom Cloud VPS Thailand (4GB RAM / 2 vCPU)</div>
 <div class="sub-val" style="color:var(--green); font-weight:600;">$24/mo (~฿828/mo)</div>
 </div>
-<a class="btn-primary" style="text-align:center; width:100%;" href="https://support.hostatom.com/aff.php?aff=4643&amp;utm_campaign=line-oa-rag-chatbot-blueprint-guide-line-rag-hostatom" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_hostatom',{mode:'cors'}).catch(function(){});">
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://support.hostatom.com/aff.php?aff=4643&amp;utm_campaign=line-oa-rag-chatbot-blueprint-guide-line-rag-hostatom" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('hostatom',0)">
 View Hostatom VPS →
 </a>
 </div>
@@ -153,7 +153,7 @@ View Hostatom VPS →
 <div class="mono-val" style="font-size:14px; margin-bottom:4px;">Ruk-Com Managed Cloud VPS (8GB RAM / 4 vCPU)</div>
 <div class="sub-val" style="color:var(--green); font-weight:600;">$46/mo (~฿1,587/mo)</div>
 </div>
-<a class="btn-primary" style="text-align:center; width:100%;" href="https://portal.ruk-com.cloud/aff.php?aff=1874&amp;utm_campaign=line-oa-rag-chatbot-blueprint-guide-line-rag-rukcom" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_rukcom',{mode:'cors'}).catch(function(){});">
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://portal.ruk-com.cloud/aff.php?aff=1874&amp;utm_campaign=line-oa-rag-chatbot-blueprint-guide-line-rag-rukcom" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('rukcom',0)">
 View Ruk-Com Managed VPS →
 </a>
 </div>
@@ -163,7 +163,7 @@ View Ruk-Com Managed VPS →
 <div class="mono-val" style="font-size:14px; margin-bottom:4px;">Novita AI (DeepSeek V3 / Gemini Flash)</div>
 <div class="sub-val" style="color:var(--green); font-weight:600;">~$10/mo for 75k chats</div>
 </div>
-<a class="btn-primary" style="text-align:center; width:100%;" href="https://novita.ai/?ref=zge5ztg&amp;utm_source=affiliate&amp;utm_campaign=line-oa-rag-chatbot-blueprint-guide-line-rag-novita" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_aimlapi',{mode:'cors'}).catch(function(){});">
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://novita.ai/?ref=zge5ztg&amp;utm_source=affiliate&amp;utm_campaign=line-oa-rag-chatbot-blueprint-guide-line-rag-novita" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('aimlapi',0)">
 Get Novita AI API Key →
 </a>
 </div>
@@ -185,8 +185,14 @@ Affiliate Disclosure: Some links on this page (including Agensi.io, RunPod, Novi
 </footer>
 </div>
 <script>
+var STORAGE_KEY='ai_cost_calc_telemetry_v1',GLOBAL_NS='burapa_ai_cost_calc_live',PAGE_LOCALE='en',PAGE_SLUG='guide-line-oa-rag-chatbot-blueprint';
+function hitGlobalCounter(k){fetch('https://abacus.jasoncameron.dev/hit/'+GLOBAL_NS+'/'+k,{mode:'cors',keepalive:true}).catch(function(){});}
+function getSessionId(){var s=localStorage.getItem('ai_cost_calc_sid');if(!s){s='sess-'+Math.random().toString(36).slice(2,10)+'-'+Date.now();localStorage.setItem('ai_cost_calc_sid',s);hitGlobalCounter('unique_sessions');}return s;}
+function sendTelemetry(t,x){var e=Object.assign({eventId:t+'-'+getSessionId()+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),sessionId:getSessionId(),timestampIso:new Date().toISOString(),eventType:t,locale:PAGE_LOCALE,pageSlug:PAGE_SLUG},x||{});try{var l=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');l.push(e);localStorage.setItem(STORAGE_KEY,JSON.stringify(l));}catch(_){}if(t==='page_view')hitGlobalCounter('page_views');if(t==='affiliate_cta_click'){hitGlobalCounter('affiliate_clicks_total');if(x&&x.affiliateId)hitGlobalCounter('aff_'+x.affiliateId);}fetch('/api/telemetry',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify(e)}).catch(function(){});}
+function recordAffiliateClick(id,usd){sendTelemetry('affiliate_cta_click',{affiliateId:id,estimatedMonthlySpendUsd:usd||0});}
 function toggleTheme(){var r=document.documentElement,n=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('ai_cost_calc_theme',n);}catch(_){}}
 try{var st=localStorage.getItem('ai_cost_calc_theme');if(st){document.documentElement.setAttribute('data-theme',st);}}catch(_){}
+sendTelemetry('page_view',{});
 </script>
 </body>
 </html>

@@ -146,7 +146,7 @@ Always reply in natural, polite Thai.`;</code></pre>
 <div class="mono-val" style="font-size:14px; margin-bottom:4px;">Novita AI (DeepSeek V3 / Qwen 2.5 / Llama 3.3)</div>
 <div class="sub-val" style="color:var(--green); font-weight:600;">$0.15–$0.55 per 1M tokens</div>
 </div>
-<a class="btn-primary" style="text-align:center; width:100%;" href="https://novita.ai/?ref=zge5ztg&amp;utm_source=affiliate&amp;utm_campaign=thai-tokenizer-cost-benchmark-guide-thai-token-novita" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_aimlapi',{mode:'cors'}).catch(function(){});">
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://novita.ai/?ref=zge5ztg&amp;utm_source=affiliate&amp;utm_campaign=thai-tokenizer-cost-benchmark-guide-thai-token-novita" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('aimlapi',0)">
 Get Unified API Key →
 </a>
 </div>
@@ -156,7 +156,7 @@ Get Unified API Key →
 <div class="mono-val" style="font-size:14px; margin-bottom:4px;">Agensi.io — token-budget-architect</div>
 <div class="sub-val" style="color:var(--green); font-weight:600;">$14 one-time workflow skill</div>
 </div>
-<a class="btn-primary" style="text-align:center; width:100%;" href="https://www.agensi.io/r/BURAPA?utm_campaign=thai-tokenizer-cost-benchmark-guide-thai-token-budget-skill" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_agensi',{mode:'cors'}).catch(function(){});">
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://www.agensi.io/r/BURAPA?utm_campaign=thai-tokenizer-cost-benchmark-guide-thai-token-budget-skill" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('agensi',0)">
 View Skill on Agensi.io →
 </a>
 </div>
@@ -178,8 +178,14 @@ Affiliate Disclosure: Some links on this page (including Agensi.io, RunPod, Novi
 </footer>
 </div>
 <script>
+var STORAGE_KEY='ai_cost_calc_telemetry_v1',GLOBAL_NS='burapa_ai_cost_calc_live',PAGE_LOCALE='en',PAGE_SLUG='guide-thai-tokenizer-cost-benchmark';
+function hitGlobalCounter(k){fetch('https://abacus.jasoncameron.dev/hit/'+GLOBAL_NS+'/'+k,{mode:'cors',keepalive:true}).catch(function(){});}
+function getSessionId(){var s=localStorage.getItem('ai_cost_calc_sid');if(!s){s='sess-'+Math.random().toString(36).slice(2,10)+'-'+Date.now();localStorage.setItem('ai_cost_calc_sid',s);hitGlobalCounter('unique_sessions');}return s;}
+function sendTelemetry(t,x){var e=Object.assign({eventId:t+'-'+getSessionId()+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),sessionId:getSessionId(),timestampIso:new Date().toISOString(),eventType:t,locale:PAGE_LOCALE,pageSlug:PAGE_SLUG},x||{});try{var l=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');l.push(e);localStorage.setItem(STORAGE_KEY,JSON.stringify(l));}catch(_){}if(t==='page_view')hitGlobalCounter('page_views');if(t==='affiliate_cta_click'){hitGlobalCounter('affiliate_clicks_total');if(x&&x.affiliateId)hitGlobalCounter('aff_'+x.affiliateId);}fetch('/api/telemetry',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify(e)}).catch(function(){});}
+function recordAffiliateClick(id,usd){sendTelemetry('affiliate_cta_click',{affiliateId:id,estimatedMonthlySpendUsd:usd||0});}
 function toggleTheme(){var r=document.documentElement,n=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('ai_cost_calc_theme',n);}catch(_){}}
 try{var st=localStorage.getItem('ai_cost_calc_theme');if(st){document.documentElement.setAttribute('data-theme',st);}}catch(_){}
+sendTelemetry('page_view',{});
 </script>
 </body>
 </html>

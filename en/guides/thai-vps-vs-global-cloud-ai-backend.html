@@ -136,7 +136,7 @@
 <div class="mono-val" style="font-size:14px; margin-bottom:4px;">Hostatom Cloud VPS Thailand ($24/mo)</div>
 <div class="sub-val" style="color:var(--green); font-weight:600;">$24/mo (~฿828/mo Bangkok DC)</div>
 </div>
-<a class="btn-primary" style="text-align:center; width:100%;" href="https://support.hostatom.com/aff.php?aff=4643&amp;utm_campaign=thai-vps-vs-global-cloud-ai-backend-guide-vps-hostatom" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_hostatom',{mode:'cors'}).catch(function(){});">
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://support.hostatom.com/aff.php?aff=4643&amp;utm_campaign=thai-vps-vs-global-cloud-ai-backend-guide-vps-hostatom" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('hostatom',0)">
 View Hostatom Plans →
 </a>
 </div>
@@ -146,7 +146,7 @@ View Hostatom Plans →
 <div class="mono-val" style="font-size:14px; margin-bottom:4px;">Ruk-Com Managed Cloud VPS ($46/mo)</div>
 <div class="sub-val" style="color:var(--green); font-weight:600;">$46/mo with 24/7 Thai SLA</div>
 </div>
-<a class="btn-primary" style="text-align:center; width:100%;" href="https://portal.ruk-com.cloud/aff.php?aff=1874&amp;utm_campaign=thai-vps-vs-global-cloud-ai-backend-guide-vps-rukcom" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_rukcom',{mode:'cors'}).catch(function(){});">
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://portal.ruk-com.cloud/aff.php?aff=1874&amp;utm_campaign=thai-vps-vs-global-cloud-ai-backend-guide-vps-rukcom" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('rukcom',0)">
 View Ruk-Com Plans →
 </a>
 </div>
@@ -156,7 +156,7 @@ View Ruk-Com Plans →
 <div class="mono-val" style="font-size:14px; margin-bottom:4px;">Cloudways Managed DigitalOcean / Vultr HF ($54/mo)</div>
 <div class="sub-val" style="color:var(--green); font-weight:600;">65+ global data centers</div>
 </div>
-<a class="btn-primary" style="text-align:center; width:100%;" href="https://www.cloudways.com/en/?id=2225344&amp;utm_campaign=thai-vps-vs-global-cloud-ai-backend-guide-vps-cloudways" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_cloudways',{mode:'cors'}).catch(function(){});">
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://www.cloudways.com/en/?id=2225344&amp;utm_campaign=thai-vps-vs-global-cloud-ai-backend-guide-vps-cloudways" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('cloudways',0)">
 View Cloudways Plans →
 </a>
 </div>
@@ -178,8 +178,14 @@ Affiliate Disclosure: Some links on this page (including Agensi.io, RunPod, Novi
 </footer>
 </div>
 <script>
+var STORAGE_KEY='ai_cost_calc_telemetry_v1',GLOBAL_NS='burapa_ai_cost_calc_live',PAGE_LOCALE='en',PAGE_SLUG='guide-thai-vps-vs-global-cloud-ai-backend';
+function hitGlobalCounter(k){fetch('https://abacus.jasoncameron.dev/hit/'+GLOBAL_NS+'/'+k,{mode:'cors',keepalive:true}).catch(function(){});}
+function getSessionId(){var s=localStorage.getItem('ai_cost_calc_sid');if(!s){s='sess-'+Math.random().toString(36).slice(2,10)+'-'+Date.now();localStorage.setItem('ai_cost_calc_sid',s);hitGlobalCounter('unique_sessions');}return s;}
+function sendTelemetry(t,x){var e=Object.assign({eventId:t+'-'+getSessionId()+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),sessionId:getSessionId(),timestampIso:new Date().toISOString(),eventType:t,locale:PAGE_LOCALE,pageSlug:PAGE_SLUG},x||{});try{var l=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');l.push(e);localStorage.setItem(STORAGE_KEY,JSON.stringify(l));}catch(_){}if(t==='page_view')hitGlobalCounter('page_views');if(t==='affiliate_cta_click'){hitGlobalCounter('affiliate_clicks_total');if(x&&x.affiliateId)hitGlobalCounter('aff_'+x.affiliateId);}fetch('/api/telemetry',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify(e)}).catch(function(){});}
+function recordAffiliateClick(id,usd){sendTelemetry('affiliate_cta_click',{affiliateId:id,estimatedMonthlySpendUsd:usd||0});}
 function toggleTheme(){var r=document.documentElement,n=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('ai_cost_calc_theme',n);}catch(_){}}
 try{var st=localStorage.getItem('ai_cost_calc_theme');if(st){document.documentElement.setAttribute('data-theme',st);}}catch(_){}
+sendTelemetry('page_view',{});
 </script>
 </body>
 </html>

@@ -140,7 +140,7 @@
 <div class="mono-val" style="font-size:14px; margin-bottom:4px;">RunPod Cloud GPU (RTX 4090 / A6000 / L40S / A100)</div>
 <div class="sub-val" style="color:var(--green); font-weight:600;">เริ่มต้น $0.44/ชม. (หยุดเครื่องเมื่อไหร่หยุดคิดเงินทันที)</div>
 </div>
-<a class="btn-primary" style="text-align:center; width:100%;" href="https://runpod.io/?ref=gk3w1fiy&amp;utm_campaign=api-to-runpod-vllm-migration-guide-gpu-runpod" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_runpod',{mode:'cors'}).catch(function(){});">
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://runpod.io/?ref=gk3w1fiy&amp;utm_campaign=api-to-runpod-vllm-migration-guide-gpu-runpod" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('runpod',0)">
 ดูราคาเช่าการ์ดจอบน RunPod →
 </a>
 </div>
@@ -150,7 +150,7 @@
 <div class="mono-val" style="font-size:14px; margin-bottom:4px;">Agensi.io — cloud-gpu-breakeven-auditor</div>
 <div class="sub-val" style="color:var(--green); font-weight:600;">$24 จ่ายครั้งเดียว ตรวจจุดคุ้มทุนทั้งโปรเจกต์</div>
 </div>
-<a class="btn-primary" style="text-align:center; width:100%;" href="https://www.agensi.io/r/BURAPA?utm_campaign=api-to-runpod-vllm-migration-guide-gpu-auditor-skill" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_agensi',{mode:'cors'}).catch(function(){});">
+<a class="btn-primary" style="text-align:center; width:100%;" href="https://www.agensi.io/r/BURAPA?utm_campaign=api-to-runpod-vllm-migration-guide-gpu-auditor-skill" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('agensi',0)">
 ดูสกิลคำนวณจุดคุ้มทุน →
 </a>
 </div>
@@ -172,8 +172,14 @@
 </footer>
 </div>
 <script>
+var STORAGE_KEY='ai_cost_calc_telemetry_v1',GLOBAL_NS='burapa_ai_cost_calc_live',PAGE_LOCALE='th',PAGE_SLUG='guide-api-to-runpod-vllm-migration';
+function hitGlobalCounter(k){fetch('https://abacus.jasoncameron.dev/hit/'+GLOBAL_NS+'/'+k,{mode:'cors',keepalive:true}).catch(function(){});}
+function getSessionId(){var s=localStorage.getItem('ai_cost_calc_sid');if(!s){s='sess-'+Math.random().toString(36).slice(2,10)+'-'+Date.now();localStorage.setItem('ai_cost_calc_sid',s);hitGlobalCounter('unique_sessions');}return s;}
+function sendTelemetry(t,x){var e=Object.assign({eventId:t+'-'+getSessionId()+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),sessionId:getSessionId(),timestampIso:new Date().toISOString(),eventType:t,locale:PAGE_LOCALE,pageSlug:PAGE_SLUG},x||{});try{var l=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');l.push(e);localStorage.setItem(STORAGE_KEY,JSON.stringify(l));}catch(_){}if(t==='page_view')hitGlobalCounter('page_views');if(t==='affiliate_cta_click'){hitGlobalCounter('affiliate_clicks_total');if(x&&x.affiliateId)hitGlobalCounter('aff_'+x.affiliateId);}fetch('/api/telemetry',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify(e)}).catch(function(){});}
+function recordAffiliateClick(id,usd){sendTelemetry('affiliate_cta_click',{affiliateId:id,estimatedMonthlySpendUsd:usd||0});}
 function toggleTheme(){var r=document.documentElement,n=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('ai_cost_calc_theme',n);}catch(_){}}
 try{var st=localStorage.getItem('ai_cost_calc_theme');if(st){document.documentElement.setAttribute('data-theme',st);}}catch(_){}
+sendTelemetry('page_view',{});
 </script>
 </body>
 </html>
