@@ -384,7 +384,7 @@ function renderPlaybookGuidePage(
                 <div class="mono-val" style="font-size:14px; margin-bottom:4px;">${escapeHtml(item.name)}</div>
                 <div class="sub-val" style="color:var(--green); font-weight:600;">${escapeHtml(item.priceNote[locale])}</div>
               </div>
-              <a class="btn-primary" style="text-align:center; width:100%;" href="${escapeHtml(affUrl)}" target="_blank" rel="noopener sponsored" onclick="fetch('https://abacus.jasoncameron.dev/hit/burapa_ai_cost_calc_live/aff_${item.affiliateId}',{mode:'cors'}).catch(function(){});">
+              <a class="btn-primary" style="text-align:center; width:100%;" href="${escapeHtml(affUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${item.affiliateId}',0)">
                 ${escapeHtml(item.ctaLabel[locale])}
               </a>
             </div>`;
@@ -416,8 +416,14 @@ function renderPlaybookGuidePage(
     </footer>
   </div>
   <script>
+    var STORAGE_KEY='ai_cost_calc_telemetry_v1',GLOBAL_NS='burapa_ai_cost_calc_live',PAGE_LOCALE='${locale}',PAGE_SLUG='guide-${guide.slug}';
+    function hitGlobalCounter(k){fetch('https://abacus.jasoncameron.dev/hit/'+GLOBAL_NS+'/'+k,{mode:'cors',keepalive:true}).catch(function(){});}
+    function getSessionId(){var s=localStorage.getItem('ai_cost_calc_sid');if(!s){s='sess-'+Math.random().toString(36).slice(2,10)+'-'+Date.now();localStorage.setItem('ai_cost_calc_sid',s);hitGlobalCounter('unique_sessions');}return s;}
+    function sendTelemetry(t,x){var e=Object.assign({eventId:t+'-'+getSessionId()+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),sessionId:getSessionId(),timestampIso:new Date().toISOString(),eventType:t,locale:PAGE_LOCALE,pageSlug:PAGE_SLUG},x||{});try{var l=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');l.push(e);localStorage.setItem(STORAGE_KEY,JSON.stringify(l));}catch(_){}if(t==='page_view')hitGlobalCounter('page_views');if(t==='affiliate_cta_click'){hitGlobalCounter('affiliate_clicks_total');if(x&&x.affiliateId)hitGlobalCounter('aff_'+x.affiliateId);}fetch('/api/telemetry',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify(e)}).catch(function(){});}
+    function recordAffiliateClick(id,usd){sendTelemetry('affiliate_cta_click',{affiliateId:id,estimatedMonthlySpendUsd:usd||0});}
     function toggleTheme(){var r=document.documentElement,n=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('ai_cost_calc_theme',n);}catch(_){}}
     try{var st=localStorage.getItem('ai_cost_calc_theme');if(st){document.documentElement.setAttribute('data-theme',st);}}catch(_){}
+    sendTelemetry('page_view',{});
   </script>
 </body>
 </html>`.replace(/\n[ \t]+/g, '\n');
@@ -1015,12 +1021,13 @@ const APP_DATA=Object.assign(${precomputedCatalogJson},{locale:'${locale}',pageS
 const STORAGE_KEY='ai_cost_calc_telemetry_v1',GLOBAL_NS='burapa_ai_cost_calc_live',SLIDERS=[['req','inp-req'],['steps','inp-steps'],['inTok','inp-intok'],['outTok','inp-outtok'],['cache','inp-cache'],['hours','inp-hours']];
 const $=function(id){return document.getElementById(id);};
 function fmt(n){return n.toLocaleString();}
-function hitGlobalCounter(k){fetch('https://abacus.jasoncameron.dev/hit/'+GLOBAL_NS+'/'+k,{mode:'cors'}).catch(function(){});}
+function hitGlobalCounter(k){fetch('https://abacus.jasoncameron.dev/hit/'+GLOBAL_NS+'/'+k,{mode:'cors',keepalive:true}).catch(function(){});}
 function getSessionId(){let s=localStorage.getItem('ai_cost_calc_sid');if(!s){s='sess-'+Math.random().toString(36).slice(2,10)+'-'+Date.now();localStorage.setItem('ai_cost_calc_sid',s);hitGlobalCounter('unique_sessions');}return s;}
-function sendTelemetry(t,x){const e=Object.assign({eventId:t+'-'+getSessionId()+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),sessionId:getSessionId(),timestampIso:new Date().toISOString(),eventType:t,locale:APP_DATA.locale,pageSlug:APP_DATA.pageSlug},x||{});try{const l=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');l.push(e);localStorage.setItem(STORAGE_KEY,JSON.stringify(l));}catch(_){}if(t==='page_view')hitGlobalCounter('page_views');if(t==='calculation_run')hitGlobalCounter('calculation_runs');if(t==='scenario_shared')hitGlobalCounter('scenarios_shared');if(t==='affiliate_cta_click'){hitGlobalCounter('affiliate_clicks_total');if(x&&x.affiliateId)hitGlobalCounter('aff_'+x.affiliateId);}fetch('/api/telemetry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(e)}).catch(function(){});}
+function sendTelemetry(t,x){const e=Object.assign({eventId:t+'-'+getSessionId()+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),sessionId:getSessionId(),timestampIso:new Date().toISOString(),eventType:t,locale:APP_DATA.locale,pageSlug:APP_DATA.pageSlug},x||{});try{const l=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');l.push(e);localStorage.setItem(STORAGE_KEY,JSON.stringify(l));}catch(_){}if(t==='page_view')hitGlobalCounter('page_views');if(t==='calculation_run')hitGlobalCounter('calculation_runs');if(t==='scenario_shared')hitGlobalCounter('scenarios_shared');if(t==='affiliate_cta_click'){hitGlobalCounter('affiliate_clicks_total');if(x&&x.affiliateId)hitGlobalCounter('aff_'+x.affiliateId);}fetch('/api/telemetry',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify(e)}).catch(function(){});}
 function recordAffiliateClick(id,usd){sendTelemetry('affiliate_cta_click',{affiliateId:id,estimatedMonthlySpendUsd:usd});}
 function buildAffiliateLink(id,slug){const p=APP_DATA.affiliates[id],c=(p.affiliateCode||'ai-cost-calc').trim();if(id==='agensi'){const h=c.replace(/^https?:\\/\\/(www\\.)?agensi\\.io\\/r\\//i,'').replace(/^agensi\\.io\\/r\\//i,'').replace(/^\\/?r\\//i,'').replace(/[^a-zA-Z0-9_-]/g,'')||'BURAPA',u=new URL('https://www.agensi.io/r/'+h);u.searchParams.set('utm_campaign',APP_DATA.pageSlug+'-'+slug);return u.toString();}const u=new URL(p.baseUrl);u.searchParams.set(p.paramKey||'ref',c);if(id==='aimlapi')u.searchParams.set('utm_source','affiliate');u.searchParams.set('utm_campaign',APP_DATA.pageSlug+'-'+slug);return u.toString();}
 let hasLoggedCalcInteraction=false,lastSummaryText='';
+function logCalc(u){if(!hasLoggedCalcInteraction){hasLoggedCalcInteraction=true;sendTelemetry('calculation_run',{estimatedMonthlySpendUsd:u||0});}}
 function findSelfModel(id){return APP_DATA.selfModels.find(function(x){return x.id===id;})||APP_DATA.selfModels[1];}
 function measurePromptSample(){
 const txt=(($('inp-prompt-sample')&&$('inp-prompt-sample').value)||'').trim()||'sample',th=((txt.match(/[\u0E00-\u0E7F]/g))||[]).length,ot=Math.max(0,txt.length-th),tPct=Math.round((th/Math.max(1,txt.length))*100),tFast=Math.max(1,Math.ceil(th*0.42+ot*0.25)),tGpt=Math.max(1,Math.ceil(th*0.68+ot*0.25)),tClaude=Math.max(1,Math.ceil(th*0.92+ot*0.28)),mult=(tClaude/tFast).toFixed(1);
@@ -1060,17 +1067,17 @@ $('svg-lbl-flag').textContent='3. '+flagship.name+' (API)';$('svg-bar-flag').set
 const wName=$('winner-name'),wVerd=$('winner-verdict'),wCta=$('winner-cta');
 if(bestGpu.monthlyUsd<flagship.monthlyUsd){const dUsd=Number((flagship.monthlyUsd-bestGpu.monthlyUsd).toFixed(2)),dThb=Math.round(dUsd*fx);wName.textContent=bestGpu.name+' — $'+fmt(bestGpu.monthlyUsd)+'/mo (฿'+fmt(bestGpu.monthlyThb)+')';wVerd.textContent='${isTh ? 'ที่ปริมาณงาน ' : 'At '}'+fmt(req)+'${isTh ? ' งาน/วัน การเช่าเหมาชั่วโมง (' : ' tasks/day, renting '}'+bestGpu.name+'${isTh ? ') ล็อกงบรายเดือนอยู่ที่ ฿' : ' caps your bill at ฿'}'+fmt(bestGpu.monthlyThb)+'${isTh ? ' ประหยัดกว่า ' : ' — saving ฿'}'+fmt(dThb)+'/mo vs '+flagship.name;wCta.href=bestGpu.url;wCta.textContent='RunPod GPU ↗';wCta.onclick=function(){recordAffiliateClick('runpod',bestGpu.monthlyUsd);};}else{const dUsd=Number((bestGpu.monthlyUsd-flagship.monthlyUsd).toFixed(2)),dThb=Math.round(dUsd*fx);wName.textContent=flagship.name+' — $'+fmt(flagship.monthlyUsd)+'/mo (฿'+fmt(flagship.monthlyThb)+')';wVerd.textContent='${isTh ? 'เมื่อใช้งานไม่ถึง ' : 'Below '}'+fmt(bestGpu.breakEven)+'${isTh ? ' งาน/วัน การจ่ายตามจริงผ่าน API (' : ' tasks/day, pay-per-token API ('}'+flagship.name+'${isTh ? ') ประหยัดกว่าเช่าเครื่องถึง ฿' : ') saves ฿'}'+fmt(dThb)+'/mo';wCta.href=flagship.url;wCta.textContent='Novita AI ↗';wCta.onclick=function(){recordAffiliateClick('aimlapi',flagship.monthlyUsd);};}
 lastSummaryText='[TCO // BENCHMARK.26]\\n• Workload: '+fmt(req)+'/d, '+steps+'x steps, In '+fmt(inTok)+'/Out '+fmt(outTok)+' tok, Cache '+cachePct+'%, '+hours+'h/d\\n• Best API: '+cheapest.name+' — $'+fmt(cheapest.monthlyUsd)+'/mo (฿'+fmt(cheapest.monthlyThb)+')\\n• Hybrid '+rPct+'/'+(100-rPct)+' Router: $'+fmt(hybUsd)+'/mo (฿'+fmt(hybThb)+')\\n• Dedicated GPU: '+bestGpu.name+' — $'+fmt(bestGpu.monthlyUsd)+'/mo (VRAM '+reqVram.toFixed(1)+'GB)\\n• RAG VPS RAM: '+reqRam.toFixed(1)+'GB ('+recTier+'GB+ plan)';
-if(fromUser&&!hasLoggedCalcInteraction){hasLoggedCalcInteraction=true;sendTelemetry('calculation_run',{estimatedMonthlySpendUsd:Math.min(bestGpu.monthlyUsd,flagship.monthlyUsd)});}
+if(fromUser)logCalc(Math.min(bestGpu.monthlyUsd,flagship.monthlyUsd));
 }
 function applyPreset(idx){const p=APP_DATA.presets[idx];if(!p)return;SLIDERS.forEach(function(k){$(k[1]).value=p[k[0]];});document.querySelectorAll('.preset-chip').forEach(function(c,i){c.classList.toggle('active',i===idx);});recalculate(true);}
-function switchTab(name){document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-tab')===name);});document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.toggle('active',p.id==='tab-'+name);});${
+function switchTab(name,initCall){document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-tab')===name);});document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.toggle('active',p.id==='tab-'+name);});if(!initCall)logCalc(0);${
     isComparisonSubpage
       ? ''
       : `document.querySelectorAll('.hero-node').forEach(function(n){n.classList.toggle('active',n.getAttribute('data-tab')===name);});`
   }}${isComparisonSubpage ? '' : `\nfunction activateHeroPath(idx,tab){applyPreset(idx);switchTab(tab);}`}
 function cpTxt(txt,btn,lbl){if(navigator.clipboard)navigator.clipboard.writeText(txt).catch(function(){});$(btn).textContent=lbl;}
-function copyVllmCommand(){cpTxt($('vllm-command').textContent,'btn-copy-vllm','${isTh ? 'คัดลอกแล้ว' : 'Copied'}');}
-function copyVpsCommand(){cpTxt($('vps-docker-command').textContent,'btn-copy-vps','${isTh ? 'คัดลอกแล้ว' : 'Copied'}');}
+function copyVllmCommand(){cpTxt($('vllm-command').textContent,'btn-copy-vllm','${isTh ? 'คัดลอกแล้ว' : 'Copied'}');logCalc(0);sendTelemetry('scenario_shared',{});}
+function copyVpsCommand(){cpTxt($('vps-docker-command').textContent,'btn-copy-vps','${isTh ? 'คัดลอกแล้ว' : 'Copied'}');logCalc(0);sendTelemetry('scenario_shared',{});}
 function buildShareUrl(){const p=new URLSearchParams();SLIDERS.forEach(function(k){p.set(k[0],$(k[1]).value);});p.set('selfModel',$('inp-selfmodel').value);p.set('conc',$('inp-conc').value);p.set('volume',$('inp-volume').checked?'1':'0');return window.location.origin+window.location.pathname+'?'+p.toString();}
 function copyScenarioLink(){cpTxt(buildShareUrl(),'btn-share','${isTh ? 'คัดลอกลิงก์เรียบร้อยแล้ว' : 'Link Copied'}');sendTelemetry('scenario_shared',{});}
 function copyExecSummary(){cpTxt(lastSummaryText+'\\n• Link: '+buildShareUrl(),'btn-copy-summary','${isTh ? 'คัดลอกสรุปงบแล้ว' : 'Summary Copied'}');sendTelemetry('scenario_shared',{});}
@@ -1078,7 +1085,7 @@ function toggleTheme(){const r=document.documentElement,n=r.getAttribute('data-t
 (function init(){
 try{const st=localStorage.getItem('ai_cost_calc_theme');if(st){document.documentElement.setAttribute('data-theme',st);}}catch(_){}
 const q=new URLSearchParams(window.location.search);
-SLIDERS.forEach(function(k){if(q.has(k[0]))$(k[1]).value=q.get(k[0]);});if(q.has('selfModel'))$('inp-selfmodel').value=q.get('selfModel');if(q.has('conc'))$('inp-conc').value=q.get('conc');if(q.has('volume'))$('inp-volume').checked=q.get('volume')==='1';if(q.has('tab'))switchTab(q.get('tab'));
+SLIDERS.forEach(function(k){if(q.has(k[0]))$(k[1]).value=q.get(k[0]);});if(q.has('selfModel'))$('inp-selfmodel').value=q.get('selfModel');if(q.has('conc'))$('inp-conc').value=q.get('conc');if(q.has('volume'))$('inp-volume').checked=q.get('volume')==='1';if(q.has('tab'))switchTab(q.get('tab'),true);
 ['inp-req','inp-steps','inp-intok','inp-outtok','inp-cache','inp-hours','inp-conc','inp-router-pct','inp-prompt-sample'].forEach(function(id){if($(id))$(id).addEventListener('input',function(){recalculate(true);});});
 ['inp-selfmodel','inp-volume','inp-hybrid-router','inp-rag-docs','inp-rag-stack'].forEach(function(id){if($(id))$(id).addEventListener('change',function(){recalculate(true);});});
 recalculate(false);sendTelemetry('page_view',{});

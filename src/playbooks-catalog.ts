@@ -286,12 +286,12 @@ export function renderSpecificMatchupCard(
         <div class="decision-box">
           <div class="decision-badge">${isTh ? `เมื่อไหร่ควรเลือก ${cheaper.name}` : `When to pick ${cheaper.name}`}</div>
           <p class="benefit-desc">${isTh ? `${cheaper.summary.th} — เหมาะเป็นโมเดลหลักรับงาน 80% แรกเพื่อคุมงบรายเดือนให้ต่ำที่สุด` : `${cheaper.summary.en} — Best as your primary workhorse for 80% of daily requests.`}</p>
-          <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(cheaper.id === m1.id ? url1 : url2)}" target="_blank" rel="noopener sponsored">${isTh ? `ใช้ ${cheaper.name} ในบิลเดียว →` : `Run ${cheaper.name} →`}</a>
+          <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(cheaper.id === m1.id ? url1 : url2)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${cheaper.affiliateId}',0)">${isTh ? `ใช้ ${cheaper.name} ในบิลเดียว →` : `Run ${cheaper.name} →`}</a>
         </div>
         <div class="decision-box">
           <div class="decision-badge">${isTh ? `เมื่อไหร่ควรเลือก ${pricier.name}` : `When to pick ${pricier.name}`}</div>
           <p class="benefit-desc">${isTh ? `${pricier.summary.th} — เรียกใช้เฉพาะงานที่ต้องการความแม่นยำสูงหรือแก้โค้ดหลายไฟล์` : `${pricier.summary.en} — Route complex multi-step reasoning here when accuracy is critical.`}</p>
-          <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(pricier.id === m1.id ? url1 : url2)}" target="_blank" rel="noopener sponsored">${isTh ? `ใช้ ${pricier.name} ในบิลเดียว →` : `Run ${pricier.name} →`}</a>
+          <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(pricier.id === m1.id ? url1 : url2)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${pricier.affiliateId}',0)">${isTh ? `ใช้ ${pricier.name} ในบิลเดียว →` : `Run ${pricier.name} →`}</a>
         </div>
       </div>
     </div>`;
@@ -315,13 +315,13 @@ export function renderSpecificMatchupCard(
         <div class="decision-box">
           <div class="decision-badge">${isTh ? `1. ใช้ ${model.name} API เมื่อยอดยังไม่ถึง ~$${gpuMonthly10h}/เดือน` : `1. Stay on ${model.name} API below ~$${gpuMonthly10h}/mo`}</div>
           <p class="benefit-desc">${isTh ? `จ่ายตามจริง Input $${model.inputUsdPer1M}/1M (Cache $${model.cachedInputUsdPer1M}/1M) ไม่ต้องดูแลการ์ดจอเอง เหมาะกับช่วงเริ่มต้นหรือทราฟฟิกมาเป็นช่วงๆ` : `Pay per token ($${model.inputUsdPer1M}/1M in, $${model.cachedInputUsdPer1M}/1M cached) with zero ops overhead during spiky or low-volume phases.`}</p>
-          <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(apiUrl)}" target="_blank" rel="noopener sponsored">${isTh ? `ใช้ ${model.name} แบบจ่ายตามจริง →` : `Start with ${model.name} API →`}</a>
+          <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(apiUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${model.affiliateId}',${gpuMonthly10h})">${isTh ? `ใช้ ${model.name} แบบจ่ายตามจริง →` : `Start with ${model.name} API →`}</a>
         </div>
         <div class="decision-box">
           <div class="decision-badge">${isTh ? `2. ย้ายมาเช่า ${gpu.name} ($${gpu.hourlyUsd}/ชม.) เมื่อต้องการล็อกงบ` : `2. Switch to ${gpu.name} ($${gpu.hourlyUsd}/hr) for Flat TCO`}</div>
           <p class="benefit-desc">${isTh ? `ได้ VRAM ${gpu.vramGb}GB (~${gpu.throughputTokensPerSec} tok/s) เปิดวันละ 10 ชม. จ่ายคงที่ ~$${gpuMonthly10h}/เดือน (~฿${gpuThb10h.toLocaleString()}) เหมาะรัน: ${gpu.bestForModels}` : `${gpu.vramGb}GB VRAM (~${gpu.throughputTokensPerSec} tok/s) caps 10h/day usage at ~$${gpuMonthly10h}/mo. Ideal for: ${gpu.bestForModels}.`}</p>
           <code style="display:block; margin-top:8px; padding:6px 10px; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:5px; font-size:0.74rem; font-family:var(--mono); overflow-x:auto;">vllm serve Qwen/Qwen2.5-Coder-32B-Instruct --enable-prefix-caching --max-model-len 32768</code>
-          <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(gpuUrl)}" target="_blank" rel="noopener sponsored">${isTh ? `เช่า ${gpu.name} บน RunPod →` : `Deploy ${gpu.name} on RunPod →`}</a>
+          <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(gpuUrl)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${gpu.affiliateId}',${gpuMonthly10h})">${isTh ? `เช่า ${gpu.name} บน RunPod →` : `Deploy ${gpu.name} on RunPod →`}</a>
         </div>
       </div>
     </div>`;
@@ -343,12 +343,12 @@ export function renderSpecificMatchupCard(
         <div class="decision-box">
           <div class="decision-badge">${esc(v1.name)} — $${v1.monthlyUsd}/mo (฿${Math.round(v1.monthlyUsd * fx).toLocaleString()})</div>
           <p class="benefit-desc">${v1.vcpu} vCPU / ${v1.ramGb}GB RAM (${v1.region.toUpperCase()}). ${esc(v1.summary[locale])}</p>
-          <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(u1)}" target="_blank" rel="noopener sponsored">${isTh ? 'ดูแพ็กเกจเซิร์ฟเวอร์นี้ →' : 'View Server Plan →'}</a>
+          <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(u1)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${v1.affiliateId}',${v1.monthlyUsd})">${isTh ? 'ดูแพ็กเกจเซิร์ฟเวอร์นี้ →' : 'View Server Plan →'}</a>
         </div>
         <div class="decision-box">
           <div class="decision-badge">${esc(v2.name)} — $${v2.monthlyUsd}/mo (฿${Math.round(v2.monthlyUsd * fx).toLocaleString()})</div>
           <p class="benefit-desc">${v2.vcpu} vCPU / ${v2.ramGb}GB RAM (${v2.region.toUpperCase()}). ${esc(v2.summary[locale])}</p>
-          <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(u2)}" target="_blank" rel="noopener sponsored">${isTh ? 'ดูแพ็กเกจเซิร์ฟเวอร์นี้ →' : 'View Server Plan →'}</a>
+          <a class="action-link" style="display:inline-block; margin-top:8px;" href="${esc(u2)}" target="_blank" rel="noopener sponsored" onclick="recordAffiliateClick('${v2.affiliateId}',${v2.monthlyUsd})">${isTh ? 'ดูแพ็กเกจเซิร์ฟเวอร์นี้ →' : 'View Server Plan →'}</a>
         </div>
       </div>
     </div>`;

@@ -85,6 +85,9 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
     const enCompare = fs.readFileSync(enSubpagePath, 'utf8');
     assert.equal(enCompare.includes('Claude 3.7 Sonnet vs. RunPod NVIDIA A100 PCIe (80GB)'), true);
     assert.equal(enCompare.includes('class="matchup-spotlight"'), true);
+    assert.equal(enCompare.includes("onclick=\"recordAffiliateClick('aimlapi'"), true);
+    assert.equal(enCompare.includes("onclick=\"recordAffiliateClick('runpod'"), true);
+    assert.equal(enCompare.includes('keepalive:true'), true);
     assert.equal(enCompare.includes('<svg'), true);
     assert.equal(enCompare.includes('id="inp-prompt-sample"'), true);
     assert.equal(enCompare.includes('id="inp-hybrid-router"'), true);
@@ -128,6 +131,10 @@ test('Pre-mortem #3: generateStaticSite is idempotent across reruns and creates 
     assert.equal(thGuide.includes('<svg'), true);
     assert.equal(thGuide.includes('Hostatom'), true);
     assert.equal(thGuide.includes('Ruk-Com'), true);
+    assert.equal(thGuide.includes('unique_sessions'), true);
+    assert.equal(thGuide.includes('page_views'), true);
+    assert.equal(thGuide.includes('affiliate_clicks_total'), true);
+    assert.equal(thGuide.includes("onclick=\"recordAffiliateClick('hostatom'"), true);
     assert.equal(Buffer.byteLength(thGuide, 'utf8') < 65_000, true);
   } finally {
     fs.rmSync(tmpRoot, { recursive: true, force: true });

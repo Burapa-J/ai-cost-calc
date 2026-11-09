@@ -4,6 +4,7 @@ import { sanitizeIndexNowKey } from './calculator.ts';
 import type { AffiliateConfigFile } from './domain.ts';
 import { generateStaticSite } from './generator.ts';
 import { buildProgrammaticPagesCatalog } from './pages-catalog.ts';
+import { buildPlaybooksCatalog } from './playbooks-catalog.ts';
 
 const rootDir = path.resolve(import.meta.dirname, '..');
 const configPath = path.join(rootDir, 'config', 'affiliates.json');
@@ -26,10 +27,13 @@ async function run() {
   const key = sanitizeIndexNowKey(config.indexNowKey);
   const parsedBase = new URL(publicBaseUrl);
   const catalog = buildProgrammaticPagesCatalog();
+  const playbooks = buildPlaybooksCatalog();
 
   const urlList: string[] = [
     `${publicBaseUrl}/th/index.html`,
     `${publicBaseUrl}/en/index.html`,
+    ...playbooks.map((g) => `${publicBaseUrl}/th/guides/${g.slug}.html`),
+    ...playbooks.map((g) => `${publicBaseUrl}/en/guides/${g.slug}.html`),
     ...catalog.map((p) => `${publicBaseUrl}/th/compare/${p.slug}.html`),
     ...catalog.map((p) => `${publicBaseUrl}/en/compare/${p.slug}.html`)
   ];
