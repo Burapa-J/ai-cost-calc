@@ -1,0 +1,18 @@
+# devguard gate: checks that must pass before a commit or a push.
+# One per line: <stage> <name>: <command>
+#   stage "commit" runs on every commit (keep it fast); "push" runs before push (slow suites).
+# Agents: run `devguard check` before calling a task done, and never bypass with --no-verify.
+
+# --- Stack Checks (uncomment the lines matching your repository) ---
+commit typecheck: npx tsc --noEmit
+push   test:      npm test
+
+# commit build: swift build
+# push   test:  swift test
+
+# commit check: cargo check --quiet
+# push   test:  cargo test
+
+# --- Security Gates (enabled by default in devguard v1.1.0) ---
+commit secrets: gitleaks git --staged --redact --no-banner .
+push   deps:    osv-scanner scan source -r . --allow-no-lockfiles

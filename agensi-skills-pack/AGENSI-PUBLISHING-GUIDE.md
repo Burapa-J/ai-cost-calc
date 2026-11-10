@@ -1,9 +1,10 @@
 # คู่มือวางขายแพ็กเกจ SKILL.md บน Agensi.io/sell และรับรหัส Affiliate (ตามคำแนะนำของ Joeri Brons)
 
-ไฟล์ ZIP ทั้ง **3 ชิ้น** ถูกจัดโครงสร้างใหม่ให้มีไฟล์ **`SKILL.md` อยู่ชั้นนอกสุด (Root of the ZIP)** ตามที่ระบบอัปโหลดของ `https://www.agensi.io/sell` กำหนดทุกประการ และปรับราคาให้อยู่ในช่วงขายดี `$10–$30` สำหรับ Single-Purpose Skill เรียบร้อยแล้วครับ:
-1. `agensi-skills-pack/token-budget-architect.zip` (`SKILL.md` อยู่ที่ Root ของ ZIP) — ราคาแนะนำ **`$14`**
-2. `agensi-skills-pack/swiss-minimal-ui-ledger.zip` (`SKILL.md` อยู่ที่ Root ของ ZIP) — ราคาแนะนำ **`$19`**
-3. `agensi-skills-pack/cloud-gpu-breakeven-auditor.zip` (`SKILL.md` อยู่ที่ Root ของ ZIP) — ราคาแนะนำ **`$24`**
+ไฟล์ ZIP ทั้ง **4 ชิ้น** ถูกจัดโครงสร้างให้มีไฟล์ **`SKILL.md` อยู่ชั้นนอกสุด (Root of the ZIP)** ตามที่ระบบอัปโหลดของ `https://www.agensi.io/sell` กำหนดทุกประการ และปรับราคาให้อยู่ในช่วงขายดี `$10–$30` สำหรับ Single-Purpose Skill เรียบร้อยแล้วครับ:
+1. `agensi-skills-pack/devguard.zip` (`v1.1.0` — `SKILL.md` + `references/` + `templates/` อยู่ที่ Root ของ ZIP) — ราคา **`$19`** (Deal `$15`)
+2. `agensi-skills-pack/token-budget-architect.zip` (`SKILL.md` อยู่ที่ Root ของ ZIP) — ราคา **`$14`** (Deal `$11`)
+3. `agensi-skills-pack/swiss-minimal-ui-ledger.zip` (`SKILL.md` อยู่ที่ Root ของ ZIP) — ราคา **`$19`** (Deal `$15`)
+4. `agensi-skills-pack/cloud-gpu-breakeven-auditor.zip` (`SKILL.md` อยู่ที่ Root ของ ZIP) — ราคา **`$24`** (Deal `$19`)
 
 ---
 
